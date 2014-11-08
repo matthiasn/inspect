@@ -1,4 +1,4 @@
-(ns com.matthiasnehlsen.inspect.http.component
+(ns com.matthiasnehlsen.inspect.http
   (:gen-class)
   (:require
    [clojure.tools.logging :as log]
