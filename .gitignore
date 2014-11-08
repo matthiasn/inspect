@@ -7,3 +7,6 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
+
+resources/public/js/build/
+resources/public/bower_components/
