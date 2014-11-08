@@ -10,13 +10,13 @@
 
 (defn interval-put-loop
   "put msg on chan every interval milliseonds"
-  [interval chan msg]
-  (go-loop [] (<! (timeout interval)) (put! chan msg) (recur)))
+  [interval msg-type msg]
+  (go-loop [] (<! (timeout interval)) (inspect msg-type msg) (recur)))
 
-(interval-put-loop  1000 inspect/in-chan {:origin :every-second :payload {:msg "every second"}})
-(interval-put-loop  5000 inspect/in-chan {:origin :every-five-seconds :payload {:msg "every five seconds"}})
-(interval-put-loop 10000 inspect/in-chan {:origin :every-ten-seconds :payload {:msg "every ten seconds"}})
-(interval-put-loop 60000 inspect/in-chan {:origin :every-minute :payload {:msg "every minute"}})
+(interval-put-loop  1000 :interval-put {:origin :every-second :payload {:msg "every second"}})
+(interval-put-loop  5000 :interval-put {:origin :every-five-seconds :payload {:msg "every five seconds"}})
+(interval-put-loop 10000 :interval-put {:origin :every-ten-seconds :payload {:msg "every ten seconds"}})
+(interval-put-loop 60000 :interval-put {:origin :every-minute :payload {:msg "every minute"}})
 
 (defn reload [] (inspect/stop) (refresh) (inspect/start))
 
