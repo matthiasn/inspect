@@ -1,6 +1,9 @@
 (ns com.matthiasnehlsen.inspect.main
   (:gen-class)
   (:require
+   [com.matthiasnehlsen.inspect.matcher.component :as matcher]
+   [clojure.tools.namespace.repl :refer (refresh)]
+   [com.matthiasnehlsen.inspect.http.component :as http]
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]
    [clojure.pprint :as pp]
@@ -8,27 +11,32 @@
 
 (def inspect-chan (chan))
 
-(go-loop [] (<! (timeout 1000))
-         (put! inspect-chan {:origin :every-second :payload "every second"})
-         (recur))
+(defn interval-put-loop
+  "put msg on chan every interval milliseonds"
+  [interval chan msg]
+  (go-loop [] (<! (timeout interval)) (put! chan msg) (recur)))
 
-(go-loop [] (<! (timeout 5000))
-         (put! inspect-chan {:origin :every-five-seconds :payload "every five seconds"})
-         (recur))
+(interval-put-loop  1000 inspect-chan {:origin :every-second :payload {:msg "every second"}})
+(interval-put-loop  5000 inspect-chan {:origin :every-five-seconds :payload {:msg "every five seconds"}})
+(interval-put-loop 10000 inspect-chan {:origin :every-ten-seconds :payload {:msg "every ten seconds"}})
+(interval-put-loop 60000 inspect-chan {:origin :every-minute :payload {:msg "every minute"}})
 
-(go-loop [] (<! (timeout 10000))
-         (put! inspect-chan {:origin :every-ten-seconds :payload "every ten seconds"})
-         (recur))
+(def conf {:port 8000})
 
-(go-loop [] (<! (timeout 60000))
-         (put! inspect-chan {:origin :every-minute :payload "every minute"})
-         (recur))
+(defn get-system
+  "Create system by wiring individual components so that component/start
+  will bring up the individual components in the correct order."
+  [conf]
+  (component/system-map
+   :matcher (matcher/new-matcher inspect-chan)
+   :http    (component/using (http/new-http-server conf) {:matcher :matcher})))
 
-(go-loop []
-         (let [msg (<! inspect-chan)]
-           (log/info (pp/pprint msg)))
-         (recur))
+(def system (get-system conf))
+
+(defn start [] (alter-var-root #'system component/start))
+(defn stop [] (alter-var-root #'system component/stop))
+(defn reload [] (stop) (refresh) (start))
 
 (defn -main [& args]
   (log/info "Application started")
-  (Thread/sleep Long/MAX_VALUE))
+  (start))

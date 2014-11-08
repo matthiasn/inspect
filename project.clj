@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/tools.logging "0.3.0"]
+                 [org.clojure/tools.namespace "0.2.7"]
                  [ch.qos.logback/logback-classic "1.1.1"]
                  [com.taoensso/sente "1.2.0" :exclusions [org.clojure/clojure]]
                  [org.clojure/core.match "0.2.1"]
@@ -24,15 +25,9 @@
 
   :plugins [[lein-cljsbuild "1.0.3"]]
 
-  :cljsbuild {:builds [{:id "dev"
+  :cljsbuild {:builds [{:id "release"
                         :source-paths ["src/cljs"]
-                        :compiler {:output-to "resources/public/js/build/birdwatch.js"
-                                   :output-dir "resources/public/js/build/out"
-                                   :optimizations :simple
-                                   :source-map "resources/public/js/build/birdwatch.js.map"}}
-                       {:id "release"
-                        :source-paths ["src/cljs"]
-                        :compiler {:output-to "resources/public/js/build/birdwatch-opt.js"
+                        :compiler {:output-to "resources/public/js/build/inspect-opt.js"
                                    :optimizations :advanced
-                                   ;:preamble ["react/react.min.js"]
-                                   :externs ["externs/react.js" "externs/misc.js"]}}]})
+                                   ;:externs ["externs/react.js" "externs/misc.js"]
+                                   }}]})
