@@ -17,7 +17,11 @@
 (defn lister [items]
   [:div
    (for [item items]
-     [:pre [:code (:pp item)]])])
+     [:div
+      [:h4 (str (:origin item))]
+      [:p (:received item)]
+      [:pre [:code (:payload item)]]
+      [:br]])])
 
 (defn lister-user []
   [:div
