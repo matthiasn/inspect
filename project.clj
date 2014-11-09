@@ -16,7 +16,7 @@
                  [ring/ring-defaults "0.1.1"]
                  [clj-time "0.8.0"]
                  [org.clojure/clojurescript "0.0-2371"]
-                 [om "0.8.0-alpha1"]
+                 [reagent "0.4.3"]
                  [com.stuartsierra/component "0.2.2"]]
 
   :source-paths ["src/clj/"]
@@ -28,6 +28,4 @@
   :cljsbuild {:builds [{:id "release"
                         :source-paths ["src/cljs"]
                         :compiler {:output-to "resources/public/js/build/inspect-opt.js"
-                                   :optimizations :advanced
-                                   ;:externs ["externs/react.js" "externs/misc.js"]
-                                   }}]})
+                                   :optimizations :advanced}}]})

@@ -15,12 +15,10 @@
   (def chsk-state state))  ; Watchable, read-only atom
 
 (defn- event-handler [{:keys [event]}]
-  (print event)
-  #_(match event
-         [:chsk/recv  payload]
+  (match event
+         [:chsk/recv payload]
          (let [[msg-type msg] payload]
-           (match [msg-type msg]
-                  [:info/new msg] (print msg)))
+           (swap! appstate/app assoc :events (conj (:events @appstate/app) msg)))
          :else (print "Unmatched event: %s" event)))
 
 (defonce chsk-router (sente/start-chsk-router! ch-chsk event-handler))
