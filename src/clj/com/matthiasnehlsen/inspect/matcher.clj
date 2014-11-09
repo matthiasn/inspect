@@ -40,7 +40,7 @@
                 (when-not (= msg :stop-loop)
                   (doseq [uid (:any @uids)]
                     (when (pos? (get (:clients @app) uid 0))
-                      (chsk-send! uid [:info/msg {:pp (with-out-str (pp/pprint msg))}])
+                      (chsk-send! uid [:info/msg (assoc msg :payload (with-out-str (pp/pprint (:payload msg))))])
                       (swap! app update-in [:clients uid] dec)))
                   (recur)))))
 
