@@ -12,7 +12,7 @@
 
 (defn inspect
   "Send message to inspect sub-system with msg-type"
-  [msg-type msg] (put! in-chan [msg-type msg]))
+  [msg-type msg] (put! in-chan {:origin msg-type :payload msg}))
 
 (def conf {:port 8000})
 
@@ -21,7 +21,7 @@
   will bring up the individual components in the correct order."
   [conf]
   (component/system-map
-   :matcher (matcher/new-matcher in-chan)
+   :matcher (matcher/new-matcher in-chan inspect)
    :http    (component/using (http/new-http-server conf) {:matcher :matcher})))
 
 (def system (get-system conf))

@@ -10,6 +10,10 @@
 
 (defn by-id [id] (.getElementById js/document id))
 
+(defn get-next
+  []
+  (comm/chsk-send! [:cmd/get-next {:next-n 10}]))
+
 (defn lister [items]
   [:div
    (for [item items]
@@ -17,7 +21,7 @@
 
 (defn lister-user []
   [:div
-   "Events:"
+   [:button#get-next {:on-click get-next} "Next"]
    [lister (reverse (:events @appstate/app))]])
 
 (defn run []
