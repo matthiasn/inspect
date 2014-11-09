@@ -6,13 +6,17 @@
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]
    [clojure.pprint :as pp]
+   [clj-time.core :as t]
+   [clj-time.format :as f]
    [clojure.core.async :as async :refer [<! chan put! timeout go-loop]]))
 
 (def in-chan (chan))
 
+(def built-in-formatter (f/formatters :date-time))
+
 (defn inspect
   "Send message to inspect sub-system with msg-type"
-  [msg-type msg] (put! in-chan {:origin msg-type :payload msg}))
+  [msg-type msg] (put! in-chan {:origin msg-type :received (f/unparse built-in-formatter (t/now)) :payload msg}))
 
 (def conf {:port 8000})
 
