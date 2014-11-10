@@ -1,6 +1,6 @@
 # inspect
 
-A Clojure library designed to inspect messages flowing through a CSP-style system built on top of core.async.
+Library / tool for inspecting messages. Not usable yet.
 
 ## Usage
 
