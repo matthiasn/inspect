@@ -35,8 +35,11 @@
   "start listener for all event types, limited to the next n for each"
   [params full-event]
   (let [uid (strip-uid (:client-uuid full-event))
-        n (:n params)]
-    (log/info (into {} (map (fn [t] [t n]) (seq @known-event-types))))))
+        n (:n params)
+        client-map (into {} (map (fn [t] [t n]) (seq @known-event-types)))]
+
+    (swap! client-maps assoc-in [uid] client-map)
+    (log/info client-maps)))
 
 (defn send-event-types
   "send set with known event types to connected UIs"
