@@ -23,7 +23,9 @@
                                                         (reset! appstate/known-event-types event-types)
                                                         (reset! appstate/selected-event-types event-types))
                 :else (print "Unkown msg-type " payload))
-         [:chsk/state state] (when (:open? state) (chsk-send! [:cmd/get-event-types]))
+         [:chsk/state state] (when (:open? state)
+                               (chsk-send! [:cmd/get-event-types])
+                               (chsk-send! [:cmd/initialize {:n 10}]))
          :else (print "Unmatched event: %s" event)))
 
 (defonce chsk-router (sente/start-chsk-router! ch-chsk event-handler))

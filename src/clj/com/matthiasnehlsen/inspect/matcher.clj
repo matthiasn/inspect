@@ -16,13 +16,27 @@
     uid))
 
 (def clients (atom {}))
+(def client-maps (atom {}))
 (def known-event-types (atom #{}))
+
+(defn strip-uid
+  "for some reason, the :client-uuid is longer than expected. This strips the
+   uuid string to the expected length as used elsewhere"
+  [client-uuid]
+  (subs client-uuid 0 36))
 
 (defn get-next
   "get next items for the specified event types"
   [params full-event]
   (let [next-n (:next-n params)]
-    (swap! clients update-in [(subs (:client-uuid full-event) 0 36)] (fn [n] (if n (+ n next-n) next-n)))))
+    (swap! clients update-in [(strip-uid (:client-uuid full-event))] (fn [n] (if n (+ n next-n) next-n)))))
+
+(defn initialize-inspector
+  "start listener for all event types, limited to the next n for each"
+  [params full-event]
+  (let [uid (strip-uid (:client-uuid full-event))
+        n (:n params)]
+    (log/info (into {} (map (fn [t] [t n]) (seq @known-event-types))))))
 
 (defn send-event-types
   "send set with known event types to connected UIs"
@@ -38,6 +52,7 @@
       (inspect-fn :ws/event-in full-event)
       (match event
              [:cmd/get-next params] (get-next params full-event)
+             [:cmd/initialize params] (initialize-inspector params full-event)
              [:cmd/get-event-types] (send-event-types uids chsk-send!)
              [:chsk/ws-ping]    () ; currently just do nothing with ping (no logging either)
              :else              (log/debug "Unmatched event:" (pp/pprint event))))))
