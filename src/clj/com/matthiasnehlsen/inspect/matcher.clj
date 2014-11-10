@@ -18,7 +18,9 @@
 (def clients (atom {}))
 (def known-event-types (atom #{}))
 
-(defn get-next [params full-event]
+(defn get-next
+  "get next items for the specified event types"
+  [params full-event]
   (let [next-n (:next-n params)]
     (swap! clients update-in [(subs (:client-uuid full-event) 0 36)] (fn [n] (if n (+ n next-n) next-n)))))
 
