@@ -12,7 +12,7 @@
 
 (defn get-next
   []
-  (comm/chsk-send! [:cmd/get-next {:next-n 10}]))
+  (comm/chsk-send! [:cmd/get-next {:next-n (:next-n @appstate/app)}]))
 
 (defn lister [items]
   [:div
@@ -26,6 +26,10 @@
 (defn lister-user []
   [:div
    [:button#get-next {:on-click get-next} "Next"]
+     [:input {:type "number"
+           :value (:next-n @appstate/app)
+           :on-change #(let [value (js/parseInt (-> % .-target .-value))]
+                        (when-not (or (js/isNaN value) (neg? value)) (swap! appstate/app assoc :next-n value)))}]
    [lister (reverse (:events @appstate/app))]])
 
 (defn run []
