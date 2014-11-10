@@ -56,6 +56,8 @@
 (defn inspect-view []
   [:div
    [known-types @appstate/known-event-types appstate/selected-event-types]
+   [:br]
+   [:br]
    [:button#get-next {:on-click get-next} "Next"]
    [:input {:type "number"
             :value (:next-n @appstate/app)
