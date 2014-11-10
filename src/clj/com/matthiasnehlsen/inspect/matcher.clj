@@ -37,9 +37,7 @@
   (let [uid (strip-uid (:client-uuid full-event))
         n (:n params)
         client-map (into {} (map (fn [t] [t n]) (seq @known-event-types)))]
-
-    (swap! client-maps assoc-in [uid] client-map)
-    (log/info client-maps)))
+    (swap! client-maps assoc-in [uid] client-map)))
 
 (defn send-event-types
   "send set with known event types to connected UIs"
@@ -54,11 +52,11 @@
     (let [event (:event full-event)]
       (inspect-fn :ws/event-in full-event)
       (match event
-             [:cmd/get-next params] (get-next params full-event)
+             [:cmd/get-next params]   (get-next params full-event)
              [:cmd/initialize params] (initialize-inspector params full-event)
-             [:cmd/get-event-types] (send-event-types uids chsk-send!)
-             [:chsk/ws-ping]    () ; currently just do nothing with ping (no logging either)
-             :else              (log/debug "Unmatched event:" (pp/pprint event))))))
+             [:cmd/get-event-types]   (send-event-types uids chsk-send!)
+             [:chsk/ws-ping]          () ; currently just do nothing with ping (no logging either)
+             :else                    (log/debug "Unmatched event:" (pp/pprint event))))))
 
 (defn send-loop
   "run loop, call chsk-send! with message on channel"
@@ -66,15 +64,13 @@
   (go-loop [] (let [msg (<! channel)
                     origin (:origin msg)]
                 (when-not (= msg :stop-loop)
-
                   (when-not (contains? @known-event-types origin)
                     (swap! known-event-types conj origin)
                     (send-event-types uids chsk-send!))
-
                   (doseq [uid (:any @uids)]
-                    (when (pos? (get @clients uid 0))
+                    (when (pos? (get-in @client-maps [uid origin] 0))
                       (chsk-send! uid [:info/msg (assoc msg :payload (with-out-str (pp/pprint (:payload msg))))])
-                      (swap! clients update-in [uid] dec)))
+                      (swap! client-maps update-in [uid origin] dec)))
                   (recur)))))
 
 (defrecord Matcher [inspect-chan inspect-fn chsk-router]
