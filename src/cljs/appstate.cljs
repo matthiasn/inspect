@@ -5,7 +5,10 @@
 
 (enable-console-print!)
 
-;;; Application state in a single atom
-;;; Will be initialized with the map returned by util/initial-state.
-;;; Reset to a new clean slate when a new search is started.
+;;; Application state in reagent's watched atoms
+
 (def app (atom {:events [] :next-n 10}))
+
+(def known-event-types (atom #{}))
+(def selected-event-types (atom #{}))
+

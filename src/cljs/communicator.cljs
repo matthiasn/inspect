@@ -17,9 +17,14 @@
 (defn- event-handler [{:keys [event]}]
   (match event
          [:chsk/recv payload]
-         (let [[msg-type msg] payload]
-           ;(print (js/hljs.highlight "clojure" (:pp msg)))
-           (swap! appstate/app assoc :events (conj (:events @appstate/app) msg)))
-         :else (print "Unmatched event: %s" event)))
+         (match payload
+                [:info/msg msg] (swap! appstate/app assoc :events (conj (:events @appstate/app) msg))
+                [:info/known-event-types event-types] (do
+                                                        (reset! appstate/known-event-types event-types)
+                                                        (reset! appstate/selected-event-types event-types))
+                :else (print "Unkown msg-type " payload))
+         [:chsk/state state] (when (:open? state) (chsk-send! [:cmd/get-event-types]))
+         :else (print "Unmatched event: %s" event))
+  (print appstate/known-event-types))
 
 (defonce chsk-router (sente/start-chsk-router! ch-chsk event-handler))
