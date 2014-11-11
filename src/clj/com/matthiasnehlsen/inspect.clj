@@ -14,9 +14,13 @@
 
 (def built-in-formatter (f/formatters :date-time))
 
+(def active (atom false))
+
 (defn inspect
-  "Send message to inspect sub-system with msg-type"
-  [msg-type msg] (put! in-chan {:origin msg-type :received (f/unparse built-in-formatter (t/now)) :payload msg}))
+  "Send message to inspect sub-system with msg-type. Only does anything when system active"
+  [msg-type msg]
+  (when @active
+    (put! in-chan {:origin msg-type :received (f/unparse built-in-formatter (t/now)) :payload msg})))
 
 (def conf {:port 8000})
 
@@ -30,6 +34,14 @@
 
 (def system (get-system conf))
 
-(defn start [] (alter-var-root #'system component/start))
-(defn stop [] (alter-var-root #'system
-                              (fn [s] (when s (component/stop s)))))
+(defn start
+  "start the inspect system and set active atom to true"
+  []
+  (alter-var-root #'system component/start)
+  (reset! active true))
+
+(defn stop
+  "stop the inspect system and set active atom to false"
+  []
+  (alter-var-root #'system (fn [s] (when s (component/stop s))))
+  (reset! active false))
