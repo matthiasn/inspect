@@ -31,6 +31,12 @@
   (let [next-n (:next-n params)]
     (swap! clients update-in [(strip-uid (:client-uuid full-event))] (fn [n] (if n (+ n next-n) next-n)))))
 
+(defn get-next-items
+  "start listener for all event types, limited to the next n for each"
+  [client-map full-event]
+  (let [uid (strip-uid (:client-uuid full-event))]
+    (swap! client-maps assoc-in [uid] client-map)))
+
 (defn initialize-inspector
   "start listener for all event types, limited to the next n for each"
   [params full-event]
@@ -52,11 +58,12 @@
     (let [event (:event full-event)]
       (inspect-fn :ws/event-in full-event)
       (match event
-             [:cmd/get-next params]   (get-next params full-event)
-             [:cmd/initialize params] (initialize-inspector params full-event)
-             [:cmd/get-event-types]   (send-event-types uids chsk-send!)
-             [:chsk/ws-ping]          () ; currently just do nothing with ping (no logging either)
-             :else                    (log/debug "Unmatched event:" (pp/pprint event))))))
+             [:cmd/get-next params]       (get-next params full-event)
+             [:cmd/get-next-items params] (get-next-items params full-event)
+             [:cmd/initialize params]     (initialize-inspector params full-event)
+             [:cmd/get-event-types]       (send-event-types uids chsk-send!)
+             [:chsk/ws-ping]              () ; currently just do nothing with ping (no logging either)
+             :else                        (log/debug "Unmatched event:" (pp/pprint event))))))
 
 (defn send-loop
   "run loop, call chsk-send! with message on channel"
