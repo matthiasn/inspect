@@ -34,16 +34,18 @@
 (defn get-next-items
   "start listener for all event types, limited to the next n for each"
   [client-map full-event]
+  (log/info client-map)
   (let [uid (strip-uid (:client-uuid full-event))]
     (swap! client-maps assoc-in [uid] client-map)))
 
 (defn initialize-inspector
   "start listener for all event types, limited to the next n for each"
-  [params full-event]
+  [params full-event chsk-send!]
   (let [uid (strip-uid (:client-uuid full-event))
         n (:n params)
         client-map (into {} (map (fn [t] [t n]) (seq @known-event-types)))]
-    (swap! client-maps assoc-in [uid] client-map)))
+    (swap! client-maps assoc-in [uid] client-map)
+    (chsk-send! uid [:info/client-map (get-in @client-maps [uid])])))
 
 (defn send-event-types
   "send set with known event types to connected UIs"
@@ -60,7 +62,7 @@
       (match event
              [:cmd/get-next params]       (get-next params full-event)
              [:cmd/get-next-items params] (get-next-items params full-event)
-             [:cmd/initialize params]     (initialize-inspector params full-event)
+             [:cmd/initialize params]     (initialize-inspector params full-event chsk-send!)
              [:cmd/get-event-types]       (send-event-types uids chsk-send!)
              [:chsk/ws-ping]              () ; currently just do nothing with ping (no logging either)
              :else                        (log/debug "Unmatched event:" (pp/pprint event))))))
@@ -77,7 +79,8 @@
                   (doseq [uid (:any @uids)]
                     (when (pos? (get-in @client-maps [uid origin] 0))
                       (chsk-send! uid [:info/msg (assoc msg :payload (with-out-str (pp/pprint (:payload msg))))])
-                      (swap! client-maps update-in [uid origin] dec)))
+                      (swap! client-maps update-in [uid origin] dec)
+                      (chsk-send! uid [:info/client-map (get-in @client-maps [uid])])))
                   (recur)))))
 
 (defrecord Matcher [inspect-chan inspect-fn chsk-router]

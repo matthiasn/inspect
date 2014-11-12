@@ -10,7 +10,7 @@
 
 (let [{:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket! "/chsk")]
   (def chsk chsk)
-  (def ch-chsk ch-recv) ; ChannelSocket's receive channel
+  (def ch-chsk ch-recv)    ; ChannelSocket's receive channel
   (def chsk-send! send-fn) ; ChannelSocket's send API fn
   (def chsk-state state))  ; Watchable, read-only atom
 
@@ -22,6 +22,7 @@
                 [:info/known-event-types event-types] (do
                                                         (reset! appstate/known-event-types event-types)
                                                         (reset! appstate/selected-event-types event-types))
+                [:info/client-map client-map] (reset! appstate/client-map client-map)
                 :else (print "Unkown msg-type " payload))
          [:chsk/state state] (when (:open? state)
                                (chsk-send! [:cmd/get-event-types])

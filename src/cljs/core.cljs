@@ -15,6 +15,11 @@
   []
   (comm/chsk-send! [:cmd/get-next {:next-n (:next-n @appstate/app)}]))
 
+(defn get-next-items
+  ""
+  []
+  (comm/chsk-send! [:cmd/get-next-items @appstate/client-map]))
+
 (defn active?
   "check if message type is active"
   [selected t]
@@ -63,6 +68,10 @@
             :value (:next-n @appstate/app)
             :on-change #(let [value (js/parseInt (-> % .-target .-value))]
                           (when-not (or (js/isNaN value) (neg? value)) (swap! appstate/app assoc :next-n value)))}]
+   [:br]
+   [:br]
+   [:div (str @appstate/client-map)]
+   [:br]
    [lister (reverse (:events @appstate/app)) appstate/selected-event-types]])
 
 (defn run []
