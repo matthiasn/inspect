@@ -1,27 +1,3 @@
-table, th, td {
-  text-align: right;
-}
-
-.button-xsmall {
-  font-size: 70%;
-  margin: 2px;
-}
-
-.table-small {
-  font-size: 70%;
-}
-
-pre {
-  background-color: #eee;
-  overflow: scroll-x;
-  border-radius: 2px;
-  padding: 10px;
-}
-
-code {
-  color: #333;
-}
-
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -33,7 +9,6 @@ code {
 * Most of these are inherited from Base, but I want to change a few.
 */
 body {
-  line-height: 1.7em;
   color: #7f8c8d;
   font-size: 13px;
   font-family: "Lato", sans-serif;
@@ -163,26 +138,6 @@ label {
   text-transform: uppercase;
 }
 
-.event {
-}
-
-.event h4 {
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
-
-.event span {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  font-size: 0.7em;
-  float: right;
-}
-
-.event pre {
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
-
 /* This is the main heading that appears on the blue section */
 .splash-head {
   font-size: 20px;
@@ -213,7 +168,7 @@ label {
   width: 100%;
   min-height: 12%;
   z-index: 2;
-  background: white;
+  background: #eee;
 
 }
 
@@ -303,4 +258,51 @@ label {
   .splash-head {
     font-size: 300%;
   }
+}
+
+table, th, td {
+  text-align: right;
+}
+
+.button-xsmall {
+  font-size: 70%;
+  margin: 2px;
+}
+
+.table-small {
+  font-size: 70%;
+}
+
+pre {
+  background-color: #ddd;
+  color: black;
+  overflow: scroll-x;
+  border-radius: 2px;
+  padding: 10px;
+}
+
+code {
+  font-family: Monaco, monospace;
+  font-size: 0.7em;
+  line-height: 10px;
+}
+
+.event {
+}
+
+.event h4 {
+  margin-top: 0px;
+  margin-bottom: 4px;
+}
+
+.event span {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 0.7em;
+  float: right;
+}
+
+.event pre {
+  margin-top: 0px;
+  margin-bottom: 10px;
 }
