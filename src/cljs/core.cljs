@@ -8,10 +8,13 @@
 
 ;;;; Main file of the inspect tool written in ClojureScript
 
-(defn by-id [id] (.getElementById js/document id))
+(defn by-id
+  "helper function for selecting DOM elements"
+  [id]
+  (.getElementById js/document id))
 
 (defn get-next-items
-  ""
+  "send command to server to subscribe to the next events"
   []
   (let [next-items (into {} (map (fn [i] [i (:next-n @appstate/app)]) @appstate/selected-event-types))]
     (print next-items)
@@ -29,18 +32,30 @@
     (swap! selected disj t)
     (swap! selected conj t)))
 
-(defn select-btn [t selected]
-  (let [active (if (active? selected t) "btn-primary btn-sm" "")]
-    [:button.btn {:class active :on-click #(toggle-selected selected t)} (str t)]))
+(defn select-btn
+  "creates toggle button in group for selecting shown event types"
+  [t selected]
+  (let [active (if (active? selected t) "btn-primary" "")]
+    [:button.btn.btn-sm {:class active :on-click #(toggle-selected selected t)} (str t)]))
 
-(defn known-types [types selected]
+(defn known-types
+  "creates button group for all known event types"
+  [types selected]
   [:div.btn-group
-   (for [t types]
-     [select-btn t selected])
+   (for [t types] [select-btn t selected])
    [:br]])
 
+(defn subscribed-selected
+  "creates table with the current subscriptions"
+  [client-map]
+  [:div
+   [:table (for [[origin n] @client-map]
+             [:tr
+              [:td (str origin)]
+              [:td n]])]])
+
 (defn event-div
-  ""
+  "creates div with the event (header, timestamp, pre code) when type currently selected"
   [item selected]
   (let [origin (:origin item)]
     (when (active? selected origin)
@@ -50,19 +65,16 @@
        [:pre [:code (:payload item)]]
        [:br]])))
 
-(defn subscribed-selected [client-map]
-  [:div
-   [:table (for [[origin n] @client-map]
-             [:tr
-              [:td (str origin)]
-              [:td n]])]])
-
-(defn lister [items selected]
+(defn lister
+  "list view for events"
+  [items selected]
   [:div
    (for [item items]
      [event-div item selected])])
 
-(defn inspect-view []
+(defn inspect-view
+  "creates main view of the application"
+  []
   [:div
    [known-types @appstate/known-event-types appstate/selected-event-types]
    [:br]
