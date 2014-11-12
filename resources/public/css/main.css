@@ -1,1 +1,10 @@
+table, th, td {
+  border: 1px solid #CCC;
+  padding: 4px;
+}
 
+td {
+  text-align: right;
+  min-width: 30px;
+  font-size: 0.8em;
+}

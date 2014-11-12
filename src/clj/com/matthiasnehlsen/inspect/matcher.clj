@@ -25,12 +25,6 @@
   [client-uuid]
   (subs client-uuid 0 36))
 
-(defn get-next
-  "get next items for the specified event types"
-  [params full-event]
-  (let [next-n (:next-n params)]
-    (swap! clients update-in [(strip-uid (:client-uuid full-event))] (fn [n] (if n (+ n next-n) next-n)))))
-
 (defn get-next-items
   "start listener for all event types, limited to the next n for each"
   [client-map full-event]
@@ -60,7 +54,6 @@
     (let [event (:event full-event)]
       (inspect-fn :ws/event-in full-event)
       (match event
-             [:cmd/get-next params]       (get-next params full-event)
              [:cmd/get-next-items params] (get-next-items params full-event)
              [:cmd/initialize params]     (initialize-inspector params full-event chsk-send!)
              [:cmd/get-event-types]       (send-event-types uids chsk-send!)
