@@ -273,26 +273,9 @@ table, th, td {
   font-size: 70%;
 }
 
-pre {
-  background-color: #ddd;
-  color: black;
-  overflow: scroll-x;
-  border-radius: 2px;
-  padding: 10px;
-}
-
-code {
-  font-family: Monaco, monospace;
-  font-size: 0.7em;
-  line-height: 10px;
-}
-
-.event {
-}
-
 .event h4 {
   margin-top: 0px;
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }
 
 .event span {
@@ -303,8 +286,21 @@ code {
 }
 
 .event pre {
+  margin-top: 2px;
+  background-color: #ddd;
+  color: black;
+  overflow: scroll-x;
+  border-radius: 2px;
+  padding: 10px;
+}
+
+.event pre code {
+  font-family: Monaco, monospace;
+  font-size: 0.7em;
+  line-height: 10px;
   margin-top: 0px;
   margin-bottom: 10px;
+  overflow: scroll-x;
 }
 
 .active {
