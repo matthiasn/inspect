@@ -8,9 +8,9 @@
    [clojure.pprint :as pp]
    [clj-time.core :as t]
    [clj-time.format :as f]
-   [clojure.core.async :as async :refer [<! chan put! timeout go-loop]]))
+   [clojure.core.async :as async :refer [<! chan put! timeout go-loop sliding-buffer]]))
 
-(def in-chan (chan))
+(def in-chan (chan (sliding-buffer 1000)))
 
 (def built-in-formatter (f/formatters :date-time))
 
