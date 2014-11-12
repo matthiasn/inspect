@@ -306,3 +306,8 @@ code {
   margin-top: 0px;
   margin-bottom: 10px;
 }
+
+.active {
+  color: black;
+  font-weight: bold;
+}

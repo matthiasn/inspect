@@ -55,13 +55,14 @@
 
 (defn subscribed-selected
   "creates table with the current subscriptions"
-  [client-map]
+  [client-map selected-event-types]
   [:div.pure-u-md-1-4
    [:table.pure-table.table-small.pure-table-striped
     [:thead [:tr [:th "origin"] [:th "remaining"]]]
     [:tbody
      (for [[origin n] @client-map]
-       [:tr [:td (str origin)] [:td n]])]]])
+       [:tr {:class (if (contains? @selected-event-types origin) "active" "")}
+        [:td (str origin)] [:td n]])]]])
 
 (defn event-div
   "creates div with the event (header, timestamp, pre code) when type currently selected"
@@ -90,7 +91,7 @@
 (defn run []
   (reagent/render-component (fn [] [inspect-view])
                             (by-id "code"))
-  (reagent/render-component (fn [] [subscribed-selected appstate/client-map])
+  (reagent/render-component (fn [] [subscribed-selected appstate/client-map appstate/selected-event-types])
                             (by-id "subscription-table"))
   (reagent/render-component (fn [] [known-types appstate/known-event-types appstate/selected-event-types])
                             (by-id "subscription-table2")))
