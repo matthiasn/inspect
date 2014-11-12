@@ -58,7 +58,9 @@
              [:cmd/initialize params]     (initialize-inspector params full-event chsk-send!)
              [:cmd/get-event-types]       (send-event-types uids chsk-send!)
              [:chsk/ws-ping]              () ; currently just do nothing with ping (no logging either)
-             :else                        (log/debug "Unmatched event:" (pp/pprint event))))))
+             [:chsk/uidport-open]         () ; user-id-fn already logs established connection
+             [:chsk/uidport-close]        (log/info "Connection closed:" (strip-uid (:client-uuid full-event)))
+             :else                        (log/debug "Unmatched event:" event)))))
 
 (defn send-loop
   "run loop, call chsk-send! with message on channel"
