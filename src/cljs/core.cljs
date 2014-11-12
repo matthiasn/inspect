@@ -41,9 +41,17 @@
 (defn known-types
   "creates button group for all known event types"
   [types selected]
-  [:div.btn-group
-   (for [t types] [select-btn t selected])
-   [:br]])
+  [:div
+   [:div.btn-group
+    (for [t @types] [select-btn t selected])
+    [:br]]
+   [:br]
+   [:br]
+   [:button#get-next.pure-button.pure-button-primary.button-xsmall {:on-click get-next-items} "Next"]
+   [:input {:type "number"
+            :value (:next-n @appstate/app)
+            :on-change #(let [value (js/parseInt (-> % .-target .-value))]
+                          (when-not (or (js/isNaN value) (neg? value)) (swap! appstate/app assoc :next-n value)))}]])
 
 (defn subscribed-selected
   "creates table with the current subscriptions"
@@ -77,17 +85,6 @@
   "creates main view of the application"
   []
   [:div
-   [known-types @appstate/known-event-types appstate/selected-event-types]
-   [:br]
-   [:button#get-next.pure-button.pure-button-primary.button-xsmall {:on-click get-next-items} "Next"]
-   [:input {:type "number"
-            :value (:next-n @appstate/app)
-            :on-change #(let [value (js/parseInt (-> % .-target .-value))]
-                          (when-not (or (js/isNaN value) (neg? value)) (swap! appstate/app assoc :next-n value)))}]
-   [:br]
-   [:br]
-   [subscribed-selected appstate/client-map]
-   [:br]
    [lister (reverse (:events @appstate/app)) appstate/selected-event-types]])
 
 (defn run []
@@ -95,7 +92,7 @@
                             (by-id "code"))
   (reagent/render-component (fn [] [subscribed-selected appstate/client-map])
                             (by-id "subscription-table"))
-  (reagent/render-component (fn [] [subscribed-selected appstate/client-map])
+  (reagent/render-component (fn [] [known-types appstate/known-event-types appstate/selected-event-types])
                             (by-id "subscription-table2")))
 
 (run)
