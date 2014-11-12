@@ -2,62 +2,51 @@
 
 <html lang="en">
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>inspect</title>
 
         <!-- Stylesheets -->
-        <link rel="stylesheet" media="screen" href="/css/main.css">
-        <link rel="stylesheet" media="screen" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
 
-        <link rel="stylesheet" href="/bower_components/highlightjs/styles/github.css">
+        <link rel="stylesheet" media="screen" href="/bower_components/pure/pure-min.css">
+
+        <link rel="stylesheet" media="screen" href="/css/main.css">
+
+        <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+        <!--        <link rel="stylesheet" href="/bower_components/highlightjs/styles/github.css"> -->
 
         <link rel="shortcut icon" type="image/png" href="/images/favicon.png">
     </head>
 
     <body>
-        <div>
-            <!-- Navigation Bar -->
-            <div class="navbar">
-                <div class="container">
 
-                    <span class="navbar-brand">inspect</span>
+        <div class="header">
+            <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
+                <a class="pure-menu-heading" href="">inspect</a>
 
-                    <div class="nav-collapse">
-
-                            <!-- Project info -->
-                        <ul class="nav navbar-nav pull-right">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">About
-                                    <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="https://twitter.com/matthiasnehlsen" target="_blank">Author</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-
-                            <!-- Settings -->
-                        <ul class="nav navbar-nav pull-right">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings
-                                    <b class="caret"></b></a>
-                            </li>
-                        </ul>
-
-                    </div>
-                </div>
+                <ul>
+                    <li><a href="https://github.com/matthiasn/inspect">GitHub</a></li>
+                    <li><a href="#">about</a></li>
+                </ul>
             </div>
+        </div>
 
-                <!-- Tweets column with Pagination -->
-            <div class="container container-fluid">
+        <div class="splash-container">
+            <div class="splash">
+                <h1 class="splash-head">inspect</h1>
+                <p class="splash-subhead">println no more</p>
+            </div>
+        </div>
 
-                    <!-- Main page layout -->
-                <div class="row">
+        <div class="content-wrapper">
+            <div class="content">
+                <h2 class="content-head is-center">Have a look at your data, any time</h2>
 
-                    <div class="col-lg-12">
+                <div class="pure-g">
+                    <div class="l-box-lrg pure-u-1 pure-u-md-2-5">
                         <div id="code"></div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -66,7 +55,6 @@
 
         <script src="/bower_components/jquery/jquery.min.js"></script>
         <script src="/bower_components/react/react.min.js"></script>
-        <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
         <script src="/bower_components/highlightjs/highlight.pack.js"></script>
 

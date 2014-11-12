@@ -35,8 +35,8 @@
 (defn select-btn
   "creates toggle button in group for selecting shown event types"
   [t selected]
-  (let [active (if (active? selected t) "btn-primary" "")]
-    [:button.btn.btn-sm {:class active :on-click #(toggle-selected selected t)} (str t)]))
+  (let [active (if (active? selected t) "pure-button-primary" "")]
+    [:button.pure-button.button-xsmall {:class active :on-click #(toggle-selected selected t)} (str t)]))
 
 (defn known-types
   "creates button group for all known event types"
@@ -49,19 +49,20 @@
   "creates table with the current subscriptions"
   [client-map]
   [:div
-   [:table (for [[origin n] @client-map]
-             [:tr
-              [:td (str origin)]
-              [:td n]])]])
+   [:table.pure-table.table-small.pure-table-striped
+    [:thead [:tr [:th "origin"] [:th "remaining"]]]
+    [:tbody
+     (for [[origin n] @client-map]
+       [:tr [:td (str origin)] [:td n]])]]])
 
 (defn event-div
   "creates div with the event (header, timestamp, pre code) when type currently selected"
   [item selected]
   (let [origin (:origin item)]
     (when (active? selected origin)
-      [:div
+      [:div.event
+       [:span (:received item)]
        [:h4 (str origin)]
-       [:p (:received item)]
        [:pre [:code (:payload item)]]
        [:br]])))
 
@@ -78,8 +79,7 @@
   [:div
    [known-types @appstate/known-event-types appstate/selected-event-types]
    [:br]
-   [:br]
-   [:button#get-next {:on-click get-next-items} "Next"]
+   [:button#get-next.pure-button.pure-button-primary.button-xsmall {:on-click get-next-items} "Next"]
    [:input {:type "number"
             :value (:next-n @appstate/app)
             :on-change #(let [value (js/parseInt (-> % .-target .-value))]
