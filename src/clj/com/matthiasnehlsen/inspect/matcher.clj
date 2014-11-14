@@ -41,6 +41,16 @@
     (swap! client-maps assoc-in [uid] client-map)
     (chsk-send! uid [:info/client-map (get-in @client-maps [uid])])))
 
+(defn close-connection
+  "cleanup after connection was closed"
+  [client-uuid]
+  (log/info "Connection closed:" client-uuid)
+  (println client-maps)
+
+  (swap! client-maps dissoc client-uuid)
+  (println client-maps)
+  )
+
 (defn send-event-types
   "send set with known event types to connected UIs"
   [uids chsk-send!]
@@ -59,7 +69,7 @@
              [:cmd/get-event-types]       (send-event-types uids chsk-send!)
              [:chsk/ws-ping]              () ; currently just do nothing with ping (no logging either)
              [:chsk/uidport-open]         () ; user-id-fn already logs established connection
-             [:chsk/uidport-close]        (log/info "Connection closed:" (strip-uid (:client-uuid full-event)))
+             [:chsk/uidport-close]        (close-connection (strip-uid (:client-uuid full-event)))
              :else                        (log/debug "Unmatched event:" event)))))
 
 (defn send-loop
