@@ -45,11 +45,7 @@
   "cleanup after connection was closed"
   [client-uuid]
   (log/info "Connection closed:" client-uuid)
-  (println client-maps)
-
-  (swap! client-maps dissoc client-uuid)
-  (println client-maps)
-  )
+  (swap! client-maps dissoc client-uuid))
 
 (defn send-event-types
   "send set with known event types to connected UIs"
