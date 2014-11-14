@@ -21,8 +21,6 @@
 
   :source-paths ["src/clj/"]
 
-  :main com.matthiasnehlsen.inspect.main
-
   :plugins [[lein-cljsbuild "1.0.3"]]
 
   :cljsbuild {:builds [{:id "release"
