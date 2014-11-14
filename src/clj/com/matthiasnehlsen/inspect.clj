@@ -22,8 +22,6 @@
   (when @active
     (put! in-chan {:origin msg-type :received (f/unparse built-in-formatter (t/now)) :payload msg})))
 
-(def conf {:port 8000})
-
 (defn get-system
   "Create system by wiring individual components so that component/start
   will bring up the individual components in the correct order."
@@ -32,7 +30,13 @@
    :matcher (matcher/new-matcher in-chan inspect)
    :http    (component/using (http/new-http-server conf) {:matcher :matcher})))
 
-(def system (get-system conf))
+;; system with default port
+(def system (get-system {:port 8000}))
+
+(defn configure
+  "override system with specified config (currently only :port)"
+  [conf]
+  (def system (get-system conf)))
 
 (defn start
   "start the inspect system and set active atom to true"

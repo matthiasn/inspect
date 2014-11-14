@@ -18,6 +18,9 @@
 (interval-put-loop 10000 :interval-put/every-ten-seconds {:msg "every ten seconds"})
 (interval-put-loop 60000 :interval-put/every-minute {:msg "every minute"})
 
+;; optional, only necessary when default port 8000 is not desired
+(inspect/configure {:port 8001})
+
 (defn reload [] (inspect/stop) (refresh) (inspect/start))
 
 (defn -main [& args]
