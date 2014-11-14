@@ -1,5 +1,5 @@
-(defproject com.matthiasnehlsen/inspect "0.1.0-SNAPSHOT"
-  :description "Inspect core.async messages from a web application"
+(defproject com.matthiasnehlsen/inspect "0.1.0"
+  :description "Log to a web application to inspect what's going on in your application"
   :url "https://github.com/matthiasn/inspect"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
