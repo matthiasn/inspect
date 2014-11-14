@@ -5,6 +5,7 @@
    [clojure.tools.namespace.repl :refer [refresh]]
    [clojure.tools.logging :as log]
    [clojure.pprint :as pp]
+   [clj-pid.core :as pid]
    [clojure.core.async :as async :refer [<! chan put! timeout go-loop]]))
 
 (defn interval-put-loop
@@ -19,10 +20,12 @@
 (interval-put-loop 60000 :interval-put/every-minute {:msg "every minute"})
 
 ;; optional, only necessary when default port 8000 is not desired
-(inspect/configure {:port 8001})
+;(inspect/configure {:port 8001})
 
 (defn reload [] (inspect/stop) (refresh) (inspect/start))
 
 (defn -main [& args]
-  (log/info "Application started")
+  (pid/save "example.pid")
+  (pid/delete-on-shutdown! "example.pid")
+  (log/info "Application started, PID" (pid/current))
   (inspect/start))
