@@ -18,11 +18,10 @@
   component/Lifecycle
   (start [component] (log/info "Starting HTTP Component")
          (defroutes my-routes  ; created during start so that the correct matcher instance is used
-           (GET  "/"    [] (static-html "index.html"))
-           (GET  "/dev" [] (static-html "index-dev.html"))
+           (GET  "/"    [] (static-html "inspect/index.html"))
            (GET  "/chsk" req ((:ajax-get-or-ws-handshake-fn matcher) req))
            (POST "/chsk" req ((:ajax-post-fn matcher) req))
-           (route/resources "/") ; Static files, notably public/main.js (our cljs target)
+           (route/resources "/")
            (route/not-found "Page not found"))
          (let [my-ring-handler   (ring.middleware.defaults/wrap-defaults my-routes ring-defaults-config)
                server (http-kit-server/run-server my-ring-handler {:port (:port conf)})

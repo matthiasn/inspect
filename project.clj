@@ -25,6 +25,6 @@
 
   :cljsbuild {:builds [{:id "release"
                         :source-paths ["src/cljs"]
-                        :compiler {:output-to "resources/public/js/build/inspect-opt.js"
+                        :compiler {:output-to "resources/public/inspect/js/build/inspect-opt.js"
                                    :optimizations :advanced
                                    :externs ["externs/misc.js"]}}]})

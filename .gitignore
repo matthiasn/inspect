@@ -9,4 +9,4 @@ pom.xml.asc
 /.nrepl-port
 
 resources/public/js/build/
-resources/public/bower_components/
+resources/public/inspect/bower_components/
