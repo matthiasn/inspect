@@ -8,4 +8,5 @@
                  [clj-pid "0.1.1"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
 
-  :main ^:skip-aot example.core)
+  :main example.core
+  :aot [example.core])
