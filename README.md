@@ -4,6 +4,8 @@ Library / tool for inspecting messages. Not usable yet.
 
 ## Usage
 
+[![Clojars Project](http://clojars.org/com.matthiasnehlsen/inspect/latest-version.svg)](http://clojars.org/com.matthiasnehlsen/inspect)
+
 To run the example application, simple use
 
     lein run
