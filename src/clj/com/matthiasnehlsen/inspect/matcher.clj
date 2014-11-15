@@ -21,14 +21,14 @@
 
 (defn strip-uid
   "for some reason, the :client-uuid is longer than expected. This strips the
-   uuid string to the expected length as used elsewhere"
+  uuid string to the expected length as used elsewhere"
   [client-uuid]
   (subs client-uuid 0 36))
 
 (defn get-next-items
   "start listener for all event types, limited to the next n for each"
   [client-map full-event]
-  (log/info client-map)
+  (log/info "client-map" client-map)
   (let [uid (strip-uid (:client-uuid full-event))]
     (swap! client-maps assoc-in [uid] client-map)))
 
@@ -80,7 +80,12 @@
                   (doseq [uid (:any @uids)]
                     (when (pos? (get-in @client-maps [uid origin] 0))
                       (chsk-send! uid [:info/msg (assoc msg :payload (with-out-str (pp/pprint (:payload msg))))])
-                      (swap! client-maps update-in [uid origin] dec)
+                      (swap! client-maps
+                             (fn [prev]
+                               (let [client-map (get-in prev [uid origin])]
+                                 (if client-map ;; check if exists, may have been changed
+                                   (update-in prev [uid origin] dec)
+                                   prev))))
                       (chsk-send! uid [:info/client-map (get-in @client-maps [uid])])))
                   (recur)))))
 
