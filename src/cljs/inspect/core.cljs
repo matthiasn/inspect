@@ -51,7 +51,8 @@
    [:input {:type "number"
             :value (:next-n @appstate/app)
             :on-change #(let [value (js/parseInt (-> % .-target .-value))]
-                          (when-not (or (js/isNaN value) (neg? value)) (swap! appstate/app assoc :next-n value)))}]])
+                          (when-not (or (js/isNaN value) (neg? value) (> value 100))
+                            (swap! appstate/app assoc :next-n value)))}]])
 
 (defn subscribed-selected
   "creates table with the current subscriptions"
