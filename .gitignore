@@ -11,3 +11,6 @@ pom.xml.asc
 resources/public/js/build/
 resources/public/inspect/bower_components/
 resources/public/inspect/js/build/inspect-opt.js
+
+*.pid
+*.out
