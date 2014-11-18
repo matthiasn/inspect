@@ -16,8 +16,7 @@
 
 (defn- receive-stats
   [stats]
-  (when (empty? @appstate/stats)
-    (reset! appstate/selected (into #{} (map (fn [[t _]] t) (seq stats)))))
+  (when (empty? @appstate/stats) (reset! appstate/selected (into #{} (map (fn [[t _]] t) stats))))
   (reset! appstate/stats stats))
 
 (defn- event-handler [{:keys [event]}]
