@@ -16,8 +16,7 @@
 (defn get-next-items
   "send command to server to subscribe to the next events"
   []
-  (let [next-items (into {} (map (fn [i] [i (:next-n @appstate/app)]) @appstate/selected-event-types))]
-    (print next-items)
+  (let [next-items (into {} (map (fn [i] [i (:next-n @appstate/app)]) @appstate/selected))]
     (comm/chsk-send! [:cmd/get-next-items next-items])))
 
 (defn active?
@@ -40,10 +39,10 @@
 
 (defn known-types
   "creates button group for all known event types"
-  [types selected]
+  [stats selected]
   [:div
    [:div.btn-group
-    (for [t @types] [select-btn t selected])
+    (for [t (map (fn [[t _]] t) (vec @stats)) ] [select-btn t selected])
     [:br]]
    [:br]
    [:br]
@@ -54,16 +53,18 @@
                           (when-not (or (js/isNaN value) (neg? value) (> value 100))
                             (swap! appstate/app assoc :next-n value)))}]])
 
-(defn subscribed-selected
+(defn selection
   "creates table with the current subscriptions"
-  [client-map selected-event-types]
-  [:div.pure-u-md-1-4
-   [:table.pure-table.table-small.pure-table-striped
-    [:thead [:tr [:th "origin"] [:th "remaining"]]]
-    [:tbody
-     (for [[origin n] @client-map]
-       [:tr {:class (if (contains? @selected-event-types origin) "active" "")}
-        [:td (str origin)] [:td n]])]]])
+  [client-map selected-event-types stats]
+  (let [selected @selected-event-types
+        stats @stats]
+    [:div.pure-u-md-1-4
+     [:table.pure-table.table-small.pure-table-striped
+      [:thead [:tr [:th "origin"] [:th "left"] [:th "msg/10s"]]]
+      [:tbody
+       (for [[origin n] @client-map]
+         [:tr {:class (if (contains? selected origin) "active" "")}
+          [:td (str origin)] [:td n] [:td (get stats origin)]])]]]))
 
 (defn event-div
   "creates div with the event (header, timestamp, pre code) when type currently selected"
@@ -87,14 +88,11 @@
   "creates main view of the application"
   []
   [:div
-   [lister (reverse (:events @appstate/app)) appstate/selected-event-types]])
+   [lister (reverse (:events @appstate/app)) appstate/selected]])
 
 (defn run []
-  (reagent/render-component (fn [] [inspect-view])
-                            (by-id "code"))
-  (reagent/render-component (fn [] [subscribed-selected appstate/client-map appstate/selected-event-types])
-                            (by-id "subscription-table"))
-  (reagent/render-component (fn [] [known-types appstate/known-event-types appstate/selected-event-types])
-                            (by-id "subscription-table2")))
+  (reagent/render-component (fn [] [inspect-view]) (by-id "code"))
+  (reagent/render-component (fn [] [known-types appstate/stats appstate/selected]) (by-id "selection"))
+  (reagent/render-component (fn [] [selection appstate/client-map appstate/selected appstate/stats]) (by-id "types")))
 
 (run)

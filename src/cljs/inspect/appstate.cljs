@@ -9,9 +9,7 @@
 
 (def app (atom {:events [] :next-n 10}))
 
-(def known-event-types (atom #{}))
-
-(def selected-event-types (atom #{}))
-
+(def stats (atom {}))
+(def selected (atom #{}))
 (def client-map (atom {}))
 

@@ -14,18 +14,22 @@
   (def chsk-send! send-fn) ; ChannelSocket's send API fn
   (def chsk-state state))  ; Watchable, read-only atom
 
+(defn- receive-stats
+  [stats]
+  (when (empty? @appstate/stats)
+    (reset! appstate/selected (into #{} (map (fn [[t _]] t) (seq stats)))))
+  (reset! appstate/stats stats))
+
 (defn- event-handler [{:keys [event]}]
   (match event
          [:chsk/recv payload]
          (match payload
                 [:info/msg msg] (swap! appstate/app assoc :events (conj (:events @appstate/app) msg))
-                [:info/known-event-types event-types] (do
-                                                        (reset! appstate/known-event-types event-types)
-                                                        (reset! appstate/selected-event-types event-types))
+                [:info/stats stats] (receive-stats stats)
                 [:info/client-map client-map] (reset! appstate/client-map client-map)
                 :else (print "Unkown msg-type " payload))
          [:chsk/state state] (when (:open? state)
-                               (chsk-send! [:cmd/get-event-types])
+                               (chsk-send! [:cmd/get-stats])
                                (chsk-send! [:cmd/initialize {:n 10}]))
          :else (print "Unmatched event: %s" event)))
 
