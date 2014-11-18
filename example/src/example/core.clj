@@ -13,7 +13,9 @@
   [interval msg-type msg]
   (go-loop [] (<! (timeout interval)) (inspect msg-type msg) (recur)))
 
-(interval-put-loop     1 :interval-put/every-millisecond {:msg "every millisecond"})
+(dotimes [n 25]
+  (interval-put-loop 1 :interval-put/every-millisecond {:msg "every millisecond" :n n}))
+
 (interval-put-loop  1000 :interval-put/every-second {:msg "every second"})
 (interval-put-loop  5000 :interval-put/every-five-seconds {:msg "every five seconds"})
 (interval-put-loop 10000 :interval-put/every-ten-seconds {:msg "every ten seconds"})
