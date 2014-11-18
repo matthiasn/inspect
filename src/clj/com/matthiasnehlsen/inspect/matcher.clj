@@ -15,9 +15,7 @@
     (log/info "Connected:" (:remote-addr req) uid)
     uid))
 
-(def clients (atom {}))
 (def client-maps (atom {}))
-(def known-event-types (atom #{}))
 (def stats (atom {}))
 
 (defn strip-uid
@@ -36,7 +34,7 @@
   [params full-event chsk-send!]
   (let [uid (strip-uid (:client-uuid full-event))
         n (:n params)
-        client-map (into {} (map (fn [t] [t n]) (seq @known-event-types)))]
+        client-map (into {} (map (fn [[t _]] [t n]) (seq @stats)))]
     (swap! client-maps assoc-in [uid] client-map)
     (chsk-send! uid [:info/client-map (get-in @client-maps [uid])])))
 
@@ -50,7 +48,7 @@
   "send set with known event types to connected UIs"
   [uids chsk-send!]
   (doseq [uid (:any @uids)]
-    (chsk-send! uid [:info/known-event-types @known-event-types])
+    (chsk-send! uid [:info/known-event-types  (into #{} (map (fn [[t _]] t) (seq @stats)))])
     (chsk-send! uid [:info/stats @stats])))
 
 (defn- make-handler
@@ -71,10 +69,7 @@
 (defn add-stats
   ""
   [uids origin chsk-send!]
-  (swap! stats assoc origin (inc (get @stats origin 0)))
-  (when-not (contains? @known-event-types origin)
-    (swap! known-event-types conj origin)
-    (send-event-types uids chsk-send!)))
+  (swap! stats assoc origin (inc (get @stats origin 0))))
 
 (defn deliver-msg
   ""
@@ -121,7 +116,7 @@
           :ajax-get-or-ws-handshake-fn nil)))
 
 (defn new-matcher
-  ""
+  "create new component"
   [event-mult inspect-fn]
   (map->Matcher {:event-mult event-mult
                  :inspect-fn inspect-fn}))
