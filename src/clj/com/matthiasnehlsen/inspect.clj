@@ -10,10 +10,12 @@
    [clj-time.format :as f]
    [clojure.core.async :as async :refer [<! chan put! mult tap pub sub timeout go-loop sliding-buffer]]))
 
+;; in-chan is multiplied into event-mult. That way, the matcher component can attach on start and detach on stop.
+;; With no channel tapped into the data, the messages are simply dropped.
 (def in-chan (chan (sliding-buffer 10000)))
 (def event-mult (mult in-chan))
 
-(def built-in-formatter (f/formatters :date-time))
+(def built-in-formatter (f/formatters :date-time)) ; used for timestamping the inspected messages
 
 (defn inspect
   "Send message to inspect sub-system with msg-type. Only does anything when system active"
@@ -29,19 +31,19 @@
    :http    (component/using (http/new-http-server conf) {:matcher :matcher})))
 
 ;; system with default port
-(def system (get-system {:port 8000}))
+(def system (atom (get-system {:port 8000})))
 
 (defn configure
   "override system with specified config (currently only :port)"
   [conf]
-  (def system (get-system conf)))
+  (reset! system (get-system conf)))
 
 (defn start
-  "start the inspect system and set active atom to true"
+  "start the inspect system"
   []
-  (alter-var-root #'system component/start))
+  (swap! system component/start))
 
 (defn stop
-  "stop the inspect system and set active atom to false"
+  "stop the inspect system"
   []
-  (alter-var-root #'system (fn [s] (when s (component/stop s)))))
+  (swap! system (fn [s] (when s (component/stop s)))))
