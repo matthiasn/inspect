@@ -44,11 +44,10 @@
   (log/info "Connection closed:" client-uuid)
   (put! inspect-chan [:close client-uuid]))
 
-(defn send-event-types
+(defn send-stats
   "send set with known event types to connected UIs"
   [uids chsk-send!]
   (doseq [uid (:any @uids)]
-    (chsk-send! uid [:info/known-event-types  (into #{} (map (fn [[t _]] t) (seq @stats)))])
     (chsk-send! uid [:info/stats @stats])))
 
 (defn- make-handler
@@ -60,7 +59,7 @@
       (match event
              [:cmd/get-next-items params] (get-next-items inspect-chan params full-event)
              [:cmd/initialize params]     (initialize-inspector params full-event chsk-send!)
-             [:cmd/get-event-types]       (send-event-types uids chsk-send!)
+             [:cmd/get-stats]             (send-stats uids chsk-send!)
              [:chsk/ws-ping]              () ; currently just do nothing with ping (no logging either)
              [:chsk/uidport-open]         () ; user-id-fn already logs established connection
              [:chsk/uidport-close]        (close-connection inspect-chan (strip-uid (:client-uuid full-event)))
