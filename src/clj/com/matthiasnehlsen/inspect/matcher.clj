@@ -6,7 +6,7 @@
    [clojure.core.match :as match :refer (match)]
    [taoensso.sente :as sente]
    [com.stuartsierra.component :as component]
-   [clojure.core.async :as async :refer [chan <! put! tap untap-all sub unsub-all go-loop]]))
+   [clojure.core.async :as async :refer [chan <! >! put! tap untap-all timeout go-loop]]))
 
 (defn- user-id-fn
   "generates unique ID for request"
@@ -48,7 +48,8 @@
   "send set with known event types to connected UIs"
   [uids chsk-send!]
   (doseq [uid (:any @uids)]
-    (chsk-send! uid [:info/stats @stats])))
+    (chsk-send! uid [:info/stats @stats]))
+  (reset! stats (into {} (map (fn [[t _]] [t 0]) @stats))))
 
 (defn- make-handler
   "create event handler function for the websocket connection"
@@ -59,21 +60,17 @@
       (match event
              [:cmd/get-next-items params] (get-next-items inspect-chan params full-event)
              [:cmd/initialize params]     (initialize-inspector params full-event chsk-send!)
-             [:cmd/get-stats]             (send-stats uids chsk-send!)
+             [:cmd/get-stats]             (chsk-send! (strip-uid (:client-uuid full-event)) [:info/stats @stats])
              [:chsk/ws-ping]              () ; currently just do nothing with ping (no logging either)
              [:chsk/uidport-open]         () ; user-id-fn already logs established connection
              [:chsk/uidport-close]        (close-connection inspect-chan (strip-uid (:client-uuid full-event)))
              :else                        (log/debug "Unmatched event:" event)))))
 
-(defn add-stats
-  ""
-  [uids origin chsk-send!]
-  (swap! stats assoc origin (inc (get @stats origin 0))))
-
-(defn deliver-msg
-  ""
+(defn handle-event
+  "handles events coming in through the inspect function, includes updating stats"
   [uids msg chsk-send!]
   (let [origin (:origin msg)]
+    (swap! stats assoc origin (inc (get @stats origin 0)))
     (doseq [uid (:any @uids)]
       (when (pos? (get-in @client-maps [uid origin] 0))
         (chsk-send! uid [:info/msg (assoc msg :payload (with-out-str (pp/pprint (:payload msg))))])
@@ -83,12 +80,12 @@
 (defn event-loop
   "run loop, call chsk-send! with message on channel"
   [channel uids chsk-send!]
-  (go-loop [] (match (<! channel)
-                     [:event ev] (do
-                                   (add-stats uids (:origin ev) chsk-send!)
-                                   (deliver-msg uids ev chsk-send!))
-                     [:close uid]  (swap! client-maps dissoc uid)
-                     [:next uid client-map] (swap! client-maps assoc-in [uid] client-map))
+  (go-loop []
+           (match (<! channel)
+                  [:event ev] (handle-event uids ev chsk-send!)
+                  [:close uid]  (swap! client-maps dissoc uid)
+                  [:next uid client-map] (swap! client-maps assoc-in [uid] client-map)
+                  [:send-stats] (send-stats uids chsk-send!))
            (recur)))
 
 (defrecord Matcher [event-mult inspect-fn chsk-router]
@@ -101,6 +98,10 @@
                chsk-router (sente/start-chsk-router! ch-recv event-handler)]
            (tap event-mult inspect-chan)
            (event-loop inspect-chan connected-uids send-fn)
+           (go-loop []
+                    (<! (timeout 10000))
+                    (>! inspect-chan [:send-stats])
+                    (recur))
            (assoc component
              :ajax-post-fn ajax-post-fn
              :ajax-get-or-ws-handshake-fn ajax-get-or-ws-handshake-fn
