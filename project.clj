@@ -8,7 +8,7 @@
                  [org.clojure/tools.logging "0.3.0"]
                  [org.clojure/tools.namespace "0.2.7"]
                  [ch.qos.logback/logback-classic "1.1.1"]
-                 [com.taoensso/sente "1.3.0"]
+                 [com.taoensso/sente "1.2.0"]
                  [org.clojure/core.match "0.2.1"]
                  [http-kit "2.1.19"]
                  [compojure "1.2.1"]
