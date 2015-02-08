@@ -4,7 +4,7 @@
 
 Library / tool for inspecting messages. Read more about it in this **[blog post](http://matthiasnehlsen.com/blog/2014/11/14/Inspect/)**. Here's how the UI currently looks like:
 
-<a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/inspect1.png" /></a>
+<a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/inspect.png" /></a>
 
 You can click on the image for a live demo.
 
