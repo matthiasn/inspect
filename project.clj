@@ -1,4 +1,4 @@
-(defproject com.matthiasnehlsen/inspect "0.1.6"
+(defproject com.matthiasnehlsen/inspect "0.1.7"
   :description "Log to a web application to inspect what's going on in your application"
   :url "https://github.com/matthiasn/inspect"
   :license {:name "Eclipse Public License"
@@ -15,8 +15,8 @@
                  [ring "1.3.1"]
                  [ring/ring-defaults "0.1.1"]
                  [clj-time "0.8.0"]
-                 [org.clojure/clojurescript "0.0-2760"]
-                 [reagent "0.5.0-alpha"]
+                 [org.clojure/clojurescript "0.0-2850"]
+                 [reagent "0.5.0-alpha3"]
                  [com.stuartsierra/component "0.2.2"]]
 
   :source-paths ["src/clj/"]
