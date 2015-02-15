@@ -8,7 +8,7 @@
    [com.stuartsierra.component :as component]
    [clojure.core.async :as async :refer [chan <! >! put! tap untap-all timeout go-loop]]))
 
-(defn- user-id-fn
+(defn user-id-fn
   "generates unique ID for request"
   [req]
   (let [uid (str (java.util.UUID/randomUUID))]
@@ -18,21 +18,15 @@
 (def client-maps (atom {}))
 (def stats (atom {}))
 
-(defn strip-uid
-  "for some reason, the :client-uuid is longer than expected. This strips the
-  uuid string to the expected length as used elsewhere"
-  [client-uuid]
-  (subs client-uuid 0 36))
-
 (defn get-next-items
   "start listener for all event types, limited to the next n for each"
   [inspect-chan client-map full-event]
-  (put! inspect-chan [:next (strip-uid (:client-uuid full-event)) client-map]))
+  (put! inspect-chan [:next (:client-uuid full-event) client-map]))
 
 (defn initialize-inspector
   "start listener for all event types, limited to the next n for each"
   [params full-event chsk-send!]
-  (let [uid (strip-uid (:client-uuid full-event))
+  (let [uid (:uid params)
         n (:n params)
         client-map (into {} (map (fn [[t _]] [t n]) (seq @stats)))]
     (swap! client-maps assoc-in [uid] client-map)
@@ -60,10 +54,10 @@
       (match event
              [:cmd/get-next-items params] (get-next-items inspect-chan params full-event)
              [:cmd/initialize params]     (initialize-inspector params full-event chsk-send!)
-             [:cmd/get-stats]             (chsk-send! (strip-uid (:client-uuid full-event)) [:info/stats @stats])
+             [:cmd/get-stats params]      (chsk-send! (:uid params) [:info/stats @stats])
              [:chsk/ws-ping]              () ; currently just do nothing with ping (no logging either)
              [:chsk/uidport-open]         () ; user-id-fn already logs established connection
-             [:chsk/uidport-close]        (close-connection inspect-chan (strip-uid (:client-uuid full-event)))
+             [:chsk/uidport-close]        (close-connection inspect-chan (:client-uuid full-event))
              :else                        (log/debug "Unmatched event:" event)))))
 
 (defn handle-event
