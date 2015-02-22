@@ -12,6 +12,7 @@
                  [org.clojure/core.match "0.2.1"]
                  [http-kit "2.1.19"]
                  [compojure "1.3.1"]
+                 [mvxcvi/puget "0.7.0"]
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.4"]
                  [clj-time "0.9.0"]
