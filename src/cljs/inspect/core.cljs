@@ -74,6 +74,7 @@
       [:div.event
        [:span (:received item)]
        [:h4 (str origin)]
+       [:pre [:code (str (:hiccup item))]]
        [:pre [:code (:payload item)]]
        [:br]])))
 

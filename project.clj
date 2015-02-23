@@ -13,6 +13,7 @@
                  [http-kit "2.1.19"]
                  [compojure "1.3.1"]
                  [mvxcvi/puget "0.7.0"]
+                 [hiccup-bridge "1.0.1"]
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.4"]
                  [clj-time "0.9.0"]
@@ -28,6 +29,6 @@
   :cljsbuild {:builds [{:id "release"
                         :source-paths ["src/cljs"]
                         :compiler {:output-to "resources/public/inspect/js/build/inspect-opt.js"
-                                   :optimizations :advanced
+                                   :optimizations :simple
                                    :preamble ["reagent/react.min.js"]
                                    :externs ["externs/misc.js"]}}]})

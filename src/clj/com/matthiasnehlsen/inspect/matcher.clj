@@ -2,6 +2,8 @@
   (:gen-class)
   (:require
    [clojure.pprint :as pp]
+   [puget.printer :as puget]
+   [hiccup-bridge.core :as hicv]
    [clojure.tools.logging :as log]
    [clojure.core.match :as match :refer (match)]
    [taoensso.sente :as sente]
@@ -67,7 +69,14 @@
     (swap! stats assoc origin (inc (get @stats origin 0)))
     (doseq [uid (:any @uids)]
       (when (pos? (get-in @client-maps [uid origin] 0))
-        (chsk-send! uid [:info/msg (assoc msg :payload (with-out-str (pp/pprint (:payload msg))))])
+        (let [html (puget/pprint-str (:payload msg) {:print-color true :color-markup :html-classes})
+              hicc-html (hicv/html->hiccup html)
+              hicc-spans (rest (first (rest (first hicc-html))))]
+          (prn hicc-spans)
+          (puget/cprint msg)
+          (chsk-send! uid [:info/msg (assoc msg
+                                       :payload (with-out-str (pp/pprint (:payload msg)))
+                                       :hiccup hicc-spans)]))
         (swap! client-maps #(update-in % [uid origin] dec))
         (chsk-send! uid [:info/client-map (get-in @client-maps [uid])])))))
 
