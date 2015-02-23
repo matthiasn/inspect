@@ -22,7 +22,8 @@
 
   :source-paths ["src/clj/"]
 
-  :plugins [[lein-cljsbuild "1.0.4"]]
+  :plugins [[lein-cljsbuild "1.0.4"]
+            [codox "0.8.10"]]
 
   :cljsbuild {:builds [{:id "release"
                         :source-paths ["src/cljs"]
