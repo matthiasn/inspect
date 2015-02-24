@@ -59,7 +59,7 @@
   (let [selected @selected-event-types
         stats @stats]
     [:div.pure-u-md-1-4
-     [:table.pure-table.table-small.pure-table-striped
+     [:table.pure-table.table-small
       [:thead [:tr [:th "origin"] [:th "left"] [:th "msg/10s"]]]
       [:tbody
        (for [[origin n] @client-map]
