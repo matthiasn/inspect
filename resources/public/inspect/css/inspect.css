@@ -286,7 +286,7 @@ table, th, td {
 
 .event pre {
   margin-top: 2px;
-  background-color: #ddd;
+  background-color: #ccc;
   color: black;
   overflow: scroll-x;
   border-radius: 2px;
