@@ -277,11 +277,11 @@ table, th, td {
   margin-bottom: 0px;
 }
 
-.event span {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  font-size: 0.7em;
-  float: right;
+.received {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-size: 0.7em;
+    float: right;
 }
 
 .event pre {
@@ -305,4 +305,58 @@ table, th, td {
 .active {
   color: black;
   font-weight: bold;
+}
+
+.delimiter {
+    font-weight: bold;
+    color: red;
+}
+
+.tag {
+    color: red;
+}
+
+.nil {
+    font-weight: bold;
+    color: black;
+}
+
+.boolean {
+    color: green;
+}
+
+.number {
+    color: cyan;
+}
+
+.string {
+    font-weight: bold;
+    color: magenta;
+}
+
+.character {
+    font-weight: bold;
+    color: magenta;
+}
+
+.keyword {
+    font-weight: bold;
+    color: #ffff00;
+}
+
+.symbol {
+}
+
+.function-symbol {
+    font-weight: bold;
+    color: blue;
+}
+
+.class-delimiter {
+    color: blue;
+}
+
+.class-name {
+    font-weight: bold;
+    color: blue;
 }

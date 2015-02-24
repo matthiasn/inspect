@@ -72,9 +72,9 @@
   (let [origin (:origin item)]
     (when (active? selected origin)
       [:div.event
-       [:span (:received item)]
+       [:span.received (:received item)]
        [:h4 (str origin)]
-       [:pre [:code (str (:hiccup item))]]
+       [:pre [:code (:hiccup item)]]
        [:pre [:code (:payload item)]]
        [:br]])))
 
