@@ -78,17 +78,12 @@
     (swap! stats assoc origin (inc (get @stats origin 0)))
     (doseq [uid (:any @uids)]
       (when (pos? (get-in @client-maps [uid origin] 0))
-        (let [html (puget/pprint-str (:payload msg) {:print-color true
-                                                     :color-markup :html-classes
-                                                     :map-coll-separator :line})
+        (let [html (puget/pprint-str (:payload msg)
+                                     {:print-color true :color-markup :html-classes :map-coll-separator :line})
               hicc-html (hicv/html->hiccup html)
               hicc-spans (rest (first (rest (first hicc-html))))
               hicc-w-linebreaks (map #(if (= % ",\n") [:br] %) hicc-spans)]
-          (prn hicc-w-linebreaks)
-          (puget/cprint msg)
-          (chsk-send! uid [:info/msg (assoc msg
-                                       :payload (with-out-str (pp/pprint (:payload msg)))
-                                       :hiccup hicc-w-linebreaks)]))
+          (chsk-send! uid [:info/msg (assoc msg :payload hicc-w-linebreaks)]))
         (swap! client-maps #(update-in % [uid origin] dec))
         (chsk-send! uid [:info/client-map (get-in @client-maps [uid])])))))
 
