@@ -29,6 +29,4 @@
   :cljsbuild {:builds [{:id "release"
                         :source-paths ["src/cljs"]
                         :compiler {:output-to "resources/public/inspect/js/build/inspect-opt.js"
-                                   :optimizations :simple
-                                   :preamble ["reagent/react.min.js"]
-                                   :externs ["externs/misc.js"]}}]})
+                                   :optimizations :advanced}}]})
