@@ -42,7 +42,7 @@
   [stats selected]
   [:div
    [:div.btn-group
-    (for [t (map (fn [[t _]] t) (vec @stats)) ] [select-btn t selected])
+    (for [t (map (fn [[t _]] t) (vec @stats)) ] ^{:key t} [select-btn t selected])
     [:br]]
    [:br]
    [:br]
@@ -63,7 +63,7 @@
       [:thead [:tr [:th "origin"] [:th "left"] [:th "msg/10s"]]]
       [:tbody
        (for [[origin n] @client-map]
-         [:tr {:class (if (contains? selected origin) "active" "")}
+         ^{:key (str "origin-" origin)} [:tr {:class (if (contains? selected origin) "active" "")}
           [:td (str origin)] [:td n] [:td (get stats origin)]])]]]))
 
 (defn event-div
@@ -74,16 +74,15 @@
       [:div.event
        [:span.received (:received item)]
        [:h4 (str origin)]
-       [:pre [:code (:hiccup item)]]
-       [:pre [:code (:payload item)]]
+       [:pre (into [:code] (:payload item))]
        [:br]])))
 
 (defn lister
   "list view for events"
   [items selected]
   [:div
-   (for [item items]
-     [event-div item selected])])
+   (for [[idx item] (map-indexed vector items)]
+     ^{:key (str "item" idx)} [event-div item selected])])
 
 (defn inspect-view
   "creates main view of the application"
