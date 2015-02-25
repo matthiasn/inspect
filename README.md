@@ -4,7 +4,7 @@
 
 Library / tool for inspecting messages. Read more about it in this **[blog post](http://matthiasnehlsen.com/blog/2014/11/14/Inspect/)**. Here's how the UI currently looks like:
 
-<a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/inspect.jpg" /></a>
+<a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="doc/inspect_0.1.9.png" /></a>
 
 You can click on the image for a live demo.
 
@@ -12,7 +12,7 @@ You can click on the image for a live demo.
 
 Using the **inspect** library is super simple. All you need to do is add **inspect** to the dependencies in your project.clj:
 
-    [com.matthiasnehlsen/inspect "0.1.6"]
+    [com.matthiasnehlsen/inspect "0.1.9"]
 
 Then, you probably want to import it where you need it:
 
