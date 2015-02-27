@@ -12,7 +12,7 @@ You can click on the image for a live demo.
 
 Using the **inspect** library is super simple. All you need to do is add **inspect** to the dependencies in your project.clj:
 
-    [com.matthiasnehlsen/inspect "0.1.9"]
+    [com.matthiasnehlsen/inspect "0.1.10"]
 
 Then, you probably want to import it where you need it:
 
