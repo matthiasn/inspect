@@ -3,12 +3,10 @@
   (:require
    [com.matthiasnehlsen.inspect.matcher :as matcher]
    [com.matthiasnehlsen.inspect.http :as http]
-   [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]
-   [clojure.pprint :as pp]
    [clj-time.core :as t]
    [clj-time.format :as f]
-   [clojure.core.async :as async :refer [<! chan put! mult tap pub sub timeout go-loop sliding-buffer]]))
+   [clojure.core.async :refer [<! chan put! mult tap pub sub timeout go-loop sliding-buffer]]))
 
 ;; in-chan is multiplied into event-mult. That way, the matcher component can attach on start and detach on stop.
 ;; With no channel tapped into the data, the messages are simply dropped.
@@ -31,7 +29,7 @@
    :http    (component/using (http/new-http-server conf) {:matcher :matcher})))
 
 ;; system with default port
-(def system (atom (get-system {:port 8000})))
+(def system (atom (get-system {:port 8000 :title "inspect"})))
 
 (defn configure
   "override system with specified config (currently only :port)"
