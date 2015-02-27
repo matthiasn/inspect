@@ -301,7 +301,6 @@ th {
 .event pre code {
     font-family: Monaco, monospace;
     font-size: 0.7em;
-    line-height: 10px;
     margin-top: 0px;
     margin-bottom: 10px;
     overflow: scroll-x;
