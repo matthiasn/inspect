@@ -1,7 +1,26 @@
 (ns com.matthiasnehlsen.inspect.index
   (:gen-class)
   (:require
-    [hiccup.core :refer [html]]))
+    [hiccup.core :refer [html]]
+    [garden.core :refer [css]]))
+
+(defn index-css
+  "Generate index page CSS in Clojure using Garden."
+  []
+  (css {:pretty-print? false} 
+       [:.active          {:font-weight :bold :color :black}]
+       [:.delimiter       {:font-weight :bold :color :red}]
+       [:.number          {:color "#6897BB"}]
+       [:.tag             {:color :red}]
+       [:.boolean         {:color :green}]
+       [:.class-delimiter {:color "#4471FF"}]
+       [:.string          {:font-weight :bold :color "#6A8759"}]
+       [:.character       {:font-weight :bold :color "#6A8759"}]
+       [:.keyword         {:font-weight :bold :color "#CC7832"}]
+       [:.class-name      {:font-weight :bold :color "#4471FF"}]
+       [:.function-symbol {:font-weight :bold :color "#4471FF"}]
+       [:.nil             {:font-weight :bold :color "#CC7832"}]
+       [:.symbol]))
 
 (defn index-page
   "Generates index page HTML with the specified page title."
@@ -14,6 +33,7 @@
       [:title title]
       [:link {:href "/inspect/bower_components/pure/pure-min.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/inspect/css/inspect.css", :media "screen", :rel "stylesheet"}]
+      [:style (index-css)]
       [:link {:href "http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext" :rel "stylesheet" :type "text/css"}]
       [:link {:href "/inspect/images/favicon.png", :rel "shortcut icon", :type "image/png"}]]
      [:body

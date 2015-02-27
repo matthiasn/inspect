@@ -15,6 +15,7 @@
                  [mvxcvi/puget "0.7.0"]
                  [hiccup "1.0.5"]
                  [hiccup-bridge "1.0.1"]
+                 [garden "1.2.5"]
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.4"]
                  [clj-time "0.9.0"]
