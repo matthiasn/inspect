@@ -1,4 +1,4 @@
-(defproject com.matthiasnehlsen/inspect "0.1.9"
+(defproject com.matthiasnehlsen/inspect "0.1.10-SNAPSHOT"
   :description "Log to a web application to inspect what's going on in your application"
   :url "https://github.com/matthiasn/inspect"
   :license {:name "Eclipse Public License"
@@ -13,6 +13,7 @@
                  [http-kit "2.1.19"]
                  [compojure "1.3.1"]
                  [mvxcvi/puget "0.7.0"]
+                 [hiccup "1.0.5"]
                  [hiccup-bridge "1.0.1"]
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.4"]
