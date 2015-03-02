@@ -16,32 +16,38 @@
 (def built-in-formatter (f/formatters :date-time)) ; used for timestamping the inspected messages
 
 (defn inspect
-  "Send message to inspect sub-system with msg-type. Only does anything when system active"
+  "Send message to inspect sub-system with msg-type. Only does anything when system active."
   [msg-type msg]
   (put! in-chan [:event {:origin msg-type :received (f/unparse built-in-formatter (t/now)) :payload msg}]))
 
 (defn get-system
   "Create system by wiring individual components so that component/start
-  will bring up the individual components in the correct order."
+   will bring up the individual components in the correct order."
   [conf]
   (component/system-map
    :matcher (matcher/new-matcher event-mult inspect)
    :http    (component/using (http/new-http-server conf) {:matcher :matcher})))
 
-;; system with default port
-(def system (atom (get-system {:port 8000 :title "inspect"})))
+(def default-conf {:port 8000
+                   :title "inspect"
+                   :header "inspect"
+                   :subheader "println no more"})
+
+;; system with default configuration
+(def system (atom (get-system default-conf)))
 
 (defn configure
-  "override system with specified config (currently only :port)"
+  "Partially or complety override system configuratio with the provided
+   configuration map."
   [conf]
-  (reset! system (get-system conf)))
+  (reset! system (get-system (merge default-conf conf))))
 
 (defn start
-  "start the inspect system"
+  "Start the inspect system."
   []
   (swap! system component/start))
 
 (defn stop
-  "stop the inspect system"
+  "Stop the inspect system."
   []
   (swap! system (fn [s] (when s (component/stop s)))))

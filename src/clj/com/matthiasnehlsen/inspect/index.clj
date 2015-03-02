@@ -51,13 +51,13 @@
 
 (defn index-page
   "Generates index page HTML with the specified page title."
-  [title]
+  [conf]
   (html
     [:html
      {:lang "en"}
      [:head 
       [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
-      [:title title]
+      [:title (:title conf)]
       [:link {:href "/inspect/bower_components/pure/pure-min.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/inspect/css/inspect.css", :media "screen", :rel "stylesheet"}]
       [:style (index-css)]
@@ -72,8 +72,8 @@
          [:li [:a {:href "http://matthiasnehlsen.com/blog/2014/11/14/Inspect/"} "About"]]]]]
       [:div.splash-container
        [:div.splash 
-        [:h1.splash-head "inspect"]
-        [:p.splash-subhead "println no more"]]]
+        [:h1.splash-head (:header conf)]
+        [:p.splash-subhead (:subheader conf)]]]
       [:div.content-wrapper
        [:div.content
         [:div.pure-g

@@ -22,7 +22,7 @@
 (interval-put-loop 60000 :interval-put/every-minute {:msg "every minute"})
 
 ;; optional, only necessary when default port 8000 is not desired
-(i/configure {:port 8001 :title "Inspect Example"})
+(i/configure {:port 8001 :title "Inspect Example" :header "Inspect Example"})
 
 (defn reload [] (i/stop) (refresh) (i/start))
 

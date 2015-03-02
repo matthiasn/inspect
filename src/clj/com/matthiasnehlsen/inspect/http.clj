@@ -18,7 +18,7 @@
   component/Lifecycle
   (start [component] (log/info "Starting HTTP Component")
     (defroutes my-routes  ; created during start so that the correct matcher instance is used
-               (GET "/" [] (content-type (response (index-page (:title conf))) "text/html"))
+               (GET "/" [] (content-type (response (index-page conf)) "text/html"))
                (GET "/chsk" req ((:ajax-get-or-ws-handshake-fn matcher) req))
                (POST "/chsk" req ((:ajax-post-fn matcher) req))
                (route/resources "/")
