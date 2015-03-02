@@ -1,12 +1,9 @@
 (ns inspect.communicator
-  (:require-macros [cljs.core.match.macros :refer (match)]
-                   [cljs.core.async.macros :refer [go-loop go]])
+  (:require-macros [cljs.core.match.macros :refer (match)])
   (:require [inspect.appstate :as appstate]
             [cljs.core.match]
             [taoensso.sente  :as sente :refer (cb-success?)]
-            [cljs.core.async :as async :refer [<! >! chan put! alts! timeout]]))
-
-(enable-console-print!)
+            [cljs.core.async :refer [<! >! chan put! alts! timeout]]))
 
 (let [{:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket! "/chsk")]
   (def chsk chsk)

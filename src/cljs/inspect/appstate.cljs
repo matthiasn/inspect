@@ -1,9 +1,6 @@
 (ns inspect.appstate
-  (:require-macros [cljs.core.async.macros :refer [go-loop go alt!]])
-  (:require [cljs.core.async :as async :refer [<!]]
-            [reagent.core :as reagent :refer [atom]]))
-
-(enable-console-print!)
+  (:require [cljs.core.async :refer [<!]]
+            [reagent.core :refer [atom]]))
 
 ;;; Application state in reagent's watched atoms
 

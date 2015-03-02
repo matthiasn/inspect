@@ -2,7 +2,7 @@
   (:require [inspect.communicator :as comm]
             [inspect.appstate :as appstate]
             [reagent.core :as reagent :refer [atom]]
-            [cljs.core.async :as async :refer [<! >! chan put! alts! timeout]]))
+            [cljs.core.async :refer [<! >! chan put! alts! timeout]]))
 
 (enable-console-print!)
 
@@ -17,7 +17,7 @@
   "send command to server to subscribe to the next events"
   []
   (let [next-items (into {} (map (fn [i] [i (:next-n @appstate/app)]) @appstate/selected))]
-    (comm/chsk-send! [:cmd/get-next-items next-items])))
+    (comm/chsk-send! [:cmd/get-next-items {:uid (:uid @comm/chsk-state) :next-items next-items}])))
 
 (defn active?
   "check if message type is active"

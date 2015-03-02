@@ -1,15 +1,14 @@
 (ns com.matthiasnehlsen.inspect.matcher
   (:gen-class)
   (:require
-    [clojure.pprint :as pp]
     [puget.printer :as puget]
     [puget.data]
     [hiccup-bridge.core :as hicv]
     [clojure.tools.logging :as log]
-    [clojure.core.match :as match :refer (match)]
+    [clojure.core.match :refer (match)]
     [taoensso.sente :as sente]
     [com.stuartsierra.component :as component]
-    [clojure.core.async :as async :refer [chan <! >! put! tap untap-all timeout go-loop]]))
+    [clojure.core.async :refer [chan <! >! put! tap untap-all timeout go-loop]]))
 
 (puget.data/extend-tagged-value
   org.httpkit.server.AsyncChannel 'AsyncChannel
@@ -31,12 +30,12 @@
 
 (defn get-next-items
   "start listener for all event types, limited to the next n for each"
-  [inspect-chan client-map full-event]
-  (put! inspect-chan [:next (:client-uuid full-event) client-map]))
+  [inspect-chan params]
+  (put! inspect-chan [:next (:uid params) (:next-items params)]))
 
 (defn initialize-inspector
   "start listener for all event types, limited to the next n for each"
-  [params full-event chsk-send!]
+  [params chsk-send!]
   (let [uid (:uid params)
         n (:n params)
         client-map (into {} (map (fn [[t _]] [t n]) (seq @stats)))]
@@ -63,8 +62,8 @@
     (let [event (:event full-event)]
       (inspect-fn :ws/event-in full-event)
       (match event
-             [:cmd/get-next-items params] (get-next-items inspect-chan params full-event)
-             [:cmd/initialize params]     (initialize-inspector params full-event chsk-send!)
+             [:cmd/get-next-items params] (get-next-items inspect-chan params)
+             [:cmd/initialize params]     (initialize-inspector params chsk-send!)
              [:cmd/get-stats params]      (chsk-send! (:uid params) [:info/stats @stats])
              [:chsk/ws-ping]              () ; currently just do nothing with ping (no logging either)
              [:chsk/uidport-open]         () ; user-id-fn already logs established connection
@@ -94,7 +93,7 @@
            (match (<! channel)
                   [:event ev] (handle-event uids ev chsk-send!)
                   [:close uid]  (swap! client-maps dissoc uid)
-                  [:next uid client-map] (swap! client-maps assoc-in [uid] client-map)
+                  [:next uid next-items] (swap! client-maps assoc-in [uid] next-items)
                   [:send-stats] (send-stats uids chsk-send!))
            (recur)))
 
