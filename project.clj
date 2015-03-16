@@ -19,13 +19,13 @@
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.4"]
                  [clj-time "0.9.0"]
-                 [org.clojure/clojurescript "0.0-2913"]
+                 [org.clojure/clojurescript "0.0-3119"]
                  [reagent "0.5.0"]
                  [com.stuartsierra/component "0.2.2"]]
 
   :source-paths ["src/clj/"]
 
-  :plugins [[lein-cljsbuild "1.0.4"]
+  :plugins [[lein-cljsbuild "1.0.5"]
             [codox "0.8.10"]]
 
   :cljsbuild {:builds [{:id "release"
