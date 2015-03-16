@@ -1,4 +1,4 @@
-(defproject com.matthiasnehlsen/inspect "0.1.11"
+(defproject com.matthiasnehlsen/inspect "0.1.12-SNAPSHOT"
   :description "Log to a web application to inspect what's going on in your application"
   :url "https://github.com/matthiasn/inspect"
   :license {:name "Eclipse Public License"
@@ -6,13 +6,13 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [org.clojure/tools.namespace "0.2.9"]
-                 [ch.qos.logback/logback-classic "1.1.1"]
-                 [com.taoensso/sente "1.3.0"]
-                 [org.clojure/core.match "0.2.1"]
+                 [org.clojure/tools.namespace "0.2.10"]
+                 [ch.qos.logback/logback-classic "1.1.2"]
+                 [com.taoensso/sente "1.4.1"]
+                 [org.clojure/core.match "0.2.2"]
                  [http-kit "2.1.19"]
-                 [compojure "1.3.1"]
-                 [mvxcvi/puget "0.7.0"]
+                 [compojure "1.3.2"]
+                 [mvxcvi/puget "0.8.0"]
                  [hiccup "1.0.5"]
                  [hiccup-bridge "1.0.1"]
                  [garden "1.2.5"]
@@ -20,7 +20,7 @@
                  [ring/ring-defaults "0.1.4"]
                  [clj-time "0.9.0"]
                  [org.clojure/clojurescript "0.0-2913"]
-                 [reagent "0.5.0-alpha3"]
+                 [reagent "0.5.0"]
                  [com.stuartsierra/component "0.2.2"]]
 
   :source-paths ["src/clj/"]

@@ -7,6 +7,7 @@
     [clojure.tools.logging :as log]
     [clojure.core.match :refer (match)]
     [taoensso.sente :as sente]
+    [taoensso.sente.server-adapters.http-kit :refer [sente-web-server-adapter]]
     [com.stuartsierra.component :as component]
     [clojure.core.async :refer [chan <! >! put! tap untap-all timeout go-loop]]))
 
@@ -102,7 +103,7 @@
   (start [component] (log/info "Starting Communicator Component")
          (let [inspect-chan (chan 1000)
                {:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn connected-uids]}
-               (sente/make-channel-socket! {:user-id-fn user-id-fn})
+               (sente/make-channel-socket! sente-web-server-adapter {:user-id-fn user-id-fn})
                event-handler (make-handler inspect-fn inspect-chan send-fn connected-uids)
                chsk-router (sente/start-chsk-router! ch-recv event-handler)]
            (tap event-mult inspect-chan)
