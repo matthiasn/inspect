@@ -28,9 +28,9 @@
   :plugins [[lein-cljsbuild "1.0.5"]
             [codox "0.8.10"]]
 
-  :clean-targets ^{:protect false} ["resources/public/inspect/js/build/"]
+            ;:clean-targets ^{:protect false} ["resources/public/inspect/js/build/"]
 
   :cljsbuild {:builds [{:id "release"
                         :source-paths ["src/cljs"]
-                        :compiler {:output-to "resources/public/inspect/js/build/inspect-opt.js"
+                        :compiler {:output-to "resources/public/inspect/js/build/inspect.js"
                                    :optimizations :advanced}}]})

@@ -82,4 +82,4 @@
            [:div#types]]
           [:div.pure-u-1-2 [:div#selection]]]]
         [:div.pure-g [:div.l-box-lrg [:div#code.pure-u-1]]]]]
-      [:script {:src "/inspect/js/build/inspect-opt.js"}]]]))
+      [:script {:src "/inspect/js/build/inspect.js"}]]]))
