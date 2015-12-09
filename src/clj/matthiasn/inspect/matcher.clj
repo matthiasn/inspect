@@ -1,4 +1,4 @@
-(ns com.matthiasnehlsen.inspect.matcher
+(ns matthiasn.inspect.matcher
   (:gen-class)
   (:require
     [puget.printer :as puget]

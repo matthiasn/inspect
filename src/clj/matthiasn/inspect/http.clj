@@ -1,10 +1,10 @@
-(ns com.matthiasnehlsen.inspect.http
+(ns matthiasn.inspect.http
   (:gen-class)
   (:require
     [clojure.tools.logging :as log]
     [org.httpkit.server :as http-kit-server]
     [ring.middleware.defaults]
-    [com.matthiasnehlsen.inspect.index :refer [index-page]]
+    [matthiasn.inspect.index :refer [index-page]]
     [ring.util.response :refer [response content-type]]
     [compojure.core :refer (defroutes GET POST)]
     [compojure.route :as route]

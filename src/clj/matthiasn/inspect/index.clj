@@ -1,4 +1,4 @@
-(ns com.matthiasnehlsen.inspect.index
+(ns matthiasn.inspect.index
   (:gen-class)
   (:require
     [hiccup.core :refer [html]]

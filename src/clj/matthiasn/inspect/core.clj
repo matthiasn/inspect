@@ -1,17 +1,18 @@
-(ns com.matthiasnehlsen.inspect
+(ns matthiasn.inspect.core
   (:gen-class)
   (:require
-   [com.matthiasnehlsen.inspect.matcher :as matcher]
-   [com.matthiasnehlsen.inspect.http :as http]
-   [com.stuartsierra.component :as component]
-   [clj-time.core :as t]
-   [clj-time.format :as f]
-   [clojure.core.async :refer [<! chan put! mult tap pub sub timeout go-loop sliding-buffer]]))
+    [matthiasn.inspect.matcher :as matcher]
+    [matthiasn.inspect.http :as http]
+    [com.stuartsierra.component :as component]
+    [clj-time.core :as t]
+    [clj-time.format :as f]
+    [clojure.core.async :refer [<! chan put! mult tap pub sub timeout go-loop sliding-buffer]]
+    [clojure.pprint :as pp]))
 
 ;; in-chan is multiplied into event-mult. That way, the matcher component can attach on start and detach on stop.
 ;; With no channel tapped into the data, the messages are simply dropped.
-(def in-chan (chan (sliding-buffer 10000)))
-(def event-mult (mult in-chan))
+(defonce in-chan (chan (sliding-buffer 10000)))
+(defonce event-mult (mult in-chan))
 
 (def built-in-formatter (f/formatters :date-time)) ; used for timestamping the inspected messages
 
@@ -42,12 +43,39 @@
   [conf]
   (reset! system (get-system (merge default-conf conf))))
 
-(defn start
+(defn start!
   "Start the inspect system."
   []
   (swap! system component/start))
 
-(defn stop
+(defn stop!
   "Stop the inspect system."
   []
   (swap! system (fn [s] (when s (component/stop s)))))
+
+(defonce started (start!))
+
+(defn inspect-fn-call
+  "Traces a single call to a function f with args. 'name' is the
+symbol name of the function."
+  [fn-name f args]
+  (do
+    (inspect (keyword (name fn-name) "args") (into [] args))
+    (let [value (apply f args)]
+      (inspect (keyword (name fn-name) "return-value") value)
+      value)))
+
+(defmacro defn
+  "Use in place of defn; traces each call/return of this fn, including
+   arguments. Nested calls to deftrace'd functions will print a
+   tree-like structure.
+   The first argument of the form definition can be a doc string.
+   Borrowed from https://github.com/clojure/tools.trace"
+  [fn-name & definition]
+  (let [doc-string (if (string? (first definition)) (first definition) "")
+        fn-form  (if (string? (first definition)) (rest definition) definition)]
+    `(do
+       (declare ~fn-name)
+       (let [f# (fn ~@fn-form)]
+         (defn ~fn-name ~doc-string [& args#]
+           (inspect-fn-call '~fn-name f# args#))))))

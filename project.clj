@@ -1,4 +1,4 @@
-(defproject com.matthiasnehlsen/inspect "0.1.13"
+(defproject matthiasn/inspect "0.2.1"
   :description "Log to a web application to inspect what's going on in your application"
   :url "https://github.com/matthiasn/inspect"
   :license {:name "Eclipse Public License"
