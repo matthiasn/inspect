@@ -1,23 +1,12 @@
 (ns matthiasn.inspect.matcher
   (:gen-class)
   (:require
-    [puget.printer :as puget]
-    [puget.data]
-    [hiccup-bridge.core :as hicv]
     [clojure.tools.logging :as log]
     [clojure.core.match :refer (match)]
     [taoensso.sente :as sente]
     [taoensso.sente.server-adapters.http-kit :refer [sente-web-server-adapter]]
     [com.stuartsierra.component :as component]
     [clojure.core.async :refer [chan <! >! put! tap untap-all timeout go-loop]]))
-
-(puget.data/extend-tagged-value
-  org.httpkit.server.AsyncChannel 'AsyncChannel
-  (fn [_] "some AsyncChannel"))
-
-(puget.data/extend-tagged-value
-  clojure.lang.Atom 'Atom
-  (fn [atm] @atm))
 
 (defn user-id-fn
   "generates unique ID for request"
@@ -78,12 +67,7 @@
     (swap! stats assoc origin (inc (get @stats origin 0)))
     (doseq [uid (:any @uids)]
       (when (pos? (get-in @client-maps [uid origin] 0))
-        (let [html (puget/pprint-str (:payload msg)
-                                     {:print-color true :color-markup :html-classes :map-coll-separator :line})
-              hicc-html (hicv/html->hiccup html)
-              hicc-spans (rest (first (rest (first hicc-html))))
-              hicc-w-linebreaks (map #(if (= % ",\n") [:br] %) hicc-spans)]
-          (chsk-send! uid [:info/msg (assoc msg :payload hicc-w-linebreaks)]))
+        (chsk-send! uid [:info/msg msg])
         (swap! client-maps #(update-in % [uid origin] dec))
         (chsk-send! uid [:info/client-map (get-in @client-maps [uid])])))))
 
