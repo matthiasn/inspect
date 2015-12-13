@@ -22,25 +22,27 @@
 
 (def xform (comp (map pp/pprint)))
 
-(defn kafka-producer-state-fn
+(defn kafka-consumer-state-fn
   "Returns function for making state while using provided configuration."
   [conf]
   (fn [put-fn]
-    ;(ku/delete-tmp-dir)
+    ;    (ku/delete-tmp-dir)
     (let [zk (ku/create-zookeeper test-broker-config)
           kafka (ku/create-broker test-broker-config)
           topic (:topic test-broker-config)]
       (.startup kafka)
+      (Thread/sleep 5000)
       (let [zk-client (admin/zk-client (str "127.0.0.1:" (:zookeeper-port test-broker-config))
                                         {:session-timeout-ms    500
                                          :connection-timeout-ms 500})]
-        (Thread/sleep 3000)
+        (Thread/sleep 5000)
         (when-not (admin/topic-exists? zk-client topic)
           (admin/create-topic zk-client topic)
           (ku/wait-until-initialised kafka topic))
         (let [c (kcz/consumer config)
-              stream (kcz/create-message-stream c "test-topic")]
-          (future (eduction xform stream))
+              ;; stream (kcz/create-message-stream c "test-topic")
+              messages (kcz/messages c "test-topic")]
+          ;(future (take 10 (map pp/pprint messages)))
           {:state (atom {:consumer c})})))))
 
 (defn args-handler
@@ -53,6 +55,6 @@
 (defn cmp-map
   "Create component for starting percolation in ElasticSearch and delivering matches."
   [cmp-id conf] {:cmp-id      cmp-id
-                 :state-fn    (kafka-producer-state-fn conf)
+                 :state-fn    (kafka-consumer-state-fn conf)
                  :handler-map {:inspect/args       args-handler
                                :inspect/return-val args-handler}})

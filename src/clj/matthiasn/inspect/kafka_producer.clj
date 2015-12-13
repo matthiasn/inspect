@@ -10,7 +10,8 @@
   "Returns function for making state while using provided configuration."
   [conf]
   (fn [put-fn]
-    (let [prod (kp/producer {"bootstrap.servers" "127.0.0.1:9999"}
+    (let [prod (kp/producer {"bootstrap.servers" "127.0.0.1:9999"
+                             "client-id" "producer-cmp"}
                             (kp/byte-array-serializer)
                             (kp/byte-array-serializer))]
       (Thread/sleep 3000)
