@@ -10,12 +10,14 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.10"]
                  [ch.qos.logback/logback-classic "1.1.2"]
-                 [com.taoensso/sente "1.4.1"]
-                 [org.clojure/core.match "0.2.2"]
+                 [com.taoensso/sente "1.4.1"  :exclusions [com.taoensso/encore]]
+                 [org.clojure/core.match "0.3.0-alpha4"]
                  [http-kit "2.1.19"]
-                 [matthiasn/systems-toolbox "0.4.3"]
+                 [matthiasn/systems-toolbox "0.4.3" :exclusions [com.taoensso/sente com.taoensso/encore]]
                  [clj-kafka "0.3.4"]
-                 [com.taoensso/nippy "2.10.0"]
+                 [com.taoensso/nippy "2.11.0-beta1"]
+                 [clj-pid "0.1.1"]
+                 [instaparse "1.4.1"]
                  [compojure "1.3.2"]
                  [hiccup "1.0.5"]
                  [garden "1.2.5"]
@@ -27,6 +29,8 @@
                  [com.stuartsierra/component "0.2.2"]]
 
   :source-paths ["src/clj/"]
+
+  :main matthiasn.inspect.core
 
   :plugins [[lein-cljsbuild "1.0.5"]
             [codox "0.8.10"]]

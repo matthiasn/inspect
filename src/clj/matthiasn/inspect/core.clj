@@ -6,15 +6,20 @@
     [com.stuartsierra.component :as component]
     [clj-time.core :as t]
     [clj-time.format :as f]
+    [clj-pid.core :as pid]
     [clojure.core.async :refer [<! chan put! mult tap pub sub timeout go-loop sliding-buffer]]
-    [clojure.pprint :as pp]))
+    [clojure.pprint :as pp]
+    [clojure.tools.logging :as log]
+    [matthiasn.systems-toolbox.switchboard :as sb]
+    [matthiasn.inspect.kafka-producer :as kp]
+    [matthiasn.inspect.kafka-consumer :as kc]))
 
 ;; in-chan is multiplied into event-mult. That way, the matcher component can attach on start and detach on stop.
 ;; With no channel tapped into the data, the messages are simply dropped.
 (defonce in-chan (chan (sliding-buffer 10000)))
 (defonce event-mult (mult in-chan))
 
-(def built-in-formatter (f/formatters :date-time)) ; used for timestamping the inspected messages
+(def built-in-formatter (f/formatters :date-time))          ; used for timestamping the inspected messages
 
 (defn inspect
   "Send message to inspect sub-system with msg-type. Only does anything when system active."
@@ -26,15 +31,16 @@
    will bring up the individual components in the correct order."
   [conf]
   (component/system-map
-   :matcher (matcher/new-matcher event-mult inspect)
-   :http    (component/using (http/new-http-server conf) {:matcher :matcher})))
+    :matcher (matcher/new-matcher event-mult inspect)
+    :http (component/using (http/new-http-server conf) {:matcher :matcher})))
 
 (def port (get (System/getenv) "INSPECT_PORT" "8000"))
 
-(def default-conf {:port      (. Integer parseInt port)
-                   :title     "inspect"
-                   :header    "inspect"
-                   :subheader "println no more"})
+(def default-conf
+  {:port      (. Integer parseInt port)
+   :title     "inspect"
+   :header    "inspect"
+   :subheader "println no more"})
 
 ;; system with default configuration
 (def system (atom (get-system default-conf)))
@@ -55,4 +61,20 @@
   []
   (swap! system (fn [s] (when s (component/stop s)))))
 
-(defonce started (start!))
+;(defonce started (start!))
+
+(defonce switchboard (sb/component :probe/switchboard))
+
+(defn init!
+  []
+  (sb/send-mult-cmd
+    switchboard
+    [[:cmd/init-comp [(kc/cmp-map :probe/kafka-consumer-cmp inspect)]]]))
+
+(defn -main
+  [& args]
+  (pid/save "inspect.pid")
+  (pid/delete-on-shutdown! "inspect.pid")
+  (log/info "Application started, PID" (pid/current))
+  (init!)
+  (start!))

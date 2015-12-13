@@ -2,7 +2,6 @@
   (:gen-class)
   (:require
     [clojure.tools.logging :as log]
-    [matthiasn.inspect.core :as i]
     [clj-kafka.new.producer :as kp]
     [taoensso.nippy :as nippy]
     [clojure.pprint :as pp]))
