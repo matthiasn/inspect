@@ -25,7 +25,9 @@
         pprinted (with-out-str (pp/pprint msg))
         send-future (kp/send prod
                              (kp/record "test-topic" (.getBytes pprinted))
-                             (fn [m err] (pp/pprint m) (pp/pprint err)))]
+                             (fn [m err]
+                               (log/info "producer future result:" m)
+                               (log/info "producer future err:" err)))]
     ;(log/info pprinted)
     (apply i/inspect msg)))
 

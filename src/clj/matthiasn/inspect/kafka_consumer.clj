@@ -10,13 +10,13 @@
     [clj-kafka.admin :as admin])
   (:import [org.apache.commons.io FileUtils]))
 
-(def test-broker-config {:zookeeper-port 2182
-                         :kafka-port     9999
+(def test-broker-config {:zookeeper-port 2181
+                         :kafka-port     9092
                          :topic          "test-topic"})
 
-(def config {"zookeeper.connect" "localhost:2182"
+(def config {"zookeeper.connect" "localhost:2181"
              "group.id" "clj-kafka.consumer"
-             "port" "9999"
+             "port" "9092"
              "auto.offset.reset" "smallest"
              "auto.commit.enable" "false"})
 
@@ -27,22 +27,27 @@
   [conf]
   (fn [put-fn]
     ;    (ku/delete-tmp-dir)
-    (let [zk (ku/create-zookeeper test-broker-config)
-          kafka (ku/create-broker test-broker-config)
-          topic (:topic test-broker-config)]
-      (.startup kafka)
-      (Thread/sleep 5000)
+    (let [                                                  ;zk (ku/create-zookeeper test-broker-config)
+          ;kafka (ku/create-broker test-broker-config)
+          topic (:topic test-broker-config)
+          ]
+      ;(.startup kafka)
+      ;(Thread/sleep 5000)
       (let [zk-client (admin/zk-client (str "127.0.0.1:" (:zookeeper-port test-broker-config))
                                         {:session-timeout-ms    500
                                          :connection-timeout-ms 500})]
         (Thread/sleep 5000)
         (when-not (admin/topic-exists? zk-client topic)
           (admin/create-topic zk-client topic)
-          (ku/wait-until-initialised kafka topic))
+          ;(ku/wait-until-initialised kafka topic)
+          )
         (let [c (kcz/consumer config)
               ;; stream (kcz/create-message-stream c "test-topic")
-              messages (kcz/messages c "test-topic")]
+              ;messages (kcz/messages c "test-topic")
+              ]
           ;(future (take 10 (map pp/pprint messages)))
+          (future (let [messages (kcz/messages c "test-topic")]
+                    (log/info (take 10 messages))))
           {:state (atom {:consumer c})})))))
 
 (defn args-handler
