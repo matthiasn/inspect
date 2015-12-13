@@ -47,7 +47,9 @@
               ]
           ;(future (take 10 (map pp/pprint messages)))
           (future (let [messages (kcz/messages c "test-topic")]
-                    (log/info (take 10 messages))))
+                    (log/info (take 10 messages))
+                    (doseq [msg messages]
+                      (log/info "kafka-consumer-state-fn" (String. (:value msg)) (:value msg)))))
           {:state (atom {:consumer c})})))))
 
 (defn args-handler
