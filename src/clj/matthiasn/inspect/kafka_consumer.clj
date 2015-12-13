@@ -4,34 +4,36 @@
     [clojure.tools.logging :as log]
     [matthiasn.inspect.core :as i]
     [clj-kafka.consumer.zk :as kcz]
-    [clj-kafka.admin :as admin]))
+    [clj-kafka.admin :as admin]
+    [taoensso.nippy :as nippy]))
 
-(def test-broker-config
+(def broker-config
   {:zookeeper-port 2181
    :kafka-port     9092
-   :topic          "test-topic"})
+   :topic          "inspect-probe"})
 
 (def config
   {"zookeeper.connect"  "localhost:2181"
    "group.id"           "clj-kafka.consumer"
    "port"               "9092"
    "auto.offset.reset"  "smallest"
-   "auto.commit.enable" "false"})
+   "auto.commit.enable" "true"})
 
 (defn kafka-consumer-state-fn
   "Returns function for making state while using provided configuration."
   [put-fn]
-  (let [topic (:topic test-broker-config)]
-    (let [zk-client (admin/zk-client (str "127.0.0.1:" (:zookeeper-port test-broker-config))
+  (let [topic (:topic broker-config)]
+    (let [zk-client (admin/zk-client (str "127.0.0.1:" (:zookeeper-port broker-config))
                                      {:session-timeout-ms    500
                                       :connection-timeout-ms 500})]
       (when-not (admin/topic-exists? zk-client topic)
         (admin/create-topic zk-client topic))
       (let [c (kcz/consumer config)]
-        (future (let [messages (kcz/messages c "test-topic")]
-                  (log/info (take 10 messages))
+        (future (let [messages (kcz/messages c (:topic broker-config))]
                   (doseq [msg messages]
-                    (log/info "kafka-consumer-state-fn" (String. (:value msg))))))
+                    (let [thawed (nippy/thaw (:value msg))]
+                      ;(log/info "kafka-consumer-state-fn" thawed)
+                      (apply i/inspect thawed)))))
         {:state (atom {:consumer c})}))))
 
 (defn args-handler
@@ -41,7 +43,8 @@
   (apply i/inspect msg))
 
 (defn cmp-map
-  "Create component for starting percolation in ElasticSearch and delivering matches."
+  "Create Kafka consumer component, which receives serialized message on the 'inspect-probe' topic
+  and puts them on the out-channel."
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    kafka-consumer-state-fn

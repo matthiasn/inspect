@@ -4,6 +4,7 @@
     [clojure.tools.logging :as log]
     [matthiasn.inspect.core :as i]
     [clj-kafka.new.producer :as kp]
+    [taoensso.nippy :as nippy]
     [clojure.pprint :as pp]))
 
 (defn kafka-producer-state-fn
@@ -17,18 +18,18 @@
 
 (defn args-handler
   "Handle incoming messages: process / add to application state."
-  [{:keys [cmp-state msg]}]
+  [{:keys [cmp-state msg-type msg-payload]}]
   (let [prod (:producer @cmp-state)
-        pprinted (with-out-str (pp/pprint msg))]
+        pprinted (with-out-str (pp/pprint msg-payload))
+        frozen (nippy/freeze [msg-type pprinted])]
     (kp/send prod
-             (kp/record "test-topic" (.getBytes pprinted))
+             (kp/record "inspect-probe" frozen)
              (fn [m err]
-               (log/info "producer future result:" m)
-               (log/info "producer future err:" err)))
-    (apply i/inspect msg)))
+               (when err
+                 (log/info "producer future err:" err m))))))
 
 (defn cmp-map
-  "Create component for starting percolation in ElasticSearch and delivering matches."
+  "Create Kafka producer component, which sends serialized message on the 'inspect-probe' topic."
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    kafka-producer-state-fn
