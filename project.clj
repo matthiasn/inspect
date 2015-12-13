@@ -13,6 +13,8 @@
                  [com.taoensso/sente "1.4.1"]
                  [org.clojure/core.match "0.2.2"]
                  [http-kit "2.1.19"]
+                 [matthiasn/systems-toolbox "0.4.3"]
+                 [instaparse "1.4.1"]
                  [compojure "1.3.2"]
                  [mvxcvi/puget "0.8.0"]
                  [hiccup "1.0.5"]
