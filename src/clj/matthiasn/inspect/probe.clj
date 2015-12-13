@@ -19,7 +19,7 @@
   (sb/send-cmd
     switchboard
     [:cmd/send {:to  :probe/kafka-prod-cmp
-                :msg [:inspect/args msg]}]))
+                :msg [:inspect/probe msg]}]))
 
 (defn inspect-fn-call
   "Traces a single call to a function f with args. 'name' is the

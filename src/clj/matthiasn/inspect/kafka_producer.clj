@@ -16,12 +16,14 @@
                           (kp/byte-array-serializer))]
     {:state (atom {:producer prod})}))
 
-(defn args-handler
+(defn probe-msg-handler
   "Handle incoming messages: process / add to application state."
-  [{:keys [cmp-state msg-type msg-payload]}]
+  [{:keys [cmp-state msg-payload]}]
   (let [prod (:producer @cmp-state)
-        pprinted (with-out-str (pp/pprint msg-payload))
-        frozen (nippy/freeze [msg-type pprinted])]
+        probe-type (first msg-payload)
+        probe-msg (second msg-payload)
+        pprinted (with-out-str (pp/pprint probe-msg))
+        frozen (nippy/freeze [probe-type pprinted])]
     (kp/send prod
              (kp/record "inspect-probe" frozen)
              (fn [m err]
@@ -33,5 +35,4 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    kafka-producer-state-fn
-   :handler-map {:inspect/args       args-handler
-                 :inspect/return-val args-handler}})
+   :handler-map {:inspect/probe probe-msg-handler}})
