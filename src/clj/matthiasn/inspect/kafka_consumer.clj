@@ -33,7 +33,7 @@
           (future (let [messages (kcz/messages c (:topic broker-config))]
                     (doseq [msg messages]
                       (let [thawed (nippy/thaw (:value msg))]
-                        (log/info "kafka-consumer-state-fn" thawed)
+                        ;(log/info "kafka-consumer-state-fn" thawed)
                         (put-fn thawed)
                         (apply inspect-fn thawed)))))
           {:state (atom {:consumer c})})))))
