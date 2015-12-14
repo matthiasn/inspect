@@ -8,10 +8,8 @@
     [clj-time.format :as f]
     [clj-pid.core :as pid]
     [clojure.core.async :refer [<! chan put! mult tap pub sub timeout go-loop sliding-buffer]]
-    [clojure.pprint :as pp]
     [clojure.tools.logging :as log]
     [matthiasn.systems-toolbox.switchboard :as sb]
-    [matthiasn.inspect.kafka-producer :as kp]
     [matthiasn.inspect.kafka-consumer :as kc]))
 
 ;; in-chan is multiplied into event-mult. That way, the matcher component can attach on start and detach on stop.
@@ -60,8 +58,6 @@
   "Stop the inspect system."
   []
   (swap! system (fn [s] (when s (component/stop s)))))
-
-;(defonce started (start!))
 
 (defonce switchboard (sb/component :probe/switchboard))
 

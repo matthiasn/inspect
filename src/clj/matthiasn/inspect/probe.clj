@@ -12,8 +12,7 @@
   []
   (sb/send-mult-cmd
     switchboard
-    [;[:cmd/init-comp [(kc/cmp-map :probe/kafka-consumer-cmp i/inspect)]]
-     [:cmd/init-comp [(kp/cmp-map :probe/kafka-prod-cmp)]]]))
+    [[:cmd/init-comp [(kp/cmp-map :probe/kafka-prod-cmp)]]]))
 
 (defn send-to-producer
   [msg]
