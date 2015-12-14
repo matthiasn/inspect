@@ -50,7 +50,7 @@
    [:input {:type "number"
             :value (:next-n @appstate/app)
             :on-change #(let [value (js/parseInt (-> % .-target .-value))]
-                          (when-not (or (js/isNaN value) (neg? value) (> value 100))
+                          (when-not (or (js/isNaN value) (neg? value) (> value 1000))
                             (swap! appstate/app assoc :next-n value)))}]])
 
 (defn selection
@@ -88,7 +88,7 @@
   "creates main view of the application"
   []
   [:div
-   [lister (reverse (:events @appstate/app)) appstate/selected]])
+   [lister (take 50 (reverse (:events @appstate/app))) appstate/selected]])
 
 (defn run []
   (reagent/render-component (fn [] [inspect-view]) (by-id "code"))

@@ -10,7 +10,7 @@ pom.xml.asc
 .idea
 *.iml
 
-resources/public/js/build/
+resources/public/inspect/js/build/
 resources/public/inspect/bower_components/
 resources/public/inspect/js/build/inspect-opt.js
 
