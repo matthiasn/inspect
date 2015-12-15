@@ -36,7 +36,7 @@
               (let [messages (kcz/messages c (:topic broker-config))]
                 (doseq [msg messages]
                   (let [thawed (nippy/thaw (:value msg))]
-                    (log/info thawed)
+                    ;(log/info thawed)
                     (put-fn thawed)
                     #_(apply inspect-fn thawed))))))
           {:state (atom {:consumer c})})))))
