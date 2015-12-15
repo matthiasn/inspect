@@ -3,6 +3,7 @@
   (:require
     [matthiasn.inspect.matcher :as matcher]
     [matthiasn.inspect.http :as http]
+    [matthiasn.inspect.elastic :as es]
     [com.stuartsierra.component :as component]
     [clj-time.core :as t]
     [clj-time.format :as f]
@@ -59,13 +60,18 @@
   []
   (swap! system (fn [s] (when s (component/stop s)))))
 
-(defonce switchboard (sb/component :probe/switchboard))
+(defonce switchboard (sb/component :inspect/switchboard))
 
 (defn init!
   []
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp [(kc/cmp-map :probe/kafka-consumer-cmp inspect)]]]))
+    [[:cmd/init-comp [(kc/cmp-map :inspect/kafka-consumer-cmp inspect)]]
+     [:cmd/init-comp [(es/cmp-map :inspect/es-cmp)]]
+     ;; :inspect/es-cmp receives all messages from :inspect/kafka-consumer-cmp,
+     ;; without having an explicit handler for the msg types sent
+     [:cmd/route-all {:from :inspect/kafka-consumer-cmp
+                      :to   :inspect/es-cmp}]]))
 
 (defn -main
   [& args]

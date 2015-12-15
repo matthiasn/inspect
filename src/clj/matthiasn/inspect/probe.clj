@@ -2,9 +2,7 @@
   (:gen-class)
   (:require
     [matthiasn.systems-toolbox.switchboard :as sb]
-    [matthiasn.inspect.core :as i]
-    [matthiasn.inspect.kafka-producer :as kp]
-    [matthiasn.inspect.kafka-consumer :as kc]))
+    [matthiasn.inspect.kafka-producer :as kp]))
 
 (defonce switchboard (sb/component :probe/switchboard))
 
@@ -13,6 +11,8 @@
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp [(kp/cmp-map :probe/kafka-prod-cmp)]]]))
+
+(defonce started (init))
 
 (defn send-to-producer
   [msg]

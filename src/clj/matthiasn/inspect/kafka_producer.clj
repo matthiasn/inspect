@@ -34,4 +34,7 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    kafka-producer-state-fn
-   :handler-map {:inspect/probe probe-msg-handler}})
+   :handler-map {:inspect/probe probe-msg-handler}
+   :opts        {:in-chan               [:buffer 10000]
+                 :msgs-on-firehose      false
+                 :snapshots-on-firehose false}})
