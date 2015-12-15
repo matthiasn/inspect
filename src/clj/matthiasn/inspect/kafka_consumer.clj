@@ -4,12 +4,13 @@
     [clojure.tools.logging :as log]
     [clj-kafka.consumer.zk :as kcz]
     [clj-kafka.admin :as admin]
-    [taoensso.nippy :as nippy]))
+    [taoensso.nippy :as nippy]
+    [clojure.pprint :as pp]))
 
 (def broker-config
   {:zookeeper-port 2181
    :kafka-port     9092
-   :topic          "inspect-probe"})
+   :topic          "inspect-probe-events"})
 
 (def config
   {"zookeeper.connect"  "localhost:2181"
@@ -30,17 +31,19 @@
         (when-not (admin/topic-exists? zk-client topic)
           (admin/create-topic zk-client topic))
         (let [c (kcz/consumer config)]
-          (future (let [messages (kcz/messages c (:topic broker-config))]
-                    (doseq [msg messages]
-                      (let [thawed (nippy/thaw (:value msg))]
-                        ;(log/info "kafka-consumer-state-fn" thawed)
-                        (put-fn thawed)
-                        (apply inspect-fn thawed)))))
+          (future
+            (binding [nippy/*final-freeze-fallback* nippy/freeze-fallback-as-str]
+              (let [messages (kcz/messages c (:topic broker-config))]
+                (doseq [msg messages]
+                  (let [thawed (nippy/thaw (:value msg))]
+                    (log/info thawed)
+                    (put-fn thawed)
+                    #_(apply inspect-fn thawed))))))
           {:state (atom {:consumer c})})))))
 
 (defn cmp-map
   "Create Kafka consumer component, which receives serialized message on the 'inspect-probe' topic
   and puts them on the out-channel."
   [cmp-id inspect-fn]
-  {:cmp-id      cmp-id
-   :state-fn    (kafka-consumer-state-fn inspect-fn)})
+  {:cmp-id   cmp-id
+   :state-fn (kafka-consumer-state-fn inspect-fn)})

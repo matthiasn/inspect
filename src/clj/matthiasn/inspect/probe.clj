@@ -23,13 +23,16 @@
 
 (defn inspect-fn-call
   "Traces a single call to a function f with args. 'name' is the
-symbol name of the function."
+  symbol name of the function."
   [fn-name f args]
-  (do
-    (send-to-producer [(keyword (name fn-name) "args") (into [] args)])
-    (let [value (apply f args)]
-      (send-to-producer [(keyword (name fn-name) "return-value") value])
-      value)))
+  (let [ts (System/currentTimeMillis)
+        value (apply f args)]
+    (send-to-producer [(keyword (name fn-name))
+                       {:args         (into [] args)
+                        :return-value value
+                        :ts           ts
+                        :duration     (- (System/currentTimeMillis) ts)}])
+    value))
 
 (defmacro defn
   "Use in place of defn; hands each call's arguments and the return value
@@ -38,9 +41,9 @@ symbol name of the function."
   Borrowed from https://github.com/clojure/tools.trace"
   [fn-name & definition]
   (let [doc-string (if (string? (first definition)) (first definition) "")
-        fn-form  (if (string? (first definition)) (rest definition) definition)]
+        fn-form (if (string? (first definition)) (rest definition) definition)]
     `(do
        (declare ~fn-name)
        (let [f# (fn ~@fn-form)]
          (defn ~fn-name ~doc-string [& args#]
-           (inspect-fn-call '~fn-name f# args#))))))
+               (inspect-fn-call '~fn-name f# args#))))))

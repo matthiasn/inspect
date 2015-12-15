@@ -3,8 +3,7 @@
   (:require
     [clojure.tools.logging :as log]
     [clj-kafka.new.producer :as kp]
-    [taoensso.nippy :as nippy]
-    [clojure.pprint :as pp]))
+    [taoensso.nippy :as nippy]))
 
 (defn kafka-producer-state-fn
   "Returns function for making state while using provided configuration."
@@ -17,17 +16,15 @@
 
 (defn probe-msg-handler
   "Handle incoming messages: process / add to application state."
-  [{:keys [cmp-state msg-payload]}]
-  (let [prod (:producer @cmp-state)
-        probe-type (first msg-payload)
-        probe-msg (second msg-payload)
-        pprinted (with-out-str (pp/pprint probe-msg))
-        frozen (nippy/freeze [probe-type pprinted])]
-    (kp/send prod
-             (kp/record "inspect-probe" frozen)
-             (fn [m err]
-               (when err
-                 (log/info "producer future err:" err m))))))
+  [{:keys [cmp-state msg]}]
+  (binding [nippy/*final-freeze-fallback* nippy/freeze-fallback-as-str]
+    (let [prod (:producer @cmp-state)
+          frozen (nippy/freeze msg)]
+      (kp/send prod
+               (kp/record "inspect-probe-events" frozen)
+               (fn [m err]
+                 (when err
+                   (log/info "producer future err:" err m)))))))
 
 (defn cmp-map
   "Create Kafka producer component, which sends serialized message on the 'inspect-probe' topic."
