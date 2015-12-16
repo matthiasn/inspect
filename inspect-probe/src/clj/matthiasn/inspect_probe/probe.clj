@@ -2,6 +2,7 @@
   (:gen-class)
   (:require
     [matthiasn.systems-toolbox.switchboard :as sb]
+    [fipp.clojure :as fipp]
     [matthiasn.inspect-probe.kafka-producer :as kp]
     [clojure.pprint :as pp]))
 
@@ -29,14 +30,15 @@
   (let [ts (System/currentTimeMillis)
         value (apply f args)
         fn-name (name fn-name)]
-    (send-to-producer [(keyword fn-name)
-                       {:namespace    namespace-name
-                        :fn-name      fn-name
-                        ;:args         (into [] (map #(with-out-str (pp/pprint %)) args))
-                        :args         (with-out-str (pp/pprint (into [] args)))
-                        :return-value (with-out-str (pp/pprint value))
-                        :ts           ts
-                        :duration     (- (System/currentTimeMillis) ts)}])
+    (send-to-producer {:namespace    namespace-name
+                       :fn-name      fn-name
+                       ;:args         (into [] (map #(with-out-str (pp/pprint %)) args))
+                       ;:args         (with-out-str (fipp/pprint (into [] args)))
+                       ;:return-value (with-out-str (fipp/pprint value))
+                       :args         (into [] args)
+                       :return-value value
+                       :ts           ts
+                       :duration     (- (System/currentTimeMillis) ts)})
     value))
 
 (defmacro defn

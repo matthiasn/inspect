@@ -7,6 +7,7 @@
                  [matthiasn/systems-toolbox "0.4.3"]
                  [clj-kafka "0.3.4"]
                  [com.taoensso/nippy "2.11.0-beta1"]
+                 [fipp "0.6.3"]
                  [clj-time "0.9.0"]]
 
   :source-paths ["src/clj/"]

@@ -31,9 +31,8 @@
   "Persist event into configured ElasticSearch index."
   [{:keys [cmp-state msg-payload]}]
   (try
-    (let [event-data (second msg-payload)]
-      (when event-data
-        (esd/put (:conn @cmp-state) es-index "event" (str (uuid/v1)) event-data)))
+    (when msg-payload
+      (esd/put (:conn @cmp-state) es-index "event" (str (uuid/v1)) msg-payload))
     (catch Exception ex (log/error ex "Exception when trying to persist to ElasticSearch"))))
 
 (defn cmp-map

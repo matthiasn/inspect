@@ -3,7 +3,8 @@
   (:require
     [clojure.tools.logging :as log]
     [clj-kafka.new.producer :as kp]
-    [taoensso.nippy :as nippy]))
+    [taoensso.nippy :as nippy]
+    [fipp.clojure :as fipp]))
 
 (defn kafka-producer-state-fn
   "Returns function for making state while using provided configuration."
@@ -18,8 +19,10 @@
   [{:keys [cmp-state msg-payload]}]
   (binding [nippy/*final-freeze-fallback* nippy/freeze-fallback-as-str]
     (let [prod (:producer @cmp-state)
-          frozen (nippy/freeze msg-payload)]
-      (log/info msg-payload)
+          event (merge msg-payload
+                       {:args         (with-out-str (fipp/pprint (:args msg-payload)))
+                        :return-value (with-out-str (fipp/pprint (:return-value msg-payload)))})
+          frozen (nippy/freeze event)]
       (kp/send prod
                (kp/record "inspect-probe-events" frozen)
                (fn [m err]
@@ -32,6 +35,6 @@
   {:cmp-id      cmp-id
    :state-fn    kafka-producer-state-fn
    :handler-map {:inspect/probe probe-msg-handler}
-   :opts        {:in-chan               [:sliding 10000]
+   :opts        {:in-chan               [:sliding 100000]
                  :msgs-on-firehose      false
                  :snapshots-on-firehose false}})
