@@ -15,21 +15,25 @@
 (defn es-state-fn
   "Returns function for making state while using provided configuration."
   [put-fn]
-  (let [conn (esr/connect es-address)]
+  (let [conn (esr/connect es-address)
+        mapping-types {"event" {:properties {:namespace    {:type "string" :store "yes"}
+                                             :fn-name      {:type "string" :store "yes"}
+                                             :args         {:type "string" :store "yes"}
+                                             :return-value {:type "string" :store "yes"}
+                                             :ts           {:type "long" :store "yes"}
+                                             :duration     {:type "long" :store "yes"}}}}]
     (log/info "ElasticSearch connection started to" es-address)
     (when-not (esi/exists? conn es-index)
-      (esi/create conn es-index))
+      (esi/create conn es-index :mappings mapping-types))
     {:state (atom {:conn conn})}))
 
 (defn persist-fn
   "Persist event into configured ElasticSearch index."
-  [{:keys [cmp-state msg-type msg-payload]}]
+  [{:keys [cmp-state msg-payload]}]
   (try
-    (let [fn-name (first msg-payload)
-          event-data (second msg-payload)
-          es-doc {:event-type     fn-name
-                  :event-pprinted (with-out-str (pp/pprint event-data))}]
-      (esd/put (:conn @cmp-state) es-index "event" (str (uuid/v1)) es-doc))
+    (let [event-data (second msg-payload)]
+      (when event-data
+        (esd/put (:conn @cmp-state) es-index "event" (str (uuid/v1)) event-data)))
     (catch Exception ex (log/error ex "Exception when trying to persist to ElasticSearch"))))
 
 (defn cmp-map
