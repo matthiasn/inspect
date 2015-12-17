@@ -17,17 +17,17 @@
 
 (defn probe-msg-handler
   [{:keys [cmp-state msg-payload]}]
-  (binding [nippy/*final-freeze-fallback* nippy/freeze-fallback-as-str]
-    (let [prod (:producer @cmp-state)
-          event (merge msg-payload
-                       {:args         (with-out-str (fipp/pprint (:args msg-payload)))
-                        :return-value (with-out-str (fipp/pprint (:return-value msg-payload)))})
-          frozen (nippy/freeze event)]
-      (kp/send prod
-               (kp/record "inspect-probe-events" frozen)
-               (fn [m err]
-                 (when err
-                   (log/info "producer future err:" err m)))))))
+  (let [prod (:producer @cmp-state)
+        ;        event
+        #_(merge msg-payload
+               {:args         (with-out-str (fipp/pprint (:args msg-payload)))
+                :return-value (with-out-str (fipp/pprint (:return-value msg-payload)))})
+        frozen (nippy/freeze msg-payload)]
+    (kp/send prod
+             (kp/record "inspect-probe-events" frozen)
+             (fn [m err]
+               (when err
+                 (log/info "producer future err:" err m))))))
 
 (defn cmp-map
   "Create Kafka producer component, which sends serialized message on the 'inspect-probe' topic."
