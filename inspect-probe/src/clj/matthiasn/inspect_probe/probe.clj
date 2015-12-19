@@ -23,24 +23,6 @@
     [:cmd/send {:to  :probe/kafka-prod-cmp
                 :msg [:inspect/probe msg]}]))
 
-(defn inspect-fn-call
-  "Traces a single call to a function f with args. 'name' is the
-  symbol name of the function."
-  [fn-name f args namespace-name]
-  (let [ts (System/currentTimeMillis)
-        value (apply f args)
-        fn-name (name fn-name)]
-    (send-to-producer {:namespace    namespace-name
-                       :fn-name      fn-name
-                       ;:args         (into [] (map #(with-out-str (pp/pprint %)) args))
-                       :args         (with-out-str (fipp/pprint (into [] args)))
-                       :return-value (with-out-str (fipp/pprint value))
-                       ;                       :args         (into [] args)
-                       ;                       :return-value value
-                       :ts           ts
-                       :duration     (- (System/currentTimeMillis) ts)})
-    value))
-
 (defn inspect-fn
   "Traces a single call to a function f with args. 'name' is the
   symbol name of the function."
@@ -52,38 +34,21 @@
                :return-value (with-out-str (fipp/pprint res))
                :ts           ts
                :duration     (- (System/currentTimeMillis) ts)}]
-    (prn event)
     (send-to-producer event)))
 
-(defmacro defn
-  "Use in place of defn; hands each call's arguments and the return value
-  of this fn over to inspect for further inspection in a UI.
-  The first argument of the form definition can be a doc string.
-  Borrowed from https://github.com/clojure/tools.trace"
-  [fn-name & fdecl]
-  (let [m (merge {} (meta fn-name))
-        m (if (string? (first fdecl)) (merge m {:doc (first fdecl)}) m)
-        fdecl (if (string? (first fdecl)) (next fdecl) fdecl)
-        m (if (map? (first fdecl)) (merge m (first fdecl)) m)
-        fdecl (if (map? (first fdecl)) (next fdecl) fdecl)
-        params (first fdecl)
-        body (next fdecl)
-        conds (when (and (next body) (map? (first body)))
-                (first body))
-        body (if conds (next body) body)
-        conds (merge {} conds)
-        args# params]
-    (prn params)
-    (prn body)
-    `(defn ~fn-name ~m [~@params]
-           ~conds
-           (let [res# (do ~@body)
-                 ns# (ns-name ~*ns*)]
-             (inspect-fn ~fn-name [~@params] res# ns#)
-             res#))))
-
-#_(defmacro defn
-    "same as defn, yielding non-public def"
-    {:added "1.0"}
-    [name & decls]
-    (list* `defn name decls))
+(defmacro defn-wrapped
+  "same as defn, yielding non-public def"
+  {:added "1.0"}
+  [fn-name & decls]
+  (let [[pre-argsvec decls] (split-with #(not (vector? %)) decls)
+        [args-vec decls] (split-at 1 decls)
+        pre-post (when (and (next decls) (map? (first decls))) (first decls))
+        body (list (last decls))
+        name-str (name fn-name)
+        body (list `(let [args# ~@args-vec
+                          res# ~@body
+                          ns-name# (ns-name ~*ns*)]
+                      (inspect-fn ~name-str args# res# ns-name#)
+                      res#))
+        decls2 (concat pre-argsvec args-vec pre-post body)]
+    (list* `defn fn-name decls2)))
