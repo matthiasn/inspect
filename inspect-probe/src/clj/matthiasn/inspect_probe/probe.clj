@@ -30,23 +30,24 @@
   (let [ts (System/currentTimeMillis)
         event {:namespace    namespace-name
                :fn-name      (str fn-name)
-               :args         (with-out-str (fipp/pprint (into [] args)))
+               :args         (with-out-str (fipp/pprint args))
                :return-value (with-out-str (fipp/pprint res))
                :ts           ts
                :duration     (- (System/currentTimeMillis) ts)}]
     (send-to-producer event)))
 
-(defmacro defn-wrapped
-  "same as defn, yielding non-public def"
-  {:added "1.0"}
+(defmacro defn
+  "Same as defn, except for additionally sending args and result off to inspect."
+  {:added "0.2.1"}
   [fn-name & decls]
   (let [[pre-argsvec decls] (split-with #(not (vector? %)) decls)
         [args-vec decls] (split-at 1 decls)
-        pre-post (when (and (next decls) (map? (first decls))) (first decls))
-        body (list (last decls))
+        pre-pos? (and (next decls) (map? (first decls)))
+        pre-post (when pre-pos? (take 1 decls))
+        body (if pre-pos? (drop 1 decls) decls)
         name-str (name fn-name)
         body (list `(let [args# ~@args-vec
-                          res# ~@body
+                          res# (do ~@body)
                           ns-name# (ns-name ~*ns*)]
                       (inspect-fn ~name-str args# res# ns-name#)
                       res#))
