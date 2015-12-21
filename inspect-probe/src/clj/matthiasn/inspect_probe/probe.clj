@@ -1,27 +1,11 @@
 (ns matthiasn.inspect-probe.probe
   (:gen-class)
   (:require
-    [matthiasn.systems-toolbox.switchboard :as sb]
+    [matthiasn.systems-toolbox.component :as comp]
     [fipp.clojure :as fipp]
-    [matthiasn.inspect-probe.kafka-producer :as kp]
-    [clojure.pprint :as pp]))
+    [matthiasn.inspect-probe.kafka-producer :as kp]))
 
-(defonce switchboard (sb/component :probe/switchboard))
-
-(defn init
-  []
-  (sb/send-mult-cmd
-    switchboard
-    [[:cmd/init-comp [(kp/cmp-map :probe/kafka-prod-cmp)]]]))
-
-(defonce started (init))
-
-(defn send-to-producer
-  [msg]
-  (sb/send-cmd
-    switchboard
-    [:cmd/send {:to  :probe/kafka-prod-cmp
-                :msg [:inspect/probe msg]}]))
+(defonce kafka-producer (comp/make-component (kp/cmp-map :probe/kafka-prod-cmp)))
 
 (defn inspect-fn
   "Traces a single call to a function f with args. 'name' is the
@@ -34,7 +18,7 @@
                :return-value (with-out-str (fipp/pprint res))
                :ts           ts
                :duration     (- (System/currentTimeMillis) ts)}]
-    (send-to-producer event)))
+    (comp/send-msg kafka-producer [:inspect/probe event])))
 
 (defmacro get-env [] `[~@(keys &env)])
 
