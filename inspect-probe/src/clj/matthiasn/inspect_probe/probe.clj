@@ -36,20 +36,30 @@
                :duration     (- (System/currentTimeMillis) ts)}]
     (send-to-producer event)))
 
+(defmacro get-env [] `[~@(keys &env)])
+
 (defmacro defn
   "Same as defn, except for additionally sending args and result off to inspect."
   {:added "0.2.1"}
   [fn-name & decls]
-  (let [[pre-argsvec decls] (split-with #(not (vector? %)) decls)
-        [args-vec decls] (split-at 1 decls)
-        pre-pos? (and (next decls) (map? (first decls)))
-        pre-post (when pre-pos? (take 1 decls))
-        body (if pre-pos? (drop 1 decls) decls)
-        name-str (name fn-name)
-        body (list `(let [args# ~@args-vec
-                          res# (do ~@body)
-                          ns-name# (ns-name ~*ns*)]
-                      (inspect-fn ~name-str args# res# ns-name#)
-                      res#))
-        decls2 (concat pre-argsvec args-vec pre-post body)]
-    (list* `defn fn-name decls2)))
+  (let [[pre-argsvec decls2] (split-with #(not (vector? %)) decls)]
+    (if (empty? decls2)
+      (list* `defn fn-name decls)
+      (let [[args-vec decls] (split-at 1 decls2)
+            pre-pos? (and (next decls) (map? (first decls)))
+            pre-post (when pre-pos? (take 1 decls))
+            body (if pre-pos? (drop 1 decls) decls)
+            name-str (name fn-name)
+            body (list `(let [args# (get-env)
+                              res# (do ~@body)
+                              ns-name# (ns-name ~*ns*)]
+                          (inspect-fn ~name-str args# res# ns-name#)
+                          res#))
+            decls2 (concat pre-argsvec args-vec pre-post body)]
+        (list* `defn fn-name decls2)))))
+
+(defmacro defn-
+  "same as defn, yielding non-public def"
+  {:added "0.2.1"}
+  [name & decls]
+  (list* `defn (with-meta name (assoc (meta name) :private true)) decls))
