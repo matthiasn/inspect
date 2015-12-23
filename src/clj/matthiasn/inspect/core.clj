@@ -66,7 +66,7 @@
   []
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp [(kc/cmp-map :inspect/kafka-consumer-cmp inspect)]]
+    [[:cmd/init-comp [(kc/cmp-map :inspect/kafka-consumer-cmp)]]
      [:cmd/init-comp [(es/cmp-map :inspect/es-cmp)]]
      ;; :inspect/es-cmp receives all messages from :inspect/kafka-consumer-cmp,
      ;; without having an explicit handler for the msg types sent

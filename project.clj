@@ -25,7 +25,8 @@
                  [garden "1.2.5"]
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.4"]
-                 [clj-time "0.9.0"]
+                 [clj-time "0.11.0"]
+                 [fipp "0.6.3"]
                  [reagent "0.5.1"]
                  [com.stuartsierra/component "0.2.2"]]
 
