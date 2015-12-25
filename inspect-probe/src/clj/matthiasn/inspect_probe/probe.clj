@@ -11,21 +11,20 @@
   "Traces a single call to a function f with args. 'name' is the
   symbol name of the function."
   [f fn-name namespace-name]
-  (let [fn-name# fn-name]
-    (fn
-      [& args]
-      (let [ts# (System/currentTimeMillis)
-            res# (apply f args)]
-        (comp/send-msg kafka-producer
-                       [:inspect/probe
-                        {:namespace    namespace-name
-                         :fn-name      fn-name#
-                         :args         args
-                         :return-value res#
-                         :ts           ts#
-                         :datetime     (t/now)
-                         :duration     (- (System/currentTimeMillis) ts#)}])
-        res#))))
+  (fn
+    [& args]
+    (let [ts# (System/currentTimeMillis)
+          res# (apply f args)]
+      (comp/send-msg kafka-producer
+                     [:inspect/probe
+                      {:namespace    namespace-name
+                       :fn-name      fn-name
+                       :args         args
+                       :return-value res#
+                       :ts           ts#
+                       :datetime     (t/now)
+                       :duration     (- (System/currentTimeMillis) ts#)}])
+      res#)))
 
 (def ^{:private true :dynamic true}
 assert-valid-fdecl (fn [fdecl]))
@@ -102,7 +101,7 @@ assert-valid-fdecl (fn [fdecl]))
                                                       (next inline))))
                      m))
                m (conj (if (meta name) (meta name) {}) m)
-               inner-fn (eval `(fn ~name ~@fdecl))]
+               inner-fn `(fn ~name ~@fdecl)]
            (list 'def (with-meta name m)
                  (list `inspect-wrapper-fn inner-fn (str name) (str (ns-name *ns*)))))))
 
