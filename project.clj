@@ -16,7 +16,7 @@
                  [matthiasn/systems-toolbox "0.4.3" :exclusions [com.taoensso/sente com.taoensso/encore]]
                  [clj-kafka "0.3.4"]
                  [com.taoensso/nippy "2.11.0-beta1"]
-                 [clojurewerkz/elastisch "2.2.0-beta4"]
+                 [clojurewerkz/elastisch "2.2.0-rc1"]
                  [danlentz/clj-uuid "0.1.6"]
                  [clj-pid "0.1.1"]
                  [instaparse "1.4.1"]
