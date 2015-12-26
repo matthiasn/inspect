@@ -6,25 +6,24 @@
     [clojurewerkz.elastisch.rest.document :as esd]
     [clojurewerkz.elastisch.rest.index :as esi]
     [clj-uuid :as uuid]
-    [clojure.tools.logging :as log]
-    [clojure.pprint :as pp]))
+    [clojure.tools.logging :as log]))
 
 (def es-address (get (System/getenv) "ES_ADDRESS" "http://127.0.0.1:9200"))
-(def es-index (get (System/getenv) "ES_INDEX" "inspect"))
+
+(def mapping-types
+  {"event" {:properties {:namespace    {:type "string" :store "yes"}
+                         :fn-name      {:type "string" :store "yes"}
+                         :args         {:type "string" :store "yes"}
+                         :return-value {:type "string" :store "yes"}
+                         :ts           {:type "long" :store "yes"}
+                         :datetime     {:type "string" :store "yes"}
+                         :duration     {:type "long" :store "yes"}}}})
 
 (defn es-state-fn
   "Returns function for making state while using provided configuration."
   [put-fn]
-  (let [conn (esr/connect es-address)
-        mapping-types {"event" {:properties {:namespace    {:type "string" :store "yes"}
-                                             :fn-name      {:type "string" :store "yes"}
-                                             :args         {:type "string" :store "yes"}
-                                             :return-value {:type "string" :store "yes"}
-                                             :ts           {:type "long" :store "yes"}
-                                             :duration     {:type "long" :store "yes"}}}}]
+  (let [conn (esr/connect es-address)]
     (log/info "ElasticSearch connection started to" es-address)
-    (when-not (esi/exists? conn es-index)
-      (esi/create conn es-index :mappings mapping-types))
     {:state (atom {:conn conn})}))
 
 (defn persist-fn
@@ -32,7 +31,11 @@
   [{:keys [cmp-state msg-payload]}]
   (try
     (when msg-payload
-      (esd/put (:conn @cmp-state) es-index "event" (str (uuid/v1)) msg-payload))
+      (let [conn (:conn @cmp-state)
+            es-index (:index msg-payload)]
+        (when-not (esi/exists? conn es-index)
+          (esi/create conn es-index :mappings mapping-types))
+        (esd/put conn es-index "event" (str (uuid/v1)) (dissoc msg-payload :index))))
     (catch Exception ex (log/error ex "Exception when trying to persist to ElasticSearch"))))
 
 (defn cmp-map

@@ -7,6 +7,8 @@
 
 (defonce kafka-producer (comp/make-component (kp/cmp-map :probe/kafka-prod-cmp)))
 
+(def index (get (System/getenv) "INSPECT_IDX" "inspect"))
+
 (defn inspect-wrapper-fn
   "Traces a single call to a function f with args. 'name' is the
   symbol name of the function."
@@ -18,6 +20,7 @@
       (comp/send-msg kafka-producer
                      [:inspect/probe
                       {:namespace    namespace-name
+                       :index        index
                        :fn-name      fn-name
                        :args         args
                        :return-value res#
