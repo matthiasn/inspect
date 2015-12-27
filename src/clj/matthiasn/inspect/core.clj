@@ -11,7 +11,7 @@
     [clojure.core.async :refer [<! chan put! mult tap pub sub timeout go-loop sliding-buffer]]
     [clojure.tools.logging :as log]
     [matthiasn.systems-toolbox.switchboard :as sb]
-    [matthiasn.inspect.kafka-consumer :as kc]))
+    [matthiasn.systems-toolbox.kafka-consumer :as kc]))
 
 ;; in-chan is multiplied into event-mult. That way, the matcher component can attach on start and detach on stop.
 ;; With no channel tapped into the data, the messages are simply dropped.
@@ -66,7 +66,7 @@
   []
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp [(kc/cmp-map :inspect/kafka-consumer-cmp)]]
+    [[:cmd/init-comp [(kc/cmp-map :inspect/kafka-consumer-cmp {:topics #{"inspect-probe-events"}})]]
      [:cmd/init-comp [(es/cmp-map :inspect/es-cmp)]]
      ;; :inspect/es-cmp receives all messages from :inspect/kafka-consumer-cmp,
      ;; without having an explicit handler for the msg types sent

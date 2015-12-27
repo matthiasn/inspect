@@ -3,9 +3,10 @@
   (:require
     [matthiasn.systems-toolbox.component :as comp]
     [clj-time.core :as t]
-    [matthiasn.inspect-probe.kafka-producer :as kp]))
+    [matthiasn.systems-toolbox.kafka-producer :as kp]))
 
-(defonce kafka-producer (comp/make-component (kp/cmp-map :probe/kafka-prod-cmp)))
+(def cfg {:msg-type-topic-mapping {:inspect/probe "inspect-probe-events"}})
+(defonce kafka-producer (comp/make-component (kp/cmp-map :probe/kafka-prod-cmp cfg)))
 
 (def index (get (System/getenv) "INSPECT_IDX" "inspect"))
 

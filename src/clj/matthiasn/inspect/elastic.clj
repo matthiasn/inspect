@@ -6,7 +6,8 @@
     [clojurewerkz.elastisch.rest.document :as esd]
     [clojurewerkz.elastisch.rest.index :as esi]
     [clj-uuid :as uuid]
-    [clojure.tools.logging :as log]))
+    [clojure.tools.logging :as log]
+    [fipp.clojure :as fipp]))
 
 (def es-address (get (System/getenv) "ES_ADDRESS" "http://127.0.0.1:9200"))
 
@@ -15,9 +16,9 @@
                          :fn-name      {:type "string" :store "yes"}
                          :args         {:type "string" :store "yes"}
                          :return-value {:type "string" :store "yes"}
-                         :ts           {:type "long" :store "yes"}
+                         :ts           {:type "long"   :store "yes"}
                          :datetime     {:type "string" :store "yes"}
-                         :duration     {:type "long" :store "yes"}}}})
+                         :duration     {:type "long"   :store "yes"}}}})
 
 (defn es-state-fn
   "Returns function for making state while using provided configuration."
@@ -32,10 +33,15 @@
   (try
     (when msg-payload
       (let [conn (:conn @cmp-state)
-            es-index (:index msg-payload)]
+            es-index (:index msg-payload)
+            doc (-> msg-payload
+                    (dissoc :index)
+                    (update-in [:args] #(with-out-str (fipp/pprint %)))
+                    (update-in [:return-value] #(with-out-str (fipp/pprint %)))
+                    (update-in [:datetime] str))]
         (when-not (esi/exists? conn es-index)
           (esi/create conn es-index :mappings mapping-types))
-        (esd/put conn es-index "event" (str (uuid/v1)) (dissoc msg-payload :index))))
+        (esd/put conn es-index "event" (str (uuid/v1)) doc)))
     (catch Exception ex (log/error ex "Exception when trying to persist to ElasticSearch"))))
 
 (defn cmp-map

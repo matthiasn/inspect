@@ -13,7 +13,7 @@
                  [com.taoensso/sente "1.4.1"  :exclusions [com.taoensso/encore]]
                  [org.clojure/core.match "0.2.2"]
                  [http-kit "2.1.19"]
-                 [matthiasn/systems-toolbox "0.4.3" :exclusions [com.taoensso/sente com.taoensso/encore]]
+                 [matthiasn/systems-toolbox "0.4.9" :exclusions [com.taoensso/sente com.taoensso/encore]]
                  [clj-kafka "0.3.4"]
                  [com.taoensso/nippy "2.11.0-beta1"]
                  [clojurewerkz/elastisch "2.2.0-rc1"]
