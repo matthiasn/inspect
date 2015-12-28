@@ -1,118 +1,99 @@
 (ns matthiasn.inspect-probe.probe
   (:gen-class)
+  (:refer-clojure :exclude [defn defn-])
   (:require
-    [matthiasn.systems-toolbox.component :as comp]
+    [clojure.core :as core]
     [clj-time.core :as t]
-    [matthiasn.systems-toolbox.kafka-producer :as kp]))
+    [matthiasn.systems-toolbox.component :as comp]
+    [matthiasn.systems-toolbox.kafka-producer :as kp]
+    [net.cgrand.seqexp :as se]))
 
 (def cfg {:msg-type-topic-mapping {:inspect/probe "inspect-probe-events"}})
 (defonce kafka-producer (comp/make-component (kp/cmp-map :probe/kafka-prod-cmp cfg)))
 
 (def index (get (System/getenv) "INSPECT_IDX" "inspect"))
 
-(defn inspect-wrapper-fn
+(core/defn inspect-fn
   "Traces a single call to a function f with args. 'name' is the
   symbol name of the function."
-  [f fn-name namespace-name]
-  (fn
-    [& args]
-    (let [ts# (System/currentTimeMillis)
-          res# (apply f args)]
-      (comp/send-msg kafka-producer
-                     [:inspect/probe
-                      {:namespace    namespace-name
-                       :index        index
-                       :fn-name      fn-name
-                       :args         args
-                       :return-value res#
-                       :ts           ts#
-                       :datetime     (t/now)
-                       :duration     (- (System/currentTimeMillis) ts#)}])
-      res#)))
+  [fn-name args res namespace-name]
+  (let [ts (System/currentTimeMillis)
+        event {:namespace    namespace-name
+               :index        index
+               :fn-name      (str fn-name)
+               :args         args
+               :return-value res
+               :ts           ts
+               :datetime     (t/now)
+               :duration     (- (System/currentTimeMillis) ts)}]
+    (comp/send-msg kafka-producer [:inspect/probe event])))
 
-(def ^{:private true :dynamic true}
-assert-valid-fdecl (fn [fdecl]))
+(core/defn ^:private process-argvec-entry [argvec+bindings argvec-entry]
+  (cond
+    (symbol? argvec-entry)
+    (update argvec+bindings :argvec conj argvec-entry)
 
-(def
-  ^{:private true}
-  sigs
-  (fn [fdecl]
-    (assert-valid-fdecl fdecl)
-    (let [asig
-          (fn [fdecl]
-            (let [arglist (first fdecl)
-                  ;elide implicit macro args
-                  arglist (if (clojure.lang.Util/equals '&form (first arglist))
-                            (clojure.lang.RT/subvec arglist 2 (clojure.lang.RT/count arglist))
-                            arglist)
-                  body (next fdecl)]
-              (if (map? (first body))
-                (if (next body)
-                  (with-meta arglist (conj (if (meta arglist) (meta arglist) {}) (first body)))
-                  arglist)
-                arglist)))]
-      (if (seq? (first fdecl))
-        (loop [ret [] fdecls fdecl]
-          (if fdecls
-            (recur (conj ret (asig (first fdecls))) (next fdecls))
-            (seq ret)))
-        (list (asig fdecl))))))
+    (and (map? argvec-entry)
+         (contains? argvec-entry :as))
+    (-> argvec+bindings
+        (update :argvec conj (:as argvec-entry))
+        (update :bindings conj argvec-entry (:as argvec-entry)))
 
+    (and (vector? argvec-entry)
+         (= :as (second (rseq argvec-entry))))
+    (let [as-name (second (rseq argvec-entry))]
+      (-> argvec+bindings
+          (update :argvec conj as-name)
+          (update :bindings conj argvec-entry as-name)))
 
-(def
-  ^{:doc      "Same as (def name (fn [params* ] exprs*)) or (def
-    name (fn ([params* ] exprs*)+)) with any doc-string or attrs added
-    to the var metadata. prepost-map defines a map with optional keys
-    :pre and :post that contain collections of pre or post conditions."
-    :arglists '([name doc-string? attr-map? [params*] prepost-map? body]
-                 [name doc-string? attr-map? ([params*] prepost-map? body) + attr-map?])
-    :added    "1.0"}
-  defn (fn defn [&form &env name & fdecl]
-         ;; Note: Cannot delegate this check to def because of the call to (with-meta name ..)
-         (if (instance? clojure.lang.Symbol name)
-           nil
-           (throw (IllegalArgumentException. "First argument to defn must be a symbol")))
-         (let [m (if (string? (first fdecl))
-                   {:doc (first fdecl)}
-                   {})
-               fdecl (if (string? (first fdecl))
-                       (next fdecl)
-                       fdecl)
-               m (if (map? (first fdecl))
-                   (conj m (first fdecl))
-                   m)
-               fdecl (if (map? (first fdecl))
-                       (next fdecl)
-                       fdecl)
-               fdecl (if (vector? (first fdecl))
-                       (list fdecl)
-                       fdecl)
-               m (if (map? (last fdecl))
-                   (conj m (last fdecl))
-                   m)
-               fdecl (if (map? (last fdecl))
-                       (butlast fdecl)
-                       fdecl)
-               m (conj {:arglists (list 'quote (sigs fdecl))} m)
-               m (let [inline (:inline m)
-                       ifn (first inline)
-                       iname (second inline)]
-                   ;; same as: (if (and (= 'fn ifn) (not (symbol? iname))) ...)
-                   (if (if (clojure.lang.Util/equiv 'fn ifn)
-                         (if (instance? clojure.lang.Symbol iname) false true))
-                     ;; inserts the same fn name to the inline fn if it does not have one
-                     (assoc m :inline (cons ifn (cons (clojure.lang.Symbol/intern (.concat (.getName ^clojure.lang.Symbol name) "__inliner"))
-                                                      (next inline))))
-                     m))
-               m (conj (if (meta name) (meta name) {}) m)
-               inner-fn `(fn ~name ~@fdecl)]
-           (list 'def (with-meta name m)
-                 (list `inspect-wrapper-fn inner-fn (str name) (str (ns-name *ns*)))))))
+    :else
+    (let [gs (gensym "param__")]
+      (-> argvec+bindings
+          (update :argvec gs)
+          (update :bindings conj argvec-entry gs)))))
 
-(. (var defn) (setMacro))
+(core/defn ^:private prepare-argvec+bindings [argvec]
+  (update (reduce process-argvec-entry
+                  {:argvec   []
+                   :bindings []}
+                  argvec)
+          :argvec vary-meta (constantly (meta argvec))))
+
+(core/defn ^:private prepare-argvec+body [name-str {:keys [argvec bindings]} body]
+  `(~argvec
+     (let [args# ~(let [no-& (filterv #(not= '& %) argvec)]
+                    (zipmap (map keyword no-&) no-&))
+           ~@bindings
+           res# (do ~@body)]
+       (inspect-fn ~name-str args# res# '~(ns-name *ns*))
+       res#)))
+
+(defmacro defn
+  "Same as defn, except for additionally sending args and result off to inspect."
+  {:added "0.2.1"}
+  [fn-name & decls]
+  (let [{:keys [docstring+meta argvecs+bodies]}
+        (se/exec (se/cat (se/as :docstring+meta (se/cat (se/? string?)
+                                                        (se/? map?)))
+                         (se/as :argvecs+bodies (se/| (se/cat vector? (se/* se/_))
+                                                      (se/* #(and (list? %)
+                                                                  (vector? (first %)))))))
+                 decls)
+        single-arity? (vector? (first argvecs+bodies))
+        argvecs (if single-arity?
+                  [(first argvecs+bodies)]
+                  (mapv first argvecs+bodies))
+        bodies (if single-arity?
+                 [(next argvecs+bodies)]
+                 (mapv next argvecs+bodies))
+        new-argvecs+bindings (mapv prepare-argvec+bindings argvecs)
+        new-argvecs+bodies (mapv (partial prepare-argvec+body (name fn-name))
+                                 new-argvecs+bindings
+                                 bodies)]
+    `(core/defn ~fn-name ~@docstring+meta ~@new-argvecs+bodies)))
 
 (defmacro defn-
   "same as defn, yielding non-public def"
   {:added "0.2.1"}
   [name & decls]
-  (list* `defn (with-meta name (assoc (meta name) :private true)) decls))
+  `(defn ~(vary-meta name assoc :private true) ~@decls))
