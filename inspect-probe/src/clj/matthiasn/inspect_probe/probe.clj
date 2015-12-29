@@ -41,7 +41,7 @@
 
     (and (vector? argvec-entry)
          (= :as (second (rseq argvec-entry))))
-    (let [as-name (second (rseq argvec-entry))]
+    (let [as-name (first (rseq argvec-entry))]
       (-> argvec+bindings
           (update :argvec conj as-name)
           (update :bindings conj argvec-entry as-name)))
@@ -49,7 +49,7 @@
     :else
     (let [gs (gensym "param__")]
       (-> argvec+bindings
-          (update :argvec gs)
+          (update :argvec conj gs)
           (update :bindings conj argvec-entry gs)))))
 
 (core/defn ^:private prepare-argvec+bindings [argvec]
@@ -57,7 +57,7 @@
                   {:argvec   []
                    :bindings []}
                   argvec)
-          :argvec vary-meta (constantly (meta argvec))))
+          :argvec #(some->> %2 (vary-meta %1)) (constantly (meta argvec))))
 
 (core/defn ^:private prepare-argvec+body [name-str {:keys [argvec bindings]} body]
   `(~argvec
