@@ -1,0 +1,27 @@
+@import "variables.scss";
+
+body {
+  color: $font-color;
+  background-color: $tab-bg;
+  font-size: 12px;
+  font-weight: 300;
+  font-family: $font-family;
+  overflow: hidden;
+}
+
+// from: https://www.w3schools.com/howto/howto_css_loader.asp
+.loader {
+  border: 8px solid #f6f6f6;
+  border-top: 8px solid $green;
+  border-radius: 50%;
+  margin: 20px;
+  width: 60px;
+  height: 60px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

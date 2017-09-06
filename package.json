@@ -1,0 +1,55 @@
+{
+  "name": "st-observer-electron",
+  "version": "0.1.1",
+  "description": "",
+  "main": "prod/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthiasn/iWasWhere.git"
+  },
+  "author": "Matthias Nehlsen",
+  "license": "AGPL-1.0",
+  "bugs": {
+    "url": "https://github.com/matthiasn/iWasWhere/issues"
+  },
+  "homepage": "https://github.com/matthiasn/iWasWhere",
+  "dependencies": {
+    "@cljs-oss/module-deps": "^1.1.1",
+    "asar": "^0.13.0",
+    "browser-resolve": "^1.11.2",
+    "cookie-parser": "1.4.3",
+    "d3": "^4.10.0",
+    "d3-ellipse-force": "^0.1.1",
+    "d3-force": "^1.0.6",
+    "electron-fetch": "^1.0.0",
+    "electron-log": "^2.2.7",
+    "electron-packager": "^8.7.2",
+    "electron-spellchecker": "1.2.0",
+    "electron-updater": "^2.8.7",
+    "kafka-node": "^2.2.1",
+    "local-reverse-geocoder": "0.3.2",
+    "module-deps": "^4.1.1",
+    "moment": "^2.18.1",
+    "npid": "^0.4.0",
+    "randomcolor": "^0.5.3",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "resolve": "^1.4.0",
+    "s": "^0.1.1",
+    "sinek": "^6.0.3",
+    "tcp-port-used": "0.1.2",
+    "viz.js": "^1.8.0"
+  },
+  "devDependencies": {
+    "browser-resolve": "1.11.2",
+    "electron": "^1.7.6",
+    "electron-builder": "^19.24.1",
+    "electron-publisher-s3": "19.25.0",
+    "module-deps": "4.1.1",
+    "resolve": "1.4.0"
+  }
+}

@@ -1,0 +1,70 @@
+@import "variables.scss";
+
+body {
+  color: $font-color;
+  font-size: 12px;
+  font-weight: 300;
+  font-family: $font-family;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $header-font-family;
+}
+
+@import "buttons.scss";
+
+#graphviz {
+  svg {
+    width: 100%;
+  }
+}
+
+.observer {
+  padding: 2em;
+
+  .color {
+    padding: 0 0.6em;
+    margin-right: 0.5em;
+  }
+
+  .active {
+    background-color: #7FDBFF;
+  }
+
+  .force-wrapper {
+    align-items: center;
+    display: flex;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .tables {
+    display: flex;
+    flex-flow: row;
+
+    table {
+      background-color: white;
+      margin: 0 4em 0 0;
+      min-width: 280px;
+
+      td {
+        min-width: 20px;
+      }
+
+      .cnt {
+        text-align: end;
+        padding-right: 5px;
+        background-color: white;
+      }
+
+      .changed {
+        font-weight: bold;
+        background-color: orange;
+        //transition: background-color 1s;
+      }
+    }
+  }
+}

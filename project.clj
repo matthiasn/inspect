@@ -1,36 +1,82 @@
-(defproject com.matthiasnehlsen/inspect "0.1.13"
-  :description "Log to a web application to inspect what's going on in your application"
-  :url "https://github.com/matthiasn/inspect"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [org.clojure/tools.logging "0.3.1"]
-                 [org.clojure/tools.namespace "0.2.10"]
-                 [ch.qos.logback/logback-classic "1.1.2"]
-                 [com.taoensso/sente "1.4.1"]
-                 [org.clojure/core.match "0.2.2"]
-                 [http-kit "2.1.19"]
-                 [compojure "1.3.2"]
-                 [mvxcvi/puget "0.8.0"]
-                 [hiccup "1.0.5"]
-                 [hiccup-bridge "1.0.1"]
-                 [garden "1.2.5"]
-                 [ring "1.3.2"]
-                 [ring/ring-defaults "0.1.4"]
-                 [clj-time "0.9.0"]
-                 [org.clojure/clojurescript "0.0-3126"]
-                 [reagent "0.5.0"]
-                 [com.stuartsierra/component "0.2.2"]]
+(defproject matthiasn/inspect "0.2.1"
+  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
+                 [org.clojure/clojurescript "1.9.908"]
+                 [re-frame "0.10.1"]
+                 [com.taoensso/timbre "4.10.0"]
+                 [timbre-ns-pattern-level "0.1.2"]
+                 [com.cognitect/transit-cljs "0.8.239"]
+                 [matthiasn/systems-toolbox "0.6.13"]]
 
-  :source-paths ["src/clj/"]
+  :plugins [[lein-cljsbuild "1.1.7"]
+            [lein-sassy "1.0.8"]]
 
-  :plugins [[lein-cljsbuild "1.0.5"]
-            [codox "0.8.10"]]
+  :sass {:src "src/scss/"
+         :dst "resources/public/css/"}
 
-            ;:clean-targets ^{:protect false} ["resources/public/inspect/js/build/"]
+  :clean-targets ^{:protect false} ["resources/public/css/" "target/" "prod/"]
 
-  :cljsbuild {:builds [{:id "release"
-                        :source-paths ["src/cljs"]
-                        :compiler {:output-to "resources/public/inspect/js/build/inspect.js"
-                                   :optimizations :advanced}}]})
+  :aliases {"dist" ["do"
+                    ["clean"]
+                    ["cljsbuild" "once" "main"]
+                    ["cljsbuild" "once" "renderer"]
+                    ["cljsbuild" "once" "updater"]
+                    ["sass" "once"]]}
+
+  :cljsbuild {:builds [{:id           "main"
+                        :source-paths ["src/inspect/main"]
+                        :compiler     {:main           inspect.main.core
+                                       :target         :nodejs
+                                       :output-to      "prod/main/main.js"
+                                       :output-dir     "prod/main"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :kafka-node        "2.2.1"
+                                                        :sinek             "6.0.3"
+                                                        :electron          "1.7.6"}
+                                       :install-deps   true
+                                       :optimizations  :none
+                                       :parallel-build true}}
+                       {:id           "view"
+                        :source-paths ["src/inspect/view"]
+                        :compiler     {:main           inspect.view.core
+                                       :output-to      "prod/view/core.js"
+                                       :target         :nodejs
+                                       :output-dir     "prod/view"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log     "2.2.7"
+                                                        :moment           "2.18.1"
+                                                        :d3-force         "1.0.6"
+                                                        :d3               "4.10.0"
+                                                        :d3-ellipse-force "0.1.1"
+                                                        :randomcolor      "0.5.3"
+                                                        :viz.js           "1.8.0"
+                                                        :react            "15.6.1"
+                                                        :react-dom        "15.6.1"
+                                                        :electron         "1.7.6"}
+                                       :install-deps   true
+                                       :optimizations  :none
+                                       :parallel-build true}}
+                       {:id           "updater"
+                        :source-paths ["src/inspect/update"]
+                        :compiler     {:main           inspect.update.core
+                                       :output-to      "prod/updater/update.js"
+                                       :target         :nodejs
+                                       :output-dir     "prod/updater"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :electron          "1.7.6"}
+                                       :install-deps   true
+                                       :optimizations  :advanced
+                                       :parallel-build true}}]})

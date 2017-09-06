@@ -1,0 +1,136 @@
+@import "variables.scss";
+
+.btn {
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  cursor: pointer;
+  white-space: nowrap;
+
+  .fa {
+    padding-right: 0.1em;
+  }
+}
+
+.save {
+  height: 15px;
+}
+
+.not-saved {
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  background-color: $red;
+  cursor: pointer;
+}
+
+.link-btn {
+  padding: 0 5px;
+  color: white;
+  font-size: 0.8em;
+  background-color: $green;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button {
+  background-color: $green;
+  border: none;
+  color: white;
+  padding: 0.5em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.menu-new {
+  background-color: $menu-new-btn;
+}
+
+.show-more-btn {
+  background-color: $show-more;
+  color: whitesmoke;
+  font-size: 0.8em;
+  padding: 1px 5px;
+}
+
+.delete-warn {
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  cursor: pointer;
+  background-color: $delete-warning;
+}
+
+.show-more {
+  padding: 20px 0;
+}
+
+a, a:visited {
+  text-decoration: none;
+  font-weight: 400;
+  color: $link-color;
+  outline: none!important;
+}
+
+.toggle {
+  padding: 2px;
+  margin-left: 4px;
+  cursor: pointer;
+
+  &.green {
+    color: darken($green, 10);
+  }
+}
+
+.fa-thumbs-up, .fa-thumbs-down {
+  color: #006C91;
+}
+
+.inactive {
+  color: #AAA;
+}
+
+.hidden-comments {
+  color: red;
+}
+
+a .toggle {
+  color: $toggle-btn;
+}
+
+.upvotes {
+  vertical-align: super;
+  color: #006C91;
+  font-size: 0.7em;
+  line-height: 1.2em;
+  font-weight: bold;
+  padding: 0 2px 0 1px;
+  margin-left: 1px;
+  margin-bottom: 3px;
+  border: 1px solid #006C91;
+  border-radius: 2px;
+}
+
+.toggle-cmds {
+  margin-right: 30px;
+}
+
+.linked-tasks {
+  .filter {
+    background-color: #DDD;
+    color: #AAA;
+    font-size: 0.8em;
+    padding: 1px 5px;
+    margin: 0 2px 0 3px;
+    cursor: pointer;
+  }
+
+  .current {
+    background-color: $show-more;
+    color: whitesmoke;
+  }
+}
