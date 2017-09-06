@@ -1,6 +1,6 @@
 {
-  "name": "st-observer-electron",
-  "version": "0.1.1",
+  "name": "inspect",
+  "version": "0.2.2",
   "description": "",
   "main": "prod/main/main.js",
   "scripts": {

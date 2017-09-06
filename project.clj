@@ -18,7 +18,7 @@
   :aliases {"dist" ["do"
                     ["clean"]
                     ["cljsbuild" "once" "main"]
-                    ["cljsbuild" "once" "renderer"]
+                    ["cljsbuild" "once" "view"]
                     ["cljsbuild" "once" "updater"]
                     ["sass" "once"]]}
 
