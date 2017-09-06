@@ -7,10 +7,11 @@
             [cognitect.transit :as t]
             [cljs.core.async :as async :refer [put! chan <! >! close!]]
             [clojure.pprint :as pp]
+            [cljs.nodejs :as nodejs :refer [process]]
             [matthiasn.systems-toolbox.component :as stc]))
 
 (def config
-  {:kafkaHost          "localhost:9092"
+  {:kafkaHost          (or (aget process "env" "KAFKA_HOST") "localhost:9092")
    :logger             {:info  #(info %)
                         :warn  #(warn %)
                         :debug #(debug %)
@@ -41,6 +42,7 @@
 
 (defn start
   [{:keys [put-fn cmp-state put-chan current-state]}]
+  (info "Kafka config" config)
   (let [consumer (Consumer. "firehose" (clj->js config))
         msg-handler (fn [kafka-msg cb]
                       (swap! cmp-state update-in [:count] inc)
