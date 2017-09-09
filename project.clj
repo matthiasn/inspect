@@ -1,11 +1,11 @@
-(defproject matthiasn/inspect "0.2.1"
+(defproject matthiasn/inspect "0.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
                  [re-frame "0.10.1"]
                  [com.taoensso/timbre "4.10.0"]
                  [timbre-ns-pattern-level "0.1.2"]
                  [com.cognitect/transit-cljs "0.8.239"]
-                 [matthiasn/systems-toolbox "0.6.13"]]
+                 [matthiasn/systems-toolbox "0.6.14"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-sassy "1.0.8"]]
@@ -40,7 +40,7 @@
                                                         :sinek             "6.0.3"
                                                         :electron          "1.7.6"}
                                        :install-deps   true
-                                       :optimizations  :none
+                                       :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "view"
                         :source-paths ["src/inspect/view"]
@@ -60,7 +60,7 @@
                                                         :react-dom        "15.6.1"
                                                         :electron         "1.7.6"}
                                        :install-deps   true
-                                       :optimizations  :none
+                                       :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "updater"
                         :source-paths ["src/inspect/update"]

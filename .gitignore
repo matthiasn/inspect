@@ -5,3 +5,5 @@ dist/
 prod/
 resources/
 .sass-cache/
+package-lock.json
+*.log

@@ -7,11 +7,21 @@
             [cognitect.transit :as t]
             [cljs.core.async :as async :refer [put! chan <! >! close!]]
             [clojure.pprint :as pp]
+            [fs :refer [existsSync readFileSync]]
             [cljs.nodejs :as nodejs :refer [process]]
             [matthiasn.systems-toolbox.component :as stc]))
 
+(def kafka-address
+  (let [path "/tmp/inspect-kafka"
+        exists (existsSync path)]
+    (when exists (readFileSync path "utf-8"))))
+
+(info :kafka-address kafka-address)
+
 (def config
-  {:kafkaHost          (or (aget process "env" "KAFKA_HOST") "localhost:9092")
+  {:kafkaHost          (or (aget process "env" "KAFKA_HOST")
+                           kafka-address
+                           "localhost:9092")
    :logger             {:info  #(info %)
                         :warn  #(warn %)
                         :debug #(debug %)
