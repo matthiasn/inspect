@@ -5,6 +5,7 @@ body {
   font-size: 12px;
   font-weight: 300;
   font-family: $font-family;
+  display: flex;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -15,12 +16,21 @@ h1, h2, h3, h4, h5, h6 {
 
 #graphviz {
   svg {
-    width: 100%;
+    width: 50vw;
   }
+}
+
+.flex {
+  display: flex;
 }
 
 .observer {
   padding: 2em;
+
+  h2 {
+    margin: 0.4em 0 0 0;
+    font-size: 1.2em;
+  }
 
   .color {
     padding: 0 0.6em;
@@ -48,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
     table {
       background-color: white;
       margin: 0 4em 0 0;
-      min-width: 280px;
+      min-width: 250px;
 
       td {
         min-width: 20px;

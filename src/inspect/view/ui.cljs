@@ -85,11 +85,12 @@
       [:div.observer
        ;[f2/wiring put-fn]
        [gv/wiring put-fn]
-       [:div "Count: " [:strong @count]]
-       (for [cmp-id @cmp-ids]
-         ^{:key (str cmp-id)}
-         [component cmp-id put-fn])
-       [:button {:on-click #(put-fn [:state/freeze])} "freeze"]])))
+       [:div
+        [:div "Count: " [:strong @count]]
+        (for [cmp-id @cmp-ids]
+          ^{:key (str cmp-id)}
+          [component cmp-id put-fn])
+        [:button {:on-click #(put-fn [:state/freeze])} "freeze"]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

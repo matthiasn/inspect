@@ -42,8 +42,8 @@
             digraph (str "digraph { " links (apply str sub-graphs) "}")
             svg-elem (by-id "graphviz")
             svg (Viz digraph)]
-        (info "clusters" clusters)
-        (info "sub-graphs" sub-graphs)
+        ;(info "clusters" clusters)
+        ;(info "sub-graphs" sub-graphs)
         (info digraph)
         (aset svg-elem "innerHTML" svg)
         [:div]))))
