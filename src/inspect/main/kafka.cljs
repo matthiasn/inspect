@@ -11,39 +11,30 @@
             [cljs.nodejs :as nodejs :refer [process]]
             [matthiasn.systems-toolbox.component :as stc]))
 
-(def kafka-address
-  (let [path "/tmp/inspect-kafka"
-        exists (existsSync path)]
-    (when exists (readFileSync path "utf-8"))))
+(defn config [kafka-host]
+  (clj->js {:kafkaHost          kafka-host
+            :logger             {:info  #(info %)
+                                 :warn  #(warn %)
+                                 :debug #(debug %)
+                                 :error #(error %)}
+            :groupId            (stc/make-uuid)
+            :clientName         (str "client-name-" (stc/now))
+            :workerPerPartition 1
+            :options            {:sessionTimeout       8000
+                                 :protocol             ["roundrobin"]
+                                 :fromOffset           "latest"
+                                 :fetchMaxBytes        (* 16 1024 1024)
+                                 :fetchMinBytes        1
+                                 :fetchMaxWaitMs       10
+                                 :heartbeatInterval    250
+                                 :retryMinTimeout      250
+                                 :autoCommit           true
+                                 :autoCommitIntervalMs 1000
+                                 :requireAcks          0
+                                 :ackTimeoutMs         100
+                                 :partitionerType      3}}))
 
-(info :kafka-address kafka-address)
-
-(def config
-  {:kafkaHost          (or (aget process "env" "KAFKA_HOST")
-                           kafka-address
-                           "localhost:9092")
-   :logger             {:info  #(info %)
-                        :warn  #(warn %)
-                        :debug #(debug %)
-                        :error #(error %)}
-   :groupId            (stc/make-uuid)
-   :clientName         (str "client-name-" (stc/now))
-   :workerPerPartition 1
-   :options            {:sessionTimeout       8000
-                        :protocol             ["roundrobin"]
-                        :fromOffset           "latest"
-                        :fetchMaxBytes        (* 16 1024 1024)
-                        :fetchMinBytes        1
-                        :fetchMaxWaitMs       10
-                        :heartbeatInterval    250
-                        :retryMinTimeout      250
-                        :autoCommit           true
-                        :autoCommitIntervalMs 1000
-                        :requireAcks          0
-                        :ackTimeoutMs         100
-                        :partitionerType      3}})
-
-(s/def :subscription/subscribe string?)
+(s/def :kafka/start string?)
 
 (defn state-fn
   [put-fn]
@@ -51,9 +42,14 @@
     {:state state}))
 
 (defn start
-  [{:keys [put-fn cmp-state put-chan current-state]}]
-  (info "Kafka config" config)
-  (let [consumer (Consumer. "firehose" (clj->js config))
+  [{:keys [put-fn cmp-state put-chan current-state msg-payload]}]
+  (info "Kafka config" msg-payload)
+
+  #_
+  (when-let [consumer (:consumer current-state)]
+    (info "stopping consumer" consumer)
+    (.stopDrain consumer))
+  (let [consumer (Consumer. "firehose" (config msg-payload))
         msg-handler (fn [kafka-msg cb]
                       (swap! cmp-state update-in [:count] inc)
                       (let [cnt (:count @cmp-state)
@@ -75,11 +71,11 @@
     (-> consumer
         (.connect true)
         (.then (fn [_] (.consume consumer msg-handler))))
-    (info "Starting KAFKA component with back-pressure")
-    {}))
+    (info "Starting KAFKA component")
+    {:new-state (assoc-in current-state [:consumer] consumer)}))
 
 (defn cmp-map
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:cmd/start start}})
+   :handler-map {:kafka/start start}})

@@ -83,11 +83,13 @@
   [put-fn]
   (let [cmp-ids (subscribe [:cmp-ids])
         count (subscribe [:cnt])
-        local (r/atom {:address "localhost:9092"})
+        local (r/atom {:kafka-host "localhost:9092"})
         input-fn (fn [ev]
                    (let [address (-> ev .-nativeEvent .-target .-value)]
-                     (swap! local assoc-in [:address] address)))
-        subscribe #(info :start (:address @local))
+                     (swap! local assoc-in [:kafka-host] address)))
+        subscribe #(let [kafka-host (:kafka-host @local)]
+                     (info :start kafka-host)
+                     (put-fn [:kafka/start kafka-host]))
         freeze #(put-fn [:state/freeze])]
     (fn [_]
       [:div.observer
@@ -98,7 +100,7 @@
          [:div
           [:input {:type      :text
                    :on-change input-fn
-                   :value     (:address @local)}]
+                   :value     (:kafka-host @local)}]
           [:button {:on-click subscribe} "subscribe"]]
          [:div.cnt " Count: " [:strong @count]]]
         (for [cmp-id @cmp-ids]
