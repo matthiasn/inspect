@@ -21,8 +21,14 @@
     (info "activated" (:active-type new-state))
     {:new-state new-state}))
 
+(defn kafka-status [{:keys [current-state msg-payload]}]
+  (let [new-state (assoc-in current-state [:kafka-status] msg-payload)]
+    (info "KAFKA status" msg-payload)
+    {:new-state new-state}))
+
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :handler-map {:observer/cmps-msgs cmps-msgs
                  :cell/active        cell-active
-                 :state/freeze       freeze}})
+                 :state/freeze       freeze
+                 :kafka/status       kafka-status}})

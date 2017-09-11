@@ -22,6 +22,7 @@
     [[:cmd/init-comp #{(wm/cmp-map :electron/window-manager
                                    #{:exec/js
                                      :import/listen
+                                     :kafka/status
                                      :observer/cmps-msgs})
                        (kafka/cmp-map :electron/kafka-cmp)
                        (st/cmp-map :electron/store-cmp)

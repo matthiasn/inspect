@@ -116,4 +116,5 @@ sinek.Consumer = function() {};
 sinek.Consumer.connect = function() {};
 sinek.Consumer.consume = function() {};
 sinek.Consumer.then = function() {};
+sinek.Consumer.catch = function() {};
 sinek.Consumer.stopDrain = function() {};

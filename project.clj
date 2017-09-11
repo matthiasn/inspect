@@ -40,6 +40,8 @@
                                                         :sinek             "6.0.3"
                                                         :electron          "1.7.6"}
                                        :install-deps   true
+                                       :language-in    :ecmascript5
+                                       :language-out   :ecmascript5
                                        :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "view"

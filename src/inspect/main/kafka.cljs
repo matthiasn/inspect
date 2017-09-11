@@ -44,35 +44,39 @@
 (defn start
   [{:keys [put-fn cmp-state put-chan current-state msg-payload]}]
   (info "Kafka config" msg-payload)
-
-  #_
-  (when-let [consumer (:consumer current-state)]
-    (info "stopping consumer" consumer)
-    (.stopDrain consumer))
-  (let [consumer (Consumer. "firehose" (config msg-payload))
-        msg-handler (fn [kafka-msg cb]
-                      (swap! cmp-state update-in [:count] inc)
-                      (let [cnt (:count @cmp-state)
-                            r (t/reader :json)
-                            parsed (t/read r (.-value kafka-msg))
-                            {:keys [msg-type msg-payload msg-meta]} parsed
-                            msg (with-meta [msg-type msg-payload] msg-meta)]
-                        (go (>! put-chan msg)
-                            (cb nil))
-                        (when (zero? (mod cnt 100))
-                          (let [last-ts (:last-ts @cmp-state)
-                                now (stc/now)
-                                duration (- now last-ts)
-                                per-sec (Math/floor (/ 100 (/ duration 1000)))]
-                            (swap! cmp-state assoc-in [:last-ts] now)
-                            (info "KAFKA received:" cnt
-                                  "-" per-sec "msg/s"
-                                  "- Offset" (.-offset kafka-msg))))))]
-    (-> consumer
-        (.connect true)
-        (.then (fn [_] (.consume consumer msg-handler))))
-    (info "Starting KAFKA component")
-    {:new-state (assoc-in current-state [:consumer] consumer)}))
+  (try
+    #_
+    (when-let [consumer (:consumer current-state)]
+      (info "stopping consumer" consumer)
+      (.stopDrain consumer))
+    (let [consumer (Consumer. "firehose" (config msg-payload))
+          msg-handler (fn [kafka-msg cb]
+                        (swap! cmp-state update-in [:count] inc)
+                        (let [cnt (:count @cmp-state)
+                              r (t/reader :json)
+                              parsed (t/read r (.-value kafka-msg))
+                              {:keys [msg-type msg-payload msg-meta]} parsed
+                              msg (with-meta [msg-type msg-payload] msg-meta)]
+                          (go (>! put-chan msg)
+                              (cb nil))
+                          (when (zero? (mod cnt 100))
+                            (let [last-ts (:last-ts @cmp-state)
+                                  now (stc/now)
+                                  duration (- now last-ts)
+                                  per-sec (Math/floor (/ 100 (/ duration 1000)))]
+                              (swap! cmp-state assoc-in [:last-ts] now)
+                              (info "KAFKA received:" cnt
+                                    "-" per-sec "msg/s"
+                                    "- Offset" (.-offset kafka-msg))))))]
+      (-> consumer
+          (.connect true)
+          (.then (fn [_] (.consume consumer msg-handler)))
+          (.catch #(put-fn [:kafka/status {:status :error :text %}])))
+      (info "Starting KAFKA component")
+      {:new-state (assoc-in current-state [:consumer] consumer)})
+    (catch js/Object e (let []
+                         (error e)
+                         {:emit-msg [:kafka/error "KAFKA Error"]}))))
 
 (defn cmp-map
   [cmp-id]

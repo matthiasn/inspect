@@ -18,6 +18,7 @@
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
 (reg-sub :active-type (fn [db _] (:active-type db)))
+(reg-sub :kafka-status (fn [db _] (:kafka-status db)))
 (reg-sub :components (fn [db _] (:components (:cmps-msgs db))))
 (reg-sub :prev-cmps (fn [db _] (:components (:cmps-msgs-prev db))))
 (reg-sub :frozen (fn [db _] (:components (:frozen db))))
