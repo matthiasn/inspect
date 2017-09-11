@@ -3,13 +3,15 @@
   (:require [reagent.core :as rc]
             [re-frame.core :refer [reg-sub subscribe]]
             [re-frame.db :as rdb]
+            [taoensso.timbre :as timbre :refer-macros [info debug]]
             [inspect.view.force :as f]
             [inspect.view.force2 :as f2]
             [inspect.view.graphviz :as gv]
             [inspect.view.util :as u]
             [cljs.pprint :as pp]
             [cljs.spec.alpha :as s]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [reagent.core :as r]))
 
 (s/def :observer/cmps-msgs map?)
 
@@ -80,17 +82,29 @@
   "Main view component"
   [put-fn]
   (let [cmp-ids (subscribe [:cmp-ids])
-        count (subscribe [:cnt])]
+        count (subscribe [:cnt])
+        local (r/atom {:address "localhost:9092"})
+        input-fn (fn [ev]
+                   (let [address (-> ev .-nativeEvent .-target .-value)]
+                     (swap! local assoc-in [:address] address)))
+        subscribe #(info :start (:address @local))
+        freeze #(put-fn [:state/freeze])]
     (fn [_]
       [:div.observer
        ;[f2/wiring put-fn]
        [gv/wiring put-fn]
        [:div
-        [:div "Count: " [:strong @count]]
+        [:div.header
+         [:div
+          [:input {:type      :text
+                   :on-change input-fn
+                   :value     (:address @local)}]
+          [:button {:on-click subscribe} "subscribe"]]
+         [:div.cnt " Count: " [:strong @count]]]
         (for [cmp-id @cmp-ids]
           ^{:key (str cmp-id)}
           [component cmp-id put-fn])
-        [:button {:on-click #(put-fn [:state/freeze])} "freeze"]]])))
+        [:button.freeze {:on-click freeze} "freeze"]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

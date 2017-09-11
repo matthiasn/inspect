@@ -31,6 +31,21 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0.4em 0 0 0;
     font-size: 1.2em;
   }
+  .header {
+    display: flex;
+    margin-bottom: 20px;
+
+    input {
+      height: 28px;
+      min-width: 260px;
+    }
+    .cnt {
+      padding: 8px 20px;
+    }
+    .freeze {
+      margin-top: 10px;
+    }
+  }
 
   .color {
     padding: 0 0.6em;
