@@ -57,27 +57,31 @@
     (let [kafka-host msg-payload
           consumer (Consumer. "firehose" (config kafka-host))
           msg-handler (fn [kafka-msg cb]
-                        (swap! cmp-state update-in [:count] inc)
-                        (let [cnt (:count @cmp-state)
-                              r (t/reader :json)
-                              parsed (t/read r (.-value kafka-msg))
-                              {:keys [msg-type msg-payload msg-meta]} parsed
-                              msg (with-meta [msg-type msg-payload] msg-meta)]
-                          (go (>! put-chan msg)
-                              (cb nil))
-                          (when (zero? (mod cnt 100))
-                            (let [last-ts (:last-ts @cmp-state)
-                                  now (stc/now)
-                                  duration (- now last-ts)
-                                  per-sec (Math/floor (/ 100 (/ duration 1000)))]
-                              (swap! cmp-state assoc-in [:last-ts] now)
-                              (put-fn [:kafka/status
-                                       {:status :connected
-                                        :text   (str "Messages analyzed: " cnt
-                                                     " - " per-sec " msg/s")}])
-                              (info "KAFKA received:" cnt
-                                    "-" per-sec "msg/s"
-                                    "- Offset" (.-offset kafka-msg))))))]
+                        (try
+                          (swap! cmp-state update-in [:count] inc)
+                          (let [cnt (:count @cmp-state)
+                                r (t/reader :json)
+                                parsed (t/read r (.-value kafka-msg))
+                                {:keys [msg-type msg-payload msg-meta]} parsed
+                                msg (with-meta [msg-type msg-payload] msg-meta)]
+                            (go (>! put-chan msg)
+                                (try
+                                  (cb nil)
+                                  (catch :default e (error "Error on callback" e))))
+                            (when (zero? (mod cnt 100))
+                              (let [last-ts (:last-ts @cmp-state)
+                                    now (stc/now)
+                                    duration (- now last-ts)
+                                    per-sec (Math/floor (/ 100 (/ duration 1000)))]
+                                (swap! cmp-state assoc-in [:last-ts] now)
+                                (put-fn [:kafka/status
+                                         {:status :connected
+                                          :text   (str "Messages analyzed: " cnt
+                                                       " - " per-sec " msg/s")}])
+                                (info "KAFKA received:" cnt
+                                      "-" per-sec "msg/s"
+                                      "- Offset" (.-offset kafka-msg)))))
+                          (catch :default e (error "Something went wrong" e))))]
       (-> consumer
           (.connect true)
           (.then (fn [_]
@@ -90,10 +94,10 @@
                      (put-fn [:kafka/status {:status :error :text err}]))))
       (info "Starting KAFKA consumer")
       {:new-state (assoc-in current-state [:consumer] consumer)})
-    (catch js/Object e (let []
-                         (error "general error" e)
-                         {:emit-msg [:kafka/status {:status :error
-                                                    :text   "KAFKA Error"}]}))))
+    (catch :default e (let []
+                        (error "general error" e)
+                        {:emit-msg [:kafka/status {:status :error
+                                                   :text   "KAFKA Error"}]}))))
 
 (defn cmp-map
   [cmp-id]
