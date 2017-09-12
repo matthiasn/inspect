@@ -21,25 +21,7 @@
                      :accelerator "Cmd+Q"
                      :click       #(put-fn [:app/shutdown])}]}
          {:label   "File"
-          :submenu [{:label       "New Entry"
-                     :accelerator "Cmd+N"
-                     :click       #(put-fn [:exec/js "iwaswhere_web.ui.menu.new_entry()"])}
-                    {:label "New Story"
-                     :click #(put-fn
-                               [:window/send
-                                {:cmd      "iwaswhere_web.ui.menu.new_story()"
-                                 :cmd-type "cmd"}])}
-                    {:label "New Saga"
-                     :click #(put-fn
-                               [:window/send
-                                {:cmd      "iwaswhere_web.ui.menu.new_saga()"
-                                 :cmd-type "cmd"}])}
-                    {:label       "Upload"
-                     :accelerator "Cmd+U"
-                     :click       #(put-fn
-                                     [:window/send
-                                      {:cmd      "iwaswhere_web.ui.menu.upload()"
-                                       :cmd-type "cmd"}])}]}
+          :submenu []}
          {:label   "Edit"
           :submenu [{:label       "Undo"
                      :accelerator "CmdOrCtrl+Z"

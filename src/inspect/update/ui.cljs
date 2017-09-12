@@ -16,7 +16,7 @@
 
 (defn checking [put-fn]
   [:div.updater
-   [:h1 "Checking for latest version of iWasWhere..."]
+   [:h1 "Checking for latest version of inspect..."]
    [cancel-btn put-fn]])
 
 (defn no-update [put-fn]
@@ -40,7 +40,7 @@
                    (put-fn [:update/download]))
         {:keys [version releaseDate]} (:info status-msg)]
     [:div.updater
-     [:h1 "New version of iWasWhere available."]
+     [:h1 "New version of inspect available."]
      [:div.info
       [:div [:strong "Version: "] version]
       [:div [:strong "Release date: "] (subs releaseDate 0 10)]]
@@ -55,7 +55,7 @@
         transferred (Math/floor (/ transferred 1024 1024))
         percent (Math/floor percent)]
     [:div.updater
-     [:h1 "Downloading new version of iWasWhere."]
+     [:h1 "Downloading new version of inspect."]
      [:div.meter
       [:span {:style {:width (str percent "%")}}]]
      [:div.info
@@ -70,7 +70,7 @@
                   (info "Install button clicked")
                   (put-fn [:update/install]))]
     [:div.updater
-     [:h1 "New version of iWasWhere ready to install."]
+     [:h1 "New version of inspect ready to install."]
      [cancel-btn put-fn]
      " "
      [:button {:on-click install} "install"]]))
@@ -89,7 +89,7 @@
            :update/available [update-available status-msg put-fn]
            :update/downloading [downloading status-msg put-fn]
            :update/downloaded [update-downloaded put-fn]
-           [:h1 "iWasWhere Updater: " (str status-msg)])]))))
+           [:h1 "inspect updater: " (str status-msg)])]))))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

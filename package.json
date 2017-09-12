@@ -1,6 +1,6 @@
 {
   "name": "inspect",
-  "version": "0.2.5",
+  "version": "0.2.9",
   "description": "",
   "main": "prod/main/main.js",
   "scripts": {
