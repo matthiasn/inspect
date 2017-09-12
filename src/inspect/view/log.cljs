@@ -32,7 +32,7 @@
 
    :middleware   [(middleware {"inspect.view.ipc"   :info
                                "inspect.view.store" :info
-                               :all                  :info})]
+                               :all                 :info})]
 
    :appenders    {:console {:enabled? true
                             :fn       (fn [data]

@@ -54,7 +54,8 @@
 
      [:cmd/route {:from #{:electron/kafka-cmp
                           :electron/scheduler-cmp}
-                  :to   #{:electron/store-cmp}}]
+                  :to   #{:electron/store-cmp
+                          :electron/window-manager}}]
 
      [:cmd/route {:from :electron/store-cmp
                   :to   #{:electron/window-manager}}]

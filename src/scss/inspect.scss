@@ -33,7 +33,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   .header {
     display: flex;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 
     input {
       height: 28px;
@@ -45,6 +45,11 @@ h1, h2, h3, h4, h5, h6 {
     .freeze {
       margin-top: 10px;
     }
+  }
+
+  .status {
+    margin-bottom: 10px;
+    font-family: monospace;
   }
 
   .color {

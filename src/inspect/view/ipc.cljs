@@ -10,7 +10,7 @@
                               msg-type (first parsed)
                               {:keys [msg-payload msg-meta]} (second parsed)
                               msg (with-meta [msg-type msg-payload] msg-meta)]
-                          (debug "IPC received:" msg)
+                          (debug "IPC received:" (str msg-type))
                           (put-fn msg)))]
     (.on ipcRenderer "relay" relay-handler)
     (info "Starting IPC Component")

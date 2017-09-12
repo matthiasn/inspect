@@ -50,7 +50,7 @@
   [{:keys [current-state]}]
   (let [{:keys [cnt prev-cnt]} current-state
         new-state (assoc-in current-state [:prev-cnt] cnt)]
-    (when (not= cnt prev-cnt) (info "STORE received:" cnt))
+    (when (not= cnt prev-cnt) (debug "STORE received:" cnt))
     {:new-state new-state
      :emit-msg  (when (not= cnt prev-cnt)
                   [:observer/cmps-msgs new-state])}))

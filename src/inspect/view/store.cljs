@@ -23,7 +23,7 @@
 
 (defn kafka-status [{:keys [current-state msg-payload]}]
   (let [new-state (assoc-in current-state [:kafka-status] msg-payload)]
-    (info "KAFKA status" msg-payload)
+    (prn msg-payload)
     {:new-state new-state}))
 
 (defn cmp-map [cmp-id]

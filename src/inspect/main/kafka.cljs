@@ -35,6 +35,7 @@
                                  :partitionerType      3}}))
 
 (s/def :kafka/start string?)
+(s/def :kafka/status map?)
 
 (defn state-fn
   [put-fn]
@@ -45,11 +46,16 @@
   [{:keys [put-fn cmp-state put-chan current-state msg-payload]}]
   (info "Kafka config" msg-payload)
   (try
-    #_
     (when-let [consumer (:consumer current-state)]
-      (info "stopping consumer" consumer)
-      (.stopDrain consumer))
-    (let [consumer (Consumer. "firehose" (config msg-payload))
+      (info "stopping consumer")
+      (swap! cmp-state assoc-in [:count] 0)
+      (put-fn [:kafka/status {:status :stopped :text "stopped"}])
+      (.close consumer))
+    (put-fn [:kafka/status {:status :starting
+                            :text   (str "attempting to connect to "
+                                         msg-payload)}])
+    (let [kafka-host msg-payload
+          consumer (Consumer. "firehose" (config kafka-host))
           msg-handler (fn [kafka-msg cb]
                         (swap! cmp-state update-in [:count] inc)
                         (let [cnt (:count @cmp-state)
@@ -65,18 +71,29 @@
                                   duration (- now last-ts)
                                   per-sec (Math/floor (/ 100 (/ duration 1000)))]
                               (swap! cmp-state assoc-in [:last-ts] now)
+                              (put-fn [:kafka/status
+                                       {:status :connected
+                                        :text   (str "Messages analyzed: " cnt
+                                                     " - " per-sec " msg/s")}])
                               (info "KAFKA received:" cnt
                                     "-" per-sec "msg/s"
                                     "- Offset" (.-offset kafka-msg))))))]
       (-> consumer
           (.connect true)
-          (.then (fn [_] (.consume consumer msg-handler)))
-          (.catch #(put-fn [:kafka/status {:status :error :text %}])))
-      (info "Starting KAFKA component")
+          (.then (fn [_]
+                   (put-fn [:kafka/status
+                            {:status :connected
+                             :text   (str "connected to " kafka-host)}])
+                   (.consume consumer msg-handler)))
+          (.catch #(let [err (str (.-message %))]
+                     (error "failed promise" err)
+                     (put-fn [:kafka/status {:status :error :text err}]))))
+      (info "Starting KAFKA consumer")
       {:new-state (assoc-in current-state [:consumer] consumer)})
     (catch js/Object e (let []
-                         (error e)
-                         {:emit-msg [:kafka/error "KAFKA Error"]}))))
+                         (error "general error" e)
+                         {:emit-msg [:kafka/status {:status :error
+                                                    :text   "KAFKA Error"}]}))))
 
 (defn cmp-map
   [cmp-id]

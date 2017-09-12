@@ -71,7 +71,7 @@
   [{:keys [current-state msg-type msg-meta msg-payload]}]
   (when-let [web-contents (web-contents current-state)]
     (let [serializable [msg-type {:msg-payload msg-payload :msg-meta msg-meta}]]
-      ;(info "Relaying" (str msg-type) (str msg-payload))
+      (debug "Relaying" (str msg-type))
       (.send web-contents "relay" (pr-str serializable))))
   {})
 

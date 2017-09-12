@@ -84,6 +84,7 @@
   [put-fn]
   (let [cmp-ids (subscribe [:cmp-ids])
         count (subscribe [:cnt])
+        kafka-status (subscribe [:kafka-status])
         local (r/atom {:kafka-host "localhost:9092"})
         input-fn (fn [ev]
                    (let [address (-> ev .-nativeEvent .-target .-value)]
@@ -94,7 +95,6 @@
         freeze #(put-fn [:state/freeze])]
     (fn [_]
       [:div.observer
-       ;[f2/wiring put-fn]
        [gv/wiring put-fn]
        [:div
         [:div.header
@@ -104,6 +104,7 @@
                    :value     (:kafka-host @local)}]
           [:button {:on-click subscribe} "subscribe"]]
          [:div.cnt " Count: " [:strong @count]]]
+        [:div.status (:text @kafka-status)]
         (for [cmp-id @cmp-ids]
           ^{:key (str cmp-id)}
           [component cmp-id put-fn])
