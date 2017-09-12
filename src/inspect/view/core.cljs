@@ -19,6 +19,7 @@
                                                         :update/download
                                                         :update/install
                                                         :kafka/start
+                                                        :kafka/stop
                                                         :window/close})
                        (st/cmp-map :observer/store)
                        (ui/cmp-map :observer/ui-cmp)}]

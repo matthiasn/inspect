@@ -37,6 +37,9 @@ electron.session = {};
 electron.session.defaultSession = {};
 electron.session.clearCache = function() {};
 
+electron.dialog = {};
+electron.dialog.showErrorBox = function () {};
+
 /**
  * @constructor
  * @extends events.EventEmitter

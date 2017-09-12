@@ -5,9 +5,9 @@
 
 (defn set-feed [channel]
   (.setFeedURL autoUpdater (clj->js
-                             {:url      "https://inspect.s3.amazonaws.com"
+                             {:url      "https://matthiasn-inspect.s3.amazonaws.com"
                               :provider "s3"
-                              :bucket   "st-observer"
+                              :bucket   "matthiasn-inspect"
                               :acl      "public-read"
                               :channel  channel})))
 

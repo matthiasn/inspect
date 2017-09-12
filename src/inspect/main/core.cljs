@@ -1,6 +1,6 @@
 (ns inspect.main.core
   (:require [inspect.main.log]
-            [taoensso.timbre :as timbre :refer-macros [info]]
+            [taoensso.timbre :as timbre :refer-macros [info error]]
             [inspect.main.menu :as menu]
             [inspect.main.update :as upd]
             [inspect.main.kafka :as kafka]
@@ -78,3 +78,4 @@
                                           :initial true}]}]]))
 
 (.on app "ready" start)
+(.on app "uncaughtException" #(error "uncaughtException" %))

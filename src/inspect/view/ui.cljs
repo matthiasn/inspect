@@ -92,6 +92,7 @@
         subscribe #(let [kafka-host (:kafka-host @local)]
                      (info :start kafka-host)
                      (put-fn [:kafka/start kafka-host]))
+        stop #(put-fn [:kafka/stop])
         freeze #(put-fn [:state/freeze])]
     (fn [_]
       [:div.observer
@@ -102,9 +103,12 @@
           [:input {:type      :text
                    :on-change input-fn
                    :value     (:kafka-host @local)}]
-          [:button {:on-click subscribe} "subscribe"]]
+          (if (= :connected (:status @kafka-status))
+            [:button.stop {:on-click stop} "stop"]
+            [:button {:on-click subscribe} "subscribe"])]
          [:div.cnt " Count: " [:strong @count]]]
-        [:div.status (:text @kafka-status)]
+        [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
+         (:text @kafka-status)]
         (for [cmp-id @cmp-ids]
           ^{:key (str cmp-id)}
           [component cmp-id put-fn])

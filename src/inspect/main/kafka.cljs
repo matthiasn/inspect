@@ -4,12 +4,14 @@
             [cljs.reader :refer [read-string]]
             [cljs.spec.alpha :as s]
             [sinek :refer [Consumer]]
+            [electron :refer [dialog]]
             [cognitect.transit :as t]
             [cljs.core.async :as async :refer [put! chan <! >! close!]]
             [clojure.pprint :as pp]
             [fs :refer [existsSync readFileSync]]
             [cljs.nodejs :as nodejs :refer [process]]
-            [matthiasn.systems-toolbox.component :as stc]))
+            [matthiasn.systems-toolbox.component :as stc]
+            [clojure.string :as str]))
 
 (defn config [kafka-host]
   (clj->js {:kafkaHost          kafka-host
@@ -39,18 +41,28 @@
 
 (defn state-fn
   [put-fn]
-  (let [state (atom {:count 0 :last-ts (stc/now)})]
+  (let [state (atom {:count 0 :last-ts (stc/now)})
+        err-handler (fn [title content]
+                      (error "showErrorBox" title content)
+                      (when (str/includes? content "ETIMEDOUT")
+                        (put-fn [:kafka/status {:status :error
+                                                :text   "connection timeout"}])))]
+    (aset dialog "showErrorBox" err-handler)
     {:state state}))
 
+(defn stop
+  [{:keys [put-fn cmp-state current-state]}]
+  (when-let [consumer (:consumer current-state)]
+    (info "stopping consumer")
+    (swap! cmp-state assoc-in [:count] 0)
+    (put-fn [:kafka/status {:status :stopped :text "stopped"}])
+    (.close consumer)))
+
 (defn start
-  [{:keys [put-fn cmp-state put-chan current-state msg-payload]}]
+  [{:keys [put-fn cmp-state put-chan current-state msg-payload] :as msg-map}]
   (info "Kafka config" msg-payload)
   (try
-    (when-let [consumer (:consumer current-state)]
-      (info "stopping consumer")
-      (swap! cmp-state assoc-in [:count] 0)
-      (put-fn [:kafka/status {:status :stopped :text "stopped"}])
-      (.close consumer))
+    (stop msg-map)
     (put-fn [:kafka/status {:status :starting
                             :text   (str "attempting to connect to "
                                          msg-payload)}])
@@ -88,14 +100,16 @@
                    (put-fn [:kafka/status
                             {:status :connected
                              :text   (str "connected to " kafka-host)}])
-                   (.consume consumer msg-handler)))
+                   (try
+                     (.consume consumer msg-handler)
+                     (catch :default e (error "promise then" e)))))
           (.catch #(let [err (str (.-message %))]
                      (error "failed promise" err)
                      (put-fn [:kafka/status {:status :error :text err}]))))
       (info "Starting KAFKA consumer")
       {:new-state (assoc-in current-state [:consumer] consumer)})
     (catch :default e (let []
-                        (error "general error" e)
+                        (error "start fn" e)
                         {:emit-msg [:kafka/status {:status :error
                                                    :text   "KAFKA Error"}]}))))
 
@@ -103,4 +117,5 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:kafka/start start}})
+   :handler-map {:kafka/start start
+                 :kafka/stop  stop}})
