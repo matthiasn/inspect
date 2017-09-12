@@ -27,7 +27,7 @@
                      (info "Check beta versions")
                      (put-fn [:update/check-beta]))]
     [:div.updater
-     [:h1 "You already have the latest version of iWasWhere."]
+     [:h1 "You already have the latest version of inspect."]
      [cancel-btn put-fn]
      " "
      [:button {:on-click check} "check"]
