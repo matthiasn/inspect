@@ -15,8 +15,9 @@ h1, h2, h3, h4, h5, h6 {
 @import "buttons.scss";
 
 #graphviz {
+  width: 1fr;
   svg {
-    width: 50vw;
+    width: 100%;
   }
 }
 
@@ -28,8 +29,9 @@ h1, h2, h3, h4, h5, h6 {
   padding: 2em;
 
   h2 {
-    margin: 0.4em 0 0 0;
-    font-size: 1.2em;
+    margin: 0.6em 0 0 0;
+    font-size: 1em;
+    font-family: monospace;
   }
   .header {
     display: flex;
@@ -77,11 +79,21 @@ h1, h2, h3, h4, h5, h6 {
 
     table {
       background-color: white;
-      margin: 0 4em 0 0;
-      min-width: 250px;
+      margin: 0 1em 0 0;
+      min-width: 270px;
+      line-height: 1em;
+      font-family: monospace;
+      font-size: 0.8em;
 
       td {
         min-width: 20px;
+
+        &.dir {
+          width: 30px;
+        }
+        &.cmp-id {
+          min-width: 170px;
+        }
       }
 
       .cnt {

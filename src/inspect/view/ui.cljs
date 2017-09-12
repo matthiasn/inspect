@@ -61,9 +61,9 @@
           (for [[msg-type cnt] (dir @cmp-map)]
             ^{:key (str msg-type)}
             [:tr
-             [:td [:strong (str dir)]]
-             [:td {:on-click #(put-fn [:cell/active msg-type])
-                   :class    (when (= msg-type active-type) "active")}
+             [:td.dir [:strong (str dir)]]
+             [:td.cmp-id {:on-click #(put-fn [:cell/active msg-type])
+                          :class    (when (= msg-type active-type) "active")}
               (str msg-type)]
              [cnt-cell cmp-id msg-type dir]
              [delta-cell cmp-id msg-type dir]])]]))))
@@ -73,7 +73,7 @@
     (fn [cmp-id put-fn]
       [:div
        [:h2
-        [:span.color {:style {:background-color (u/random-color cmp-id)}}]
+        ;[:span.color {:style {:background-color (u/random-color cmp-id)}}]
         (str cmp-id)]
        [:div.tables
         [msg-table cmp-id :in put-fn]
