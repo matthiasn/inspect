@@ -104,15 +104,17 @@
                    :on-change input-fn
                    :value     (:kafka-host @local)}]
           (if (= :connected (:status @kafka-status))
-            [:button.stop {:on-click stop} "stop"]
-            [:button {:on-click subscribe} "subscribe"])]
+            [:button.stop {:on-click stop}
+             [:span.fa.fa-stop] "stop"]
+            [:button {:on-click subscribe}
+             [:span.fa.fa-play] "subscribe"])]
          [:div.cnt " Count: " [:strong @count]]]
         [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
          (:text @kafka-status)]
         (for [cmp-id @cmp-ids]
           ^{:key (str cmp-id)}
           [component cmp-id put-fn])
-        [:button.freeze {:on-click freeze} "freeze"]]])))
+        [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the
