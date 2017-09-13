@@ -44,6 +44,6 @@
             svg (Viz digraph)]
         ;(info "clusters" clusters)
         ;(info "sub-graphs" sub-graphs)
-        (info digraph)
+        (debug digraph)
         (aset svg-elem "innerHTML" svg)
         [:div]))))

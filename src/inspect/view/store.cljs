@@ -1,5 +1,8 @@
 (ns inspect.view.store
-  (:require [taoensso.timbre :as timbre :refer-macros [info debug]]))
+  (:require [taoensso.timbre :as timbre :refer-macros [info debug]]
+            [cljs.spec.alpha :as s]))
+
+(s/def :subscription/match :firehose/cmp-recv)
 
 (defn cmps-msgs [{:keys [current-state msg msg-type msg-meta msg-payload]}]
   (let [prev (:cmps-msgs current-state)
@@ -23,7 +26,13 @@
 
 (defn kafka-status [{:keys [current-state msg-payload]}]
   (let [new-state (assoc-in current-state [:kafka-status] msg-payload)]
-    (prn msg-payload)
+    (debug msg-payload)
+    {:new-state new-state}))
+
+(defn match [{:keys [current-state msg-payload]}]
+  (let [add (fn [matches match] (take 10 (conj matches match)))
+        new-state (update-in current-state [:matches] add msg-payload)]
+    (debug "Match" msg-payload)
     {:new-state new-state}))
 
 (defn cmp-map [cmp-id]
@@ -31,4 +40,5 @@
    :handler-map {:observer/cmps-msgs cmps-msgs
                  :cell/active        cell-active
                  :state/freeze       freeze
+                 :subscription/match match
                  :kafka/status       kafka-status}})

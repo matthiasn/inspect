@@ -5,17 +5,17 @@
             [clojure.set :as set]))
 
 (s/def :observer/cmps-msgs map?)
+(s/def :observer/subscribe map?)
+(s/def :subscription/match :firehose/cmp-recv)
 
-(defn state-fn
-  [put-fn]
+(defn state-fn [put-fn]
   (let [state (atom {:count      0
                      :cmp-ids    #{}
                      :components {}
                      :msg-types  #{}})]
     {:state state}))
 
-(defn firehose-msg
-  [{:keys [current-state msg-type msg msg-payload msg-meta put-fn]}]
+(defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta]}]
   (let [cnt (:cnt current-state)
         in-out (if (= msg-type :firehose/cmp-recv) :in :out)
         {:keys [cmp-id msg msg-meta]} msg-payload
@@ -48,14 +48,12 @@
         match (when (and (= msg-type (:msg-type subscription))
                          (= cmp-id (:cmp-id subscription))
                          (= in-out (:dir subscription)))
-                [:subscription/match {:msg msg-payload}])]
-    (info subscription msg-type cmp-id in-out)
-    (when match (info "Subscription match:" match))
+                [:subscription/match msg-payload])]
+    (when match (debug "Subscription match:" match))
     {:new-state new-state
      :emit-msg  match}))
 
-(defn state-publish
-  [{:keys [current-state]}]
+(defn state-publish [{:keys [current-state]}]
   (let [{:keys [cnt prev-cnt]} current-state
         new-state (assoc-in current-state [:prev-cnt] cnt)]
     (when (not= cnt prev-cnt) (debug "STORE received:" cnt))
@@ -63,18 +61,22 @@
      :emit-msg  (when (not= cnt prev-cnt)
                   [:observer/cmps-msgs new-state])}))
 
-(defn subscribe
-  [{:keys [current-state msg-payload]}]
+(defn subscribe [{:keys [current-state msg-payload]}]
   (let [new-state (assoc-in current-state [:subscription] msg-payload)]
-    (info "Subscribe" msg-payload new-state)
+    (info "Subscribe" msg-payload)
     {:new-state new-state}))
 
-(defn cmp-map
-  [cmp-id]
+(defn stop [{:keys [current-state]}]
+  (let [new-state (assoc-in current-state [:subscription] nil)]
+    (info "Subscription stopped")
+    {:new-state new-state}))
+
+(defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
    :handler-map {:firehose/cmp-recv  firehose-msg
                  :firehose/cmp-put   firehose-msg
                  :observer/subscribe subscribe
+                 :observer/stop      stop
                  :state/publish      state-publish}})
 

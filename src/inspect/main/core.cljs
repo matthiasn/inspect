@@ -24,6 +24,7 @@
                                    #{:exec/js
                                      :import/listen
                                      :kafka/status
+                                     :subscription/match
                                      :observer/cmps-msgs})
                        (kafka/cmp-map :electron/kafka-cmp)
                        (st/cmp-map :electron/store-cmp)

@@ -17,6 +17,7 @@
 
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
+(reg-sub :matches (fn [db _] (:matches db)))
 (reg-sub :active-type (fn [db _] (:active-type db)))
 (reg-sub :kafka-status (fn [db _] (:kafka-status db)))
 (reg-sub :components (fn [db _] (:components (:cmps-msgs db))))
@@ -65,7 +66,9 @@
              [:td.cmp-id {:on-click #(let [subscription {:msg-type msg-type
                                                          :cmp-id   cmp-id
                                                          :dir      dir}]
-                                       (put-fn [:observer/subscribe subscription])
+                                       (if (= msg-type active-type)
+                                         (put-fn [:observer/stop])
+                                         (put-fn [:observer/subscribe subscription]))
                                        (put-fn [:cell/active msg-type]))
                           :class    (when (= msg-type active-type) "active")}
               (str msg-type)]
@@ -82,6 +85,16 @@
        [:div.tables
         [msg-table cmp-id :in put-fn]
         [msg-table cmp-id :out put-fn]]])))
+
+(defn matches [put-fn]
+  (let [matches (subscribe [:matches])]
+    (fn [put-fn]
+      [:div
+       [:h2 "Matches"]
+       (for [match @matches]
+         ^{:key (:firehose-id match)}
+         [:div
+          [:pre [:code (with-out-str (pp/pprint match))]]])])))
 
 (defn re-frame-ui
   "Main view component"
@@ -118,7 +131,8 @@
         (for [cmp-id @cmp-ids]
           ^{:key (str cmp-id)}
           [component cmp-id put-fn])
-        [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]]])))
+        [:div [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]]
+        [matches put-fn]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the
