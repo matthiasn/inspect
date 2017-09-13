@@ -1,4 +1,4 @@
-<img src="./logo.svg" alt="logo" style="width:150px">
+<img src="./logo.svg" alt="logo" width="150px">
 
 This Electron-based application lets you look inside systems built with the **[systems-toolbox](https://github.com/matthiasn/systems-toolbox)**. You need a system that is configured to offload its firehose to a Kafka topic. Once that is set up, you can connect this application to your Kafka host and watch it draw your system from the messages flowing through. Other than that, this application has zero knowledge about the system under observation. This particular screenshot comes from observing my **[iWasWhere](https://github.com/matthiasn/iWasWhere)** journaling application, where **inspect** has already helped quite a bit in making sense of message flows.
 
