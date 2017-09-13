@@ -9,11 +9,8 @@
             [inspect.view.graphviz :as gv]
             [inspect.view.util :as u]
             [cljs.pprint :as pp]
-            [cljs.spec.alpha :as s]
             [clojure.set :as set]
             [reagent.core :as r]))
-
-(s/def :observer/cmps-msgs map?)
 
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))

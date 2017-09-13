@@ -1,8 +1,5 @@
 (ns inspect.view.store
-  (:require [taoensso.timbre :as timbre :refer-macros [info debug]]
-            [cljs.spec.alpha :as s]))
-
-(s/def :subscription/match :firehose/cmp-recv)
+  (:require [taoensso.timbre :as timbre :refer-macros [info debug]]))
 
 (defn cmps-msgs [{:keys [current-state msg msg-type msg-meta msg-payload]}]
   (let [prev (:cmps-msgs current-state)

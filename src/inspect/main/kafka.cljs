@@ -2,7 +2,6 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [taoensso.timbre :as timbre :refer-macros [info debug warn error]]
             [cljs.reader :refer [read-string]]
-            [cljs.spec.alpha :as s]
             [sinek :refer [Consumer]]
             [electron :refer [dialog]]
             [cognitect.transit :as t]
@@ -35,9 +34,6 @@
                                  :requireAcks          0
                                  :ackTimeoutMs         100
                                  :partitionerType      3}}))
-
-(s/def :kafka/start string?)
-(s/def :kafka/status map?)
 
 (defn state-fn
   [put-fn]

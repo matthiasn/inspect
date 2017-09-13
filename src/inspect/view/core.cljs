@@ -1,5 +1,6 @@
 (ns inspect.view.core
-  (:require [inspect.view.log]
+  (:require [inspect.specs.specs]
+            [inspect.view.log]
             [inspect.view.ipc :as ipc]
             [inspect.view.store :as st]
             [inspect.view.ui :as ui]

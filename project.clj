@@ -23,7 +23,7 @@
                     ["sass" "once"]]}
 
   :cljsbuild {:builds [{:id           "main"
-                        :source-paths ["src/inspect/main"]
+                        :source-paths ["src/inspect/specs" "src/inspect/main"]
                         :compiler     {:main           inspect.main.core
                                        :target         :nodejs
                                        :output-to      "prod/main/main.js"
@@ -45,7 +45,7 @@
                                        :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "view"
-                        :source-paths ["src/inspect/view"]
+                        :source-paths ["src/inspect/specs" "src/inspect/view"]
                         :compiler     {:main           inspect.view.core
                                        :output-to      "prod/view/core.js"
                                        :target         :nodejs
@@ -65,7 +65,7 @@
                                        :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "updater"
-                        :source-paths ["src/inspect/update"]
+                        :source-paths ["src/inspect/specs" "src/inspect/update"]
                         :compiler     {:main           inspect.update.core
                                        :output-to      "prod/updater/update.js"
                                        :target         :nodejs

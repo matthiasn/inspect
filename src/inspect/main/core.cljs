@@ -1,5 +1,6 @@
 (ns inspect.main.core
-  (:require [inspect.main.log]
+  (:require [inspect.specs.specs]
+            [inspect.main.log]
             [taoensso.timbre :as timbre :refer-macros [info error]]
             [inspect.main.menu :as menu]
             [inspect.main.update :as upd]

@@ -1,12 +1,7 @@
 (ns inspect.main.store
   (:require [taoensso.timbre :as timbre :refer-macros [info debug]]
             [clojure.pprint :as pp]
-            [cljs.spec.alpha :as s]
             [clojure.set :as set]))
-
-(s/def :observer/cmps-msgs map?)
-(s/def :observer/subscribe map?)
-(s/def :subscription/match :firehose/cmp-recv)
 
 (defn state-fn [put-fn]
   (let [state (atom {:count      0

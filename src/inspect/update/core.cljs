@@ -1,5 +1,6 @@
 (ns inspect.update.core
-  (:require [inspect.update.log :as log]
+  (:require [inspect.specs.specs]
+            [inspect.update.log :as log]
             [taoensso.timbre :as timbre :refer-macros [info]]
             [inspect.update.ipc :as ipc]
             [inspect.update.ui :as ui]
