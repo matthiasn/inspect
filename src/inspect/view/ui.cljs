@@ -62,7 +62,11 @@
             ^{:key (str msg-type)}
             [:tr
              [:td.dir [:strong (str dir)]]
-             [:td.cmp-id {:on-click #(put-fn [:cell/active msg-type])
+             [:td.cmp-id {:on-click #(let [subscription {:msg-type msg-type
+                                                         :cmp-id   cmp-id
+                                                         :dir      dir}]
+                                       (put-fn [:observer/subscribe subscription])
+                                       (put-fn [:cell/active msg-type]))
                           :class    (when (= msg-type active-type) "active")}
               (str msg-type)]
              [cnt-cell cmp-id msg-type dir]

@@ -6,6 +6,7 @@
             [inspect.main.kafka :as kafka]
             [inspect.main.store :as st]
             [inspect.main.startup :as startup]
+            [inspect.main.ipc :as ipc]
             [inspect.main.window-manager :as wm]
             [inspect.main.update-window :as um]
             [electron :refer [app]]
@@ -26,6 +27,7 @@
                                      :observer/cmps-msgs})
                        (kafka/cmp-map :electron/kafka-cmp)
                        (st/cmp-map :electron/store-cmp)
+                       (ipc/cmp-map :electron/ipc-cmp)
                        (startup/cmp-map :electron/startup-cmp)
                        (upd/cmp-map :electron/update-cmp)
                        (sched/cmp-map :electron/scheduler-cmp)
@@ -42,11 +44,16 @@
      [:cmd/route {:from #{:electron/update-win-cmp
                           :electron/scheduler-cmp}
                   :to   #{:electron/update-cmp
+                          :electron/store-cmp
                           :electron/kafka-cmp}}]
 
      [:cmd/route {:from :electron/update-cmp
                   :to   #{:electron/update-win-cmp
                           :electron/scheduler-cmp}}]
+
+     [:cmd/route {:from :electron/ipc-cmp
+                  :to   #{:electron/store-cmp
+                          :electron/kafka-cmp}}]
 
      [:cmd/route {:from #{:electron/update-cmp
                           :electron/scheduler-cmp}

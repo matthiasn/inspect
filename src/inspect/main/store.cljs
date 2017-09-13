@@ -43,8 +43,16 @@
                       (update-in [:components cmp-id in-out msg-type] #(inc (or % 0)))
                       (update-in [:edges] add-edge)
                       (update-in [:edges-by-type msg-type] add-edge)
-                      (update-in [:msg-types] conj msg-type))]
-    {:new-state new-state}))
+                      (update-in [:msg-types] conj msg-type))
+        subscription (:subscription current-state)
+        match (when (and (= msg-type (:msg-type subscription))
+                         (= cmp-id (:cmp-id subscription))
+                         (= in-out (:dir subscription)))
+                [:subscription/match {:msg msg-payload}])]
+    (info subscription msg-type cmp-id in-out)
+    (when match (info "Subscription match:" match))
+    {:new-state new-state
+     :emit-msg  match}))
 
 (defn state-publish
   [{:keys [current-state]}]
@@ -55,11 +63,18 @@
      :emit-msg  (when (not= cnt prev-cnt)
                   [:observer/cmps-msgs new-state])}))
 
+(defn subscribe
+  [{:keys [current-state msg-payload]}]
+  (let [new-state (assoc-in current-state [:subscription] msg-payload)]
+    (info "Subscribe" msg-payload new-state)
+    {:new-state new-state}))
+
 (defn cmp-map
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:firehose/cmp-recv firehose-msg
-                 :firehose/cmp-put  firehose-msg
-                 :state/publish     state-publish}})
+   :handler-map {:firehose/cmp-recv  firehose-msg
+                 :firehose/cmp-put   firehose-msg
+                 :observer/subscribe subscribe
+                 :state/publish      state-publish}})
 
