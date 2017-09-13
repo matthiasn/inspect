@@ -9,7 +9,7 @@
             [clojure.pprint :as pp]
             [inspect.main.runtime :as rt]))
 
-(defn updater-window [{:keys [current-state cmp-state put-fn]}]
+(defn updater-window [{:keys [current-state cmp-state]}]
   (when-let [existing (:updater-window current-state)]
     (.close existing))
   (let [window (BrowserWindow. (clj->js {:width 600 :height 300}))

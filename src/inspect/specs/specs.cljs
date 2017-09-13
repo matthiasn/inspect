@@ -10,9 +10,11 @@
 
 (s/def :subscription/match :firehose/cmp-recv)
 
-(s/def :update/status #{:update/available
-                        :update/not-available
-                        :update/checking
-                        :update/downloading
-                        :update/downloaded
-                        :update/error})
+(s/def :inspect.update/status #{:update/available
+                               :update/not-available
+                               :update/checking
+                               :update/downloading
+                               :update/downloaded
+                               :update/error})
+
+(s/def :update/status (s/keys :req-un [:inspect.update/status]))

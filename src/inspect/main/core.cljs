@@ -43,8 +43,7 @@
                           :electron/startup-cmp
                           :electron/update-cmp}}]
 
-     [:cmd/route {:from #{:electron/update-win-cmp
-                          :electron/scheduler-cmp}
+     [:cmd/route {:from #{:electron/scheduler-cmp}
                   :to   #{:electron/update-cmp
                           :electron/store-cmp
                           :electron/kafka-cmp}}]
@@ -55,10 +54,10 @@
 
      [:cmd/route {:from :electron/ipc-cmp
                   :to   #{:electron/store-cmp
-                          :electron/kafka-cmp}}]
+                          :electron/kafka-cmp
+                          :electron/update-cmp}}]
 
-     [:cmd/route {:from #{:electron/update-cmp
-                          :electron/scheduler-cmp}
+     [:cmd/route {:from :electron/scheduler-cmp
                   :to   :electron/kafka-cmp}]
 
      [:cmd/route {:from #{:electron/kafka-cmp
