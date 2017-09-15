@@ -65,18 +65,18 @@
   (when-let [active-window (active-window current-state)]
     (.-webContents active-window)))
 
-(defn relay [web-contents msg-type msg-payload msg-meta]
-  (let [serializable [msg-type {:msg-payload msg-payload
-                                :msg-meta    msg-meta}]]
-    (info "Relaying" (str msg-type) (:window-id msg-meta))
-    (.send web-contents "relay" (pr-str serializable))))
-
 (defn relay-msg [{:keys [current-state msg-type msg-meta msg-payload]}]
   (let [window-id (:window-id msg-meta)
-        web-contents (or
-                       (web-contents current-state))]
-    (when web-contents
-      (relay web-contents msg-type msg-payload msg-meta)))
+        window-ids (if (= window-id :broadcast)
+                     (keys (:windows current-state))
+                     [window-id])]
+    (doseq [window-id window-ids]
+      (let [window (get-in current-state [:windows window-id])
+            web-contents (when window (.-webContents window))
+            serializable [msg-type {:msg-payload msg-payload :msg-meta msg-meta}]]
+        (when web-contents
+          (info "Relaying" msg-type window-id)
+          (.send web-contents "relay" (pr-str serializable))))))
   {})
 
 (defn dev-tools [{:keys [current-state]}]
@@ -86,15 +86,18 @@
   {})
 
 (defn close-window [{:keys [current-state]}]
-  (when-let [active-window (active-window current-state)]
-    (info "Closing:" (:active current-state))
-    (.close active-window))
-  {})
+  (if-let [active-window (active-window current-state)]
+    (let [active (:active current-state)
+          new-state (update-in current-state [:windows] dissoc active)]
+      (info "Closing:" (:active current-state))
+      (.close active-window)
+      {:new-state new-state})
+    {}))
 
 (defn activate [{:keys [current-state]}]
   (info "Activate APP")
   (when (empty? (:windows current-state))
-    {:send-to-self [:window/new "view.html"]}))
+    {:send-to-self [:window/new {:url "view.html"}]}))
 
 (defn cmp-map
   [cmp-id relay-types]
