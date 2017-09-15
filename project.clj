@@ -45,7 +45,7 @@
                                        :install-deps   true
                                        :language-in    :ecmascript5
                                        :language-out   :ecmascript5
-                                       :optimizations  :none
+                                       :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "view"
                         :source-paths ["src/inspect/specs" "src/inspect/view"]
