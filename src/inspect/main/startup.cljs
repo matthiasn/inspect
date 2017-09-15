@@ -4,7 +4,6 @@
             [path :refer [normalize join]]
             [inspect.main.runtime :as rt]
             [child_process :refer [spawn]]
-            [cljs.nodejs :as nodejs :refer [process]]
             [clojure.string :as str]))
 
 (defn shutdown [{:keys []}]

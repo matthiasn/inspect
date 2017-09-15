@@ -75,9 +75,7 @@
      " "
      [:button {:on-click install} "install"]]))
 
-(defn re-frame-ui
-  "Main view component"
-  [local put-fn]
+(defn re-frame-ui [local put-fn]
   (let [current-page (subscribe [:current-page])]
     (fn [local put-fn]
       (let [status-msg (:status-msg @local)
@@ -91,24 +89,18 @@
            :update/downloaded [update-downloaded put-fn]
            [:h1 "inspect updater: " (str status-msg)])]))))
 
-(defn state-fn
-  "Renders main view component and wires the central re-frame app-db as the
-   observed component state, which will then be updated whenever the store-cmp
-   changes."
-  [put-fn]
+(defn state-fn [put-fn]
   (let [local (rc/atom {})]
     (rc/render [re-frame-ui local put-fn] (.getElementById js/document "app"))
     (put-fn [:update/check])
     {:observed rdb/app-db
      :state    local}))
 
-(defn set-status
-  [{:keys [current-state msg msg-type msg-meta msg-payload]}]
+(defn set-status [{:keys [current-state msg msg-type msg-meta msg-payload]}]
   (let [new-state (assoc-in current-state [:status-msg] msg-payload)]
     {:new-state new-state}))
 
-(defn cmp-map
-  [cmp-id]
+(defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
    :handler-map {:update/status set-status}})

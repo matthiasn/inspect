@@ -3,14 +3,15 @@
             [electron :refer [app Menu]]
             [cljs.nodejs :as nodejs :refer [process]]))
 
-(defn state-fn
-  [put-fn]
+(defn state-fn [put-fn]
   (let [menu-tpl
         [{:label   "Application"
           :submenu [{:label    "About"
                      :selector "orderFrontStandardAboutPanel:"}
                     {:label "Check for Updates..."
-                     :click #(put-fn [:window/updater])}
+                     :click #(put-fn [:window/new {:url    "updater.html"
+                                                   :width  600
+                                                   :height 300}])}
                     {:label   "Clear Caches"
                      :submenu [{:label "Clear Electron Cache"
                                 :click #(put-fn [:app/clear-cache])}]}
@@ -64,7 +65,6 @@
     (.setApplicationMenu Menu menu))
   {:state (atom {})})
 
-(defn cmp-map
-  [cmp-id]
+(defn cmp-map [cmp-id]
   {:cmp-id   cmp-id
    :state-fn state-fn})

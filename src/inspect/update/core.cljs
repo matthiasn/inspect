@@ -2,23 +2,24 @@
   (:require [inspect.specs.specs]
             [inspect.update.log :as log]
             [taoensso.timbre :as timbre :refer-macros [info]]
-            [inspect.update.ipc :as ipc]
+            [matthiasn.systems-toolbox-electron.ipc-renderer :as ipc]
             [inspect.update.ui :as ui]
             [electron :refer [ipcRenderer]]
             [matthiasn.systems-toolbox.switchboard :as sb]))
 
 (defonce switchboard (sb/component :updater/switchboard))
 
+(def relay-types #{:update/check
+                   :update/check-beta
+                   :update/download
+                   :update/install
+                   :window/close})
 
 (defn start []
   (info "Starting UPDATER")
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp #{(ipc/cmp-map :updater/ipc-cmp #{:update/check
-                                                       :update/check-beta
-                                                       :update/download
-                                                       :update/install
-                                                       :window/close})
+    [[:cmd/init-comp #{(ipc/cmp-map :updater/ipc-cmp relay-types)
                        (ui/cmp-map :updater/ui-cmp)}]
 
      [:cmd/route {:from :updater/ipc-cmp

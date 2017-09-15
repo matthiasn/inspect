@@ -1,7 +1,7 @@
 (ns inspect.view.core
   (:require [inspect.specs.specs]
             [inspect.view.log]
-            [inspect.view.ipc :as ipc]
+            [matthiasn.systems-toolbox-electron.ipc-renderer :as ipc]
             [inspect.view.store :as st]
             [inspect.view.ui :as ui]
             [matthiasn.systems-toolbox.switchboard :as sb]

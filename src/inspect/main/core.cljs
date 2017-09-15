@@ -3,6 +3,7 @@
             [inspect.main.log]
             [taoensso.timbre :as timbre :refer-macros [info error]]
             [matthiasn.systems-toolbox-electron.ipc-main :as ipc]
+            [matthiasn.systems-toolbox-electron.window-manager :as wm]
             [matthiasn.systems-toolbox.scheduler :as sched]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [inspect.main.menu :as menu]
@@ -11,23 +12,26 @@
             [inspect.main.download :as dl]
             [inspect.main.store :as st]
             [inspect.main.startup :as startup]
-            [inspect.main.window-manager :as wm]
-            [inspect.main.update-window :as um]
             [electron :refer [app]]
-            [cljs.nodejs :as nodejs :refer [process]]))
+            [cljs.nodejs :as nodejs :refer [process]]
+            [inspect.main.runtime :as rt]))
 
 (defonce switchboard (sb/component :electron/switchboard))
+
+(def wm-relay #{:exec/js
+                :import/listen
+                :kafka/status
+                :subscription/match
+                :update/status
+                :observer/cmps-msgs})
+
+(def app-path (:app-path rt/runtime-info))
 
 (defn start []
   (info "Starting CORE:" (.-resourcesPath process))
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp #{(wm/cmp-map :electron/window-manager
-                                   #{:exec/js
-                                     :import/listen
-                                     :kafka/status
-                                     :subscription/match
-                                     :observer/cmps-msgs})
+    [[:cmd/init-comp #{(wm/cmp-map :electron/window-manager wm-relay app-path)
                        (kafka/cmp-map :electron/kafka-cmp)
                        (st/cmp-map :electron/store-cmp)
                        (dl/cmp-map :electron/download-cmp)
@@ -35,12 +39,10 @@
                        (startup/cmp-map :electron/startup-cmp)
                        (upd/cmp-map :electron/update-cmp)
                        (sched/cmp-map :electron/scheduler-cmp)
-                       (um/cmp-map :electron/update-win-cmp)
                        (menu/cmp-map :electron/menu-cmp)}]
 
      [:cmd/route {:from :electron/menu-cmp
                   :to   #{:electron/window-manager
-                          :electron/update-win-cmp
                           :electron/kafka-cmp
                           :electron/download-cmp
                           :electron/startup-cmp
@@ -52,12 +54,13 @@
                           :electron/kafka-cmp}}]
 
      [:cmd/route {:from :electron/update-cmp
-                  :to   #{:electron/update-win-cmp
+                  :to   #{:electron/window-manager
                           :electron/scheduler-cmp}}]
 
      [:cmd/route {:from :electron/ipc-cmp
                   :to   #{:electron/store-cmp
                           :electron/kafka-cmp
+                          :electron/window-manager
                           :electron/update-cmp}}]
 
      [:cmd/route {:from :electron/scheduler-cmp
@@ -71,8 +74,11 @@
      [:cmd/route {:from :electron/store-cmp
                   :to   #{:electron/window-manager}}]
 
-     [:cmd/send {:to  :electron/kafka-cmp
-                 :msg [:cmd/start]}]
+     [:cmd/send {:to  :electron/window-manager
+                 :msg [:window/new {:url       "loading.html"
+                                    :width     400
+                                    :height    300
+                                    :window-id "loading"}]}]
 
      [:cmd/send {:to  :electron/window-manager
                  :msg [:window/new {:url "view.html"}]}]

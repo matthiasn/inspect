@@ -13,6 +13,9 @@
 
 (defn state-fn [put-fn]
   (let [state (atom {:open-window false})
+        put-fn (fn [msg]
+                 (let [msg-meta (merge {:window-id :broadcast} (meta msg))]
+                   (put-fn (with-meta msg msg-meta))))
         no-update-available (fn [_]
                               (info "Update not available.")
                               (put-fn [:update/status {:status :update/not-available}]))
@@ -69,8 +72,6 @@
 (defn install-updates [{:keys []}]
   (info "UPDATE: install")
   {:emit-msg [[:app/clear-cache]
-              ;[:app/clear-iww-cache]
-              [:app/shutdown-jvm]
               [:cmd/schedule-new {:timeout 1000
                                   :message [:update/quit-install]}]]})
 
