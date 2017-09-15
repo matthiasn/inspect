@@ -33,6 +33,8 @@
                                                         :moment            "2.18.1"
                                                         :react             "15.6.1"
                                                         :react-dom         "15.6.1"
+                                                        :electron-dl       "1.10.0"
+                                                        :decompress        "4.2.0"
                                                         :electron-builder  "19.24.1"
                                                         :electron-updater  "2.8.7"
                                                         :electron-packager "8.7.2"
@@ -42,7 +44,7 @@
                                        :install-deps   true
                                        :language-in    :ecmascript5
                                        :language-out   :ecmascript5
-                                       :optimizations  :advanced
+                                       :optimizations  :none
                                        :parallel-build true}}
                        {:id           "view"
                         :source-paths ["src/inspect/specs" "src/inspect/view"]

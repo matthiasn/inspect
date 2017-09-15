@@ -11,8 +11,7 @@
                               :acl      "public-read"
                               :channel  channel})))
 
-(defn state-fn
-  [put-fn]
+(defn state-fn [put-fn]
   (let [state (atom {:open-window false})
         no-update-available (fn [_]
                               (info "Update not available.")
@@ -49,29 +48,25 @@
     (.on autoUpdater "error" error)
     {:state state}))
 
-(defn check-updates
-  [open-window]
+(defn check-updates [open-window]
   (fn [{:keys [current-state]}]
     (info "UPDATE: check release versions")
     (set-feed "release")
     (.checkForUpdates autoUpdater)
     {:new-state (assoc-in current-state [:open-window] open-window)}))
 
-(defn check-updates-beta
-  [{:keys []}]
+(defn check-updates-beta [{:keys []}]
   (info "UPDATE: check beta versions")
   (set-feed "beta")
   (.checkForUpdates autoUpdater)
   {})
 
-(defn download-updates
-  [{:keys []}]
+(defn download-updates [{:keys []}]
   (info "UPDATE: download")
   (.downloadUpdate autoUpdater)
   {})
 
-(defn install-updates
-  [{:keys []}]
+(defn install-updates [{:keys []}]
   (info "UPDATE: install")
   {:emit-msg [[:app/clear-cache]
               ;[:app/clear-iww-cache]
@@ -79,14 +74,12 @@
               [:cmd/schedule-new {:timeout 1000
                                   :message [:update/quit-install]}]]})
 
-(defn quit-install
-  [{:keys []}]
+(defn quit-install [{:keys []}]
   (info "UPDATE: quit and install")
   (.quitAndInstall autoUpdater)
   {})
 
-(defn cmp-map
-  [cmp-id]
+(defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
    :handler-map {:update/check        (check-updates false)

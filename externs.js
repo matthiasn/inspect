@@ -40,6 +40,14 @@ electron.session.clearCache = function() {};
 electron.dialog = {};
 electron.dialog.showErrorBox = function () {};
 
+var electronDl = {};
+electronDl.download = function () {};
+electronDl.download.then = function () {};
+
+var decompress = function () {};
+decompress.then = function () {};
+
+
 /**
  * @constructor
  * @extends events.EventEmitter

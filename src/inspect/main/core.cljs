@@ -5,6 +5,7 @@
             [inspect.main.menu :as menu]
             [inspect.main.update :as upd]
             [inspect.main.kafka :as kafka]
+            [inspect.main.download :as dl]
             [inspect.main.store :as st]
             [inspect.main.startup :as startup]
             [inspect.main.ipc :as ipc]
@@ -29,6 +30,7 @@
                                      :observer/cmps-msgs})
                        (kafka/cmp-map :electron/kafka-cmp)
                        (st/cmp-map :electron/store-cmp)
+                       (dl/cmp-map :electron/download-cmp)
                        (ipc/cmp-map :electron/ipc-cmp)
                        (startup/cmp-map :electron/startup-cmp)
                        (upd/cmp-map :electron/update-cmp)
@@ -40,6 +42,7 @@
                   :to   #{:electron/window-manager
                           :electron/update-win-cmp
                           :electron/kafka-cmp
+                          :electron/download-cmp
                           :electron/startup-cmp
                           :electron/update-cmp}}]
 

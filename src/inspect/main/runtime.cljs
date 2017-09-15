@@ -14,6 +14,8 @@
         platform (.-platform process)
         info {:platform       (.-platform process)
               :user-data      user-data
+              :dl-path        (str user-data "/downloads")
+              :bin-path       (str user-data "/bin")
               :cwd            cwd
               :pid-file       (str user-data "/inspect.pid")
               :resources-path rp

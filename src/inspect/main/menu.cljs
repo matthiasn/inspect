@@ -14,6 +14,10 @@
                     {:label   "Clear Caches"
                      :submenu [{:label "Clear Electron Cache"
                                 :click #(put-fn [:app/clear-cache])}]}
+                    {:label "Download Kafka"
+                     :click #(put-fn [:download/bin :kafka])}
+                    {:label "Download JDK"
+                     :click #(put-fn [:download/bin :jdk])}
                     {:label       "Close Window"
                      :accelerator "Cmd+W"
                      :click       #(put-fn [:window/close])}
