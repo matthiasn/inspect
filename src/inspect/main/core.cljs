@@ -2,18 +2,18 @@
   (:require [inspect.specs.specs]
             [inspect.main.log]
             [taoensso.timbre :as timbre :refer-macros [info error]]
+            [matthiasn.systems-toolbox-electron.ipc-main :as ipc]
+            [matthiasn.systems-toolbox.scheduler :as sched]
+            [matthiasn.systems-toolbox.switchboard :as sb]
             [inspect.main.menu :as menu]
             [inspect.main.update :as upd]
             [inspect.main.kafka :as kafka]
             [inspect.main.download :as dl]
             [inspect.main.store :as st]
             [inspect.main.startup :as startup]
-            [inspect.main.ipc :as ipc]
             [inspect.main.window-manager :as wm]
             [inspect.main.update-window :as um]
             [electron :refer [app]]
-            [matthiasn.systems-toolbox.scheduler :as sched]
-            [matthiasn.systems-toolbox.switchboard :as sb]
             [cljs.nodejs :as nodejs :refer [process]]))
 
 (defonce switchboard (sb/component :electron/switchboard))
@@ -75,7 +75,7 @@
                  :msg [:cmd/start]}]
 
      [:cmd/send {:to  :electron/window-manager
-                 :msg [:window/new]}]
+                 :msg [:window/new {:url "view.html"}]}]
 
      [:cmd/send {:to  :electron/scheduler-cmp
                  :msg [:cmd/schedule-new {:timeout 1000

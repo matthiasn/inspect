@@ -43,7 +43,8 @@
         match (when (and (= msg-type (:msg-type subscription))
                          (= cmp-id (:cmp-id subscription))
                          (= in-out (:dir subscription)))
-                [:subscription/match msg-payload])]
+                (with-meta [:subscription/match msg-payload]
+                           (:msg-meta subscription)))]
     (when match (debug "Subscription match:" match))
     {:new-state new-state
      :emit-msg  match}))
@@ -54,16 +55,18 @@
     (when (not= cnt prev-cnt) (debug "STORE received:" cnt))
     {:new-state new-state
      :emit-msg  (when (not= cnt prev-cnt)
-                  [:observer/cmps-msgs new-state])}))
+                  (with-meta [:observer/cmps-msgs new-state]
+                             {:window-id :broadcast}))}))
 
-(defn subscribe [{:keys [current-state msg-payload]}]
-  (let [new-state (assoc-in current-state [:subscription] msg-payload)]
-    (info "Subscribe" msg-payload)
+(defn subscribe [{:keys [current-state msg-payload msg-meta]}]
+  (let [subscription (assoc-in msg-payload [:msg-meta] msg-meta)
+        new-state (assoc-in current-state [:subscription] subscription)]
+    (info "OBSERVER: subscribe" msg-payload)
     {:new-state new-state}))
 
 (defn stop [{:keys [current-state]}]
   (let [new-state (assoc-in current-state [:subscription] nil)]
-    (info "Subscription stopped")
+    (info "OBSERVER: subscription stopped")
     {:new-state new-state}))
 
 (defn cmp-map [cmp-id]

@@ -25,6 +25,8 @@ electron.showOpenDialog = function() {};
 electron.BrowserWindow = function () {};
 
 electron.BrowserWindow.on = function() {};
+electron.BrowserWindow.once = function() {};
+electron.BrowserWindow.show = function() {};
 electron.BrowserWindow.loadURL = function() {};
 electron.BrowserWindow.webContents = {};
 electron.BrowserWindow.webContents.openDevTools = function() {};

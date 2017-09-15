@@ -14,14 +14,14 @@
   (let [window (BrowserWindow. (clj->js {:width 400 :height 300}))
         url (msg-payload urls)
         progress (fn [p] (info "DOWNLOAD: progress" p))
-        {:keys [dl-path bin-path]} rt/runtime-info
-        opts (clj->js {:directory          dl-path
+        {:keys [downloads]} rt/runtime-info
+        opts (clj->js {:directory          downloads
                        :onProgress         progress
                        :openFolderWhenDone true})
         jdk-dl (download window url opts)
         on-complete (fn [dl-item]
                       (let [filename (.getFilename dl-item)]
-                        (decompress (str dl-path "/" filename) bin-path)
+                        (decompress (str downloads "/" filename) downloads)
                         (info "DOWNLOAD completed" filename)))]
     (.then jdk-dl on-complete)
     {}))

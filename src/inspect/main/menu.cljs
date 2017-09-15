@@ -14,10 +14,16 @@
                     {:label   "Clear Caches"
                      :submenu [{:label "Clear Electron Cache"
                                 :click #(put-fn [:app/clear-cache])}]}
+                    {:label "Process Management"
+                     :click #(put-fn [:mgmt/open])}
                     {:label "Download Kafka"
                      :click #(put-fn [:download/bin :kafka])}
                     {:label "Download JDK"
                      :click #(put-fn [:download/bin :jdk])}
+                    {:label "Run Zookeeper"
+                     :click #(put-fn [:run/zookeeper])}
+                    {:label "Run Kafka"
+                     :click #(put-fn [:run/kafka])}
                     {:label       "Close Window"
                      :accelerator "Cmd+W"
                      :click       #(put-fn [:window/close])}
@@ -48,7 +54,7 @@
          {:label   "View"
           :submenu [{:label       "New Window"
                      :accelerator "Option+Cmd+N"
-                     :click       #(put-fn [:window/new "main"])}
+                     :click       #(put-fn [:window/new {:url "view.html"}])}
                     {:label "Open Dev Tools"
                      :click #(put-fn [:window/dev-tools])}]}]
         menu (.buildFromTemplate Menu (clj->js menu-tpl))

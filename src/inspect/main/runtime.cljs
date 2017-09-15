@@ -1,5 +1,5 @@
 (ns inspect.main.runtime
-  (:require [path :refer [normalize]]
+  (:require [path :refer [normalize join]]
             [electron :refer [app]]
             [cljs.nodejs :as nodejs :refer [process]]
             [clojure.string :as s]))
@@ -13,9 +13,10 @@
                    (str rp "/app"))
         platform (.-platform process)
         info {:platform       (.-platform process)
+              :downloads      (.getPath app "downloads")
               :user-data      user-data
-              :dl-path        (str user-data "/downloads")
-              :bin-path       (str user-data "/bin")
+              ;:dl-path        (join user-data "downloads")
+              :bin-path       (join user-data "bin")
               :cwd            cwd
               :pid-file       (str user-data "/inspect.pid")
               :resources-path rp

@@ -9,10 +9,14 @@
             [cljs.reader :refer [read-string]]
             [clojure.pprint :as pp]))
 
-(defn new-window [{:keys [current-state cmp-state]}]
-  (let [window (BrowserWindow. (clj->js {:width 1200 :height 800}))
+(defn new-window [{:keys [current-state cmp-state msg-payload]}]
+  (let [{:keys [url]} msg-payload
+        window (BrowserWindow. (clj->js {:width  1200
+                                         :height 800
+                                         :show   false}))
         window-id (stc/make-uuid)
-        url (str "file://" (:app-path rt/runtime-info) "/view.html")
+        show #(.show window)
+        url (str "file://" (:app-path rt/runtime-info) "/" url)
         new-state (-> current-state
                       (assoc-in [:main-window] window)
                       (assoc-in [:windows window-id] window)
@@ -30,12 +34,17 @@
         close (fn [_]
                 (info "Closed" window-id)
                 (swap! cmp-state assoc-in [:active] nil)
-                (swap! cmp-state update-in [:windows] dissoc window-id))]
+                (swap! cmp-state update-in [:windows] dissoc window-id))
+        ready (fn [_]
+                (info "ready" window-id)
+                (show)
+                (.send (.-webContents window) "window-id" window-id))]
     (info "Opening new window" url)
-    (.loadURL window url)
     (.on window "focus" #(js/setTimeout focus 10))
-    ;    (.on window "blur" blur)
+    (.once window "ready-to-show" ready)
+    (.on window "blur" blur)
     (.on window "close" close)
+    (.loadURL window url)
     {:new-state new-state}))
 
 (defn loading [{:keys [current-state cmp-state]}]
@@ -56,21 +65,23 @@
   (when-let [active-window (active-window current-state)]
     (.-webContents active-window)))
 
-(defn send-cmd [{:keys [current-state msg-payload]}]
-  (let [{:keys [cmd-type cmd]} msg-payload]
-    (when-let [web-contents (web-contents current-state)]
-      (.send web-contents cmd-type cmd))
-    {}))
+(defn relay [web-contents msg-type msg-payload msg-meta]
+  (let [serializable [msg-type {:msg-payload msg-payload
+                                :msg-meta    msg-meta}]]
+    (info "Relaying" (str msg-type) (:window-id msg-meta))
+    (.send web-contents "relay" (pr-str serializable))))
 
 (defn relay-msg [{:keys [current-state msg-type msg-meta msg-payload]}]
-  (when-let [web-contents (web-contents current-state)]
-    (let [serializable [msg-type {:msg-payload msg-payload :msg-meta msg-meta}]]
-      (debug "Relaying" (str msg-type))
-      (.send web-contents "relay" (pr-str serializable))))
+  (let [window-id (:window-id msg-meta)
+        web-contents (or
+                       (web-contents current-state))]
+    (when web-contents
+      (relay web-contents msg-type msg-payload msg-meta)))
   {})
 
 (defn dev-tools [{:keys [current-state]}]
   (when-let [web-contents (web-contents current-state)]
+    (info "Open dev-tools")
     (.openDevTools web-contents))
   {})
 
@@ -83,7 +94,7 @@
 (defn activate [{:keys [current-state]}]
   (info "Activate APP")
   (when (empty? (:windows current-state))
-    {:send-to-self [:window/new]}))
+    {:send-to-self [:window/new "view.html"]}))
 
 (defn cmp-map
   [cmp-id relay-types]
@@ -93,6 +104,5 @@
                          {:window/new       new-window
                           :window/loading   loading
                           :window/activate  activate
-                          :window/send      send-cmd
                           :window/close     close-window
                           :window/dev-tools dev-tools})}))

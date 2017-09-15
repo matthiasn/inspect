@@ -54,8 +54,8 @@
     (put-fn [:kafka/status {:status :stopped :text "stopped"}])
     (.close consumer)))
 
-(defn start
-  [{:keys [put-fn cmp-state put-chan current-state msg-payload] :as msg-map}]
+(defn start [{:keys [put-fn cmp-state put-chan current-state msg-payload
+                     msg-meta] :as msg-map}]
   (info "Kafka config" msg-payload)
   (try
     (stop msg-map)
@@ -63,6 +63,7 @@
                             :text   (str "attempting to connect to "
                                          msg-payload)}])
     (let [kafka-host msg-payload
+          window-id (:window-id msg-meta)
           consumer (Consumer. "firehose" (config kafka-host))
           msg-handler (fn [kafka-msg cb]
                         (try
