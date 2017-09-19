@@ -53,6 +53,26 @@ h1, h2, h3, h4, h5, h6 {
       padding: 8px 20px;
     }
   }
+  .msg-flow {
+    table {
+      font-size: 0.8em;
+      border-spacing:0;
+
+      tr:nth-child(even) {
+        background-color: lighten($hashtag-blue, 40%);
+      }
+
+      td {
+        padding-right: 8px;
+        vertical-align: middle;
+      }
+
+      .number {
+        text-align: right;
+        font-weight: bold;
+      }
+    }
+  }
 
   .fa {
     margin-right: 5px;
@@ -95,6 +115,7 @@ h1, h2, h3, h4, h5, h6 {
   ul {
     list-style: none;
     padding: 0;
+    margin: 0;
   }
 
   .tables {
@@ -109,8 +130,16 @@ h1, h2, h3, h4, h5, h6 {
       font-family: monospace;
       font-size: 0.8em;
 
+      tr:nth-child(even) {
+        background-color: lighten($hashtag-blue, 40%);
+      }
+
       td {
         min-width: 20px;
+
+        ul {
+          margin: 0;
+        }
 
         &.dir {
           width: 30px;

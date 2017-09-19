@@ -3,17 +3,13 @@
             [inspect.update.log :as log]
             [taoensso.timbre :as timbre :refer-macros [info]]
             [matthiasn.systems-toolbox-electron.ipc-renderer :as ipc]
-            [inspect.update.ui :as ui]
-            [electron :refer [ipcRenderer]]
-            [matthiasn.systems-toolbox.switchboard :as sb]))
+            [matthiasn.systems-toolbox.switchboard :as sb]
+            [inspect.update.ui :as ui]))
 
 (defonce switchboard (sb/component :updater/switchboard))
 
-(def relay-types #{:update/check
-                   :update/check-beta
-                   :update/download
-                   :update/install
-                   :window/close})
+(def relay-types #{:update/check :update/check-beta :update/download
+                   :update/install :window/close})
 
 (defn start []
   (info "Starting UPDATER")
@@ -28,9 +24,4 @@
      [:cmd/route {:from :updater/ui-cmp
                   :to   #{:updater/ipc-cmp}}]]))
 
-
-(defn load-handler [ev]
-  (start))
-
-
-(.addEventListener js/window "load" load-handler)
+(.addEventListener js/window "load" #(start))

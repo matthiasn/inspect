@@ -131,3 +131,6 @@ sinek.Consumer.consume = function() {};
 sinek.Consumer.then = function() {};
 sinek.Consumer.catch = function() {};
 sinek.Consumer.close = function() {};
+
+var moment = function () {};
+moment.format = function () {};

@@ -1,5 +1,7 @@
 (ns inspect.view.store
-  (:require [taoensso.timbre :as timbre :refer-macros [info debug]]))
+  (:require [taoensso.timbre :as timbre :refer-macros [info debug]]
+            [linked.core :as linked]
+            [matthiasn.systems-toolbox.component :as stc]))
 
 (defn cmps-msgs [{:keys [current-state msg msg-type msg-meta msg-payload]}]
   (let [prev (:cmps-msgs current-state)
@@ -16,7 +18,7 @@
     {:new-state new-state}))
 
 (defn cell-active [{:keys [current-state msg-payload]}]
-  (let [active  #(when-not (= % msg-payload) msg-payload)
+  (let [active #(when-not (= % msg-payload) msg-payload)
         new-state (update-in current-state [:active-type] active)]
     (info "activated" (:active-type new-state))
     {:new-state new-state}))
@@ -28,12 +30,18 @@
 
 (defn match [{:keys [current-state msg-payload]}]
   (let [add (fn [matches match] (take 10 (conj matches match)))
-        new-state (update-in current-state [:matches] add msg-payload)]
+        firehose-id (:firehose-id msg-payload)
+        ; TODO: all messages MUST have a tag -> s-t (see pub)
+        tag (or (-> msg-payload :msg-meta :tag) (stc/make-uuid))
+        new-state (-> current-state
+                      (update-in [:matches] add msg-payload)
+                      (assoc-in [:ordered-msgs tag firehose-id] msg-payload))]
     (debug "Match" msg-payload)
     {:new-state new-state}))
 
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
+   :state-fn    (fn [_] {:state (atom {:ordered-msgs (linked/map)})})
    :handler-map {:observer/cmps-msgs cmps-msgs
                  :cell/active        cell-active
                  :state/freeze       freeze

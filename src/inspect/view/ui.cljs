@@ -7,6 +7,7 @@
             [inspect.view.force :as f]
             [inspect.view.force2 :as f2]
             [inspect.view.graphviz :as gv]
+            [moment]
             [inspect.view.util :as u]
             [cljs.pprint :as pp]
             [clojure.set :as set]
@@ -15,6 +16,7 @@
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
 (reg-sub :matches (fn [db _] (:matches db)))
+(reg-sub :ordered-msgs (fn [db _] (:ordered-msgs db)))
 (reg-sub :active-type (fn [db _] (:active-type db)))
 (reg-sub :kafka-status (fn [db _] (:kafka-status db)))
 (reg-sub :components (fn [db _] (:components (:cmps-msgs db))))
@@ -83,15 +85,40 @@
         [msg-table cmp-id :in put-fn]
         [msg-table cmp-id :out put-fn]]])))
 
+(defn format-time [m] (.format (moment m) "HH:mm:ss:SSS"))
+
 (defn matches [put-fn]
-  (let [matches (subscribe [:matches])]
+  (let [matches (subscribe [:matches])
+        ordered-msgs (subscribe [:ordered-msgs])]
     (fn [put-fn]
-      [:div
-       [:h2 "Matches"]
-       (for [match @matches]
-         ^{:key (:firehose-id match)}
-         [:div
-          [:pre [:code (with-out-str (pp/pprint match))]]])])))
+      [:div.msg-flow
+       [:h2 "Message Flows"]
+       [:table
+        [:tbody
+         [:tr
+          [:th "First seen"]
+          [:th "Last seen"]
+          [:th "Duration"]
+          [:th "Msg type"]
+          [:th "Tag"]]
+         (for [[tag msgs] @ordered-msgs]
+           (let [first-ts (apply min (map #(-> % second :ts) msgs))
+                 first-seen (format-time first-ts)
+                 last-ts (apply max (map #(-> % second :ts) msgs))
+                 last-seen (format-time last-ts)
+                 duration (- last-ts first-ts)
+                 msg-types (set (map #(-> % second :msg first) msgs))]
+             ^{:key (str tag first-ts)}
+             [:tr
+              [:td first-seen]
+              [:td last-seen]
+              [:td.number (if (> duration 10000)
+                            (str (.floor js/Math (/ duration 1000)) "s")
+                            (str duration "ms"))]
+              [:td [:ul (for [msg-type msg-types]
+                          ^{:key (str tag first-ts msg-type)}
+                          [:li (str msg-type)])]]
+              [:td tag]]))]]])))
 
 (defn re-frame-ui
   "Main view component"

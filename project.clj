@@ -4,8 +4,9 @@
                  [re-frame "0.10.1"]
                  [com.taoensso/timbre "4.10.0"]
                  [matthiasn/systems-toolbox "0.6.15"]
-                 [matthiasn/systems-toolbox-electron "0.6.1"]
+                 [matthiasn/systems-toolbox-electron "0.6.7"]
                  [timbre-ns-pattern-level "0.1.2"]
+                 [frankiesardo/linked "1.2.9"]
                  [com.cognitect/transit-cljs "0.8.239"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
@@ -45,7 +46,7 @@
                                        :install-deps   true
                                        :language-in    :ecmascript5
                                        :language-out   :ecmascript5
-                                       :optimizations  :advanced
+                                       :optimizations  :none
                                        :parallel-build true}}
                        {:id           "view"
                         :source-paths ["src/inspect/specs" "src/inspect/view"]
@@ -65,7 +66,7 @@
                                                         :react-dom        "15.6.1"
                                                         :electron         "1.7.6"}
                                        :install-deps   true
-                                       :optimizations  :advanced
+                                       :optimizations  :none
                                        :parallel-build true}}
                        {:id           "updater"
                         :source-paths ["src/inspect/specs" "src/inspect/update"]

@@ -75,12 +75,6 @@
                   :to   #{:electron/window-manager}}]
 
      [:cmd/send {:to  :electron/window-manager
-                 :msg [:window/new {:url       "loading.html"
-                                    :width     400
-                                    :height    300
-                                    :window-id "loading"}]}]
-
-     [:cmd/send {:to  :electron/window-manager
                  :msg [:window/new {:url "view.html"}]}]
 
      [:cmd/send {:to  :electron/scheduler-cmp

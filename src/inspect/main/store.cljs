@@ -40,11 +40,12 @@
                       (update-in [:edges-by-type msg-type] add-edge)
                       (update-in [:msg-types] conj msg-type))
         subscription (:subscription current-state)
-        match (when (and (= msg-type (:msg-type subscription))
-                         (= cmp-id (:cmp-id subscription))
-                         (= in-out (:dir subscription)))
-                (with-meta [:subscription/match msg-payload]
-                           (:msg-meta subscription)))]
+        type-and-size (update-in msg-payload [:msg] (fn [[t m]] [t (count (str m))]))
+        #_#_match (when (= msg-type (:msg-type subscription))
+                    (with-meta [:subscription/match msg-payload]
+                               (:msg-meta subscription)))
+        match (with-meta [:subscription/match type-and-size]
+                         (:msg-meta subscription))]
     (when match (debug "Subscription match:" match))
     {:new-state new-state
      :emit-msg  match}))
