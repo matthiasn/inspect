@@ -110,18 +110,25 @@
             [:th "First seen"]
             [:th "Last seen"]
             [:th "Duration"]
+            [:th "Processing time"]
             [:th "Msg type"]
             [:th "Max size"]
             [:th "Tag"]]
-           (for [[tag msgs] ordered-msgs]
+           (for [[tag msgs] (take-last 100 ordered-msgs)]
              (let [first-ts (apply min (map #(-> % second :ts) msgs))
                    first-seen (format-time first-ts)
                    last-ts (apply max (map #(-> % second :ts) msgs))
                    max-size (apply max (map #(-> % second :msg second) msgs))
+                   max-per-type (reduce (fn [acc m]
+                                          (let [msg-type (-> m second :msg first)
+                                                size (-> m second :msg second)]
+                                            (update-in acc [msg-type] max size)))
+                                        {}
+                                        msgs)
+                   processing-time (apply + (map #(-> % second :duration) msgs))
                    last-seen (format-time last-ts)
                    duration (- last-ts first-ts)
-                   msg-types (set (map #(-> % second :msg first) msgs))
-                   selected (contains? msg-types active-type)]
+                   selected (contains? max-per-type active-type)]
                ^{:key (str tag first-ts)}
                [:tr {:class (when selected "selected")}
                 [:td first-seen]
@@ -129,11 +136,18 @@
                 [:td.number (if (> duration 10000)
                               (str (.floor js/Math (/ duration 1000)) "s")
                               (str duration "ms"))]
-                [:td [:ul (for [msg-type msg-types]
-                            ^{:key (str tag first-ts msg-type)}
-                            [:li (str msg-type)])]]
+                [:td.number (str processing-time "ms")]
+                [:td [:table.max-per-type
+                      [:tbody
+                       (for [[msg-type size] max-per-type]
+                         ^{:key (str tag first-ts msg-type)}
+                         [:tr
+                          [:td (str msg-type)]
+                          [:td size]])]]]
                 [:td.number max-size]
-                [:td tag]]))]]]))))
+                [:td (subs tag 0 8)]
+                [:td {:on-click #(prn :click)}
+                 [:span.fa.fa-eye-slash]]]))]]]))))
 
 (defn re-frame-ui
   "Main view component"
@@ -149,7 +163,8 @@
                      (info :start kafka-host)
                      (put-fn [:kafka/start kafka-host]))
         stop #(put-fn [:kafka/stop])
-        freeze #(put-fn [:state/freeze])]
+        freeze #(put-fn [:state/freeze])
+        clear #(put-fn [:state/clear])]
     (fn [_]
       [:div.observer
        [gv/wiring put-fn]
@@ -170,7 +185,9 @@
         (for [cmp-id @cmp-ids]
           ^{:key (str cmp-id)}
           [component cmp-id put-fn])
-        [:div [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]]
+        [:div
+         [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
+         [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]
         [matches put-fn]]])))
 
 (defn state-fn

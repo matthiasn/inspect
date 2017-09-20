@@ -62,6 +62,12 @@ h1, h2, h3, h4, h5, h6 {
         background-color: lighten($hashtag-blue, 40%);
       }
 
+      .max-per-type {
+        tr {
+          background-color: rgba(0,0,0,0);
+        }
+      }
+
       td {
         padding-right: 8px;
         vertical-align: middle;
@@ -86,6 +92,12 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #eee;
     color: $green;
     margin-top: 10px;
+  }
+
+  .clear {
+    background-color: $red;
+    color: white;
+    margin: 10px 0 0 10px;
   }
 
   .status {

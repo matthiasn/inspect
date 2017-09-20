@@ -43,10 +43,10 @@
                                                         :kafka-node        "2.2.1"
                                                         :sinek             "6.0.3"
                                                         :electron          "1.7.6"}
-                                       :install-deps   true
+                                       ;:install-deps   true
                                        :language-in    :ecmascript5
                                        :language-out   :ecmascript5
-                                       :optimizations  :advanced
+                                       :optimizations  :none
                                        :parallel-build true}}
                        {:id           "view"
                         :source-paths ["src/inspect/specs" "src/inspect/view"]
@@ -65,8 +65,8 @@
                                                         :react            "15.6.1"
                                                         :react-dom        "15.6.1"
                                                         :electron         "1.7.6"}
-                                       :install-deps   true
-                                       :optimizations  :advanced
+                                       ;:install-deps   true
+                                       :optimizations  :none
                                        :parallel-build true}}
                        {:id           "updater"
                         :source-paths ["src/inspect/specs" "src/inspect/update"]
@@ -83,6 +83,6 @@
                                                         :electron-updater  "2.8.7"
                                                         :electron-packager "8.7.2"
                                                         :electron          "1.7.6"}
-                                       :install-deps   true
+                                       ;:install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}]})

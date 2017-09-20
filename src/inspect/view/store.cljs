@@ -17,6 +17,10 @@
     (info msg)
     {:new-state new-state}))
 
+(defn clear [{:keys [current-state]}]
+  (let [new-state (assoc-in current-state [:ordered-msgs] (linked/map))]
+    {:new-state new-state}))
+
 (defn cell-active [{:keys [current-state msg-payload]}]
   (let [active #(when-not (= % msg-payload) msg-payload)
         new-state (update-in current-state [:active-type] active)]
@@ -31,8 +35,8 @@
 (defn match [{:keys [current-state msg-payload]}]
   (let [add (fn [matches match] (take 10 (conj matches match)))
         firehose-id (:firehose-id msg-payload)
-        ; TODO: all messages MUST have a tag -> s-t (see pub)
-        tag (or (-> msg-payload :msg-meta :tag) (stc/make-uuid))
+        ; TODO: all messages MUST have a tag -> s-t (see publish state)
+        tag (-> msg-payload :msg-meta :tag)
         new-state (-> current-state
                       (update-in [:matches] add msg-payload)
                       (assoc-in [:ordered-msgs tag firehose-id] msg-payload))]
@@ -45,5 +49,6 @@
    :handler-map {:observer/cmps-msgs cmps-msgs
                  :cell/active        cell-active
                  :state/freeze       freeze
+                 :state/clear       clear
                  :subscription/match match
                  :kafka/status       kafka-status}})

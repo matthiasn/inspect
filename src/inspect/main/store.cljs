@@ -44,8 +44,9 @@
         #_#_match (when (= msg-type (:msg-type subscription))
                     (with-meta [:subscription/match msg-payload]
                                (:msg-meta subscription)))
-        match (with-meta [:subscription/match type-and-size]
-                         (:msg-meta subscription))]
+        match (when (-> type-and-size :msg-meta :tag)
+                (with-meta [:subscription/match type-and-size]
+                           (:msg-meta subscription)))]
     (when match (debug "Subscription match:" match))
     {:new-state new-state
      :emit-msg  match}))
