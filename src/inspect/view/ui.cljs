@@ -89,36 +89,51 @@
 
 (defn matches [put-fn]
   (let [matches (subscribe [:matches])
-        ordered-msgs (subscribe [:ordered-msgs])]
+        active-type (subscribe [:active-type])
+        ordered-msgs (subscribe [:ordered-msgs])
+        #_#_ordered-msgs (reaction
+                           (if @active-type
+                             (filter
+                               (fn [[tag msgs]]
+                                 (let [types (set (map #(-> % second :msg first) msgs))]
+                                   (contains? types @active-type)))
+                               (vec @ordered-msgs))
+                             @ordered-msgs))]
     (fn [put-fn]
-      [:div.msg-flow
-       [:h2 "Message Flows"]
-       [:table
-        [:tbody
-         [:tr
-          [:th "First seen"]
-          [:th "Last seen"]
-          [:th "Duration"]
-          [:th "Msg type"]
-          [:th "Tag"]]
-         (for [[tag msgs] @ordered-msgs]
-           (let [first-ts (apply min (map #(-> % second :ts) msgs))
-                 first-seen (format-time first-ts)
-                 last-ts (apply max (map #(-> % second :ts) msgs))
-                 last-seen (format-time last-ts)
-                 duration (- last-ts first-ts)
-                 msg-types (set (map #(-> % second :msg first) msgs))]
-             ^{:key (str tag first-ts)}
-             [:tr
-              [:td first-seen]
-              [:td last-seen]
-              [:td.number (if (> duration 10000)
-                            (str (.floor js/Math (/ duration 1000)) "s")
-                            (str duration "ms"))]
-              [:td [:ul (for [msg-type msg-types]
-                          ^{:key (str tag first-ts msg-type)}
-                          [:li (str msg-type)])]]
-              [:td tag]]))]]])))
+      (let [active-type @active-type
+            ordered-msgs @ordered-msgs]
+        [:div.msg-flow
+         [:h2 "Message Flows"]
+         [:table
+          [:tbody
+           [:tr
+            [:th "First seen"]
+            [:th "Last seen"]
+            [:th "Duration"]
+            [:th "Msg type"]
+            [:th "Max size"]
+            [:th "Tag"]]
+           (for [[tag msgs] ordered-msgs]
+             (let [first-ts (apply min (map #(-> % second :ts) msgs))
+                   first-seen (format-time first-ts)
+                   last-ts (apply max (map #(-> % second :ts) msgs))
+                   max-size (apply max (map #(-> % second :msg second) msgs))
+                   last-seen (format-time last-ts)
+                   duration (- last-ts first-ts)
+                   msg-types (set (map #(-> % second :msg first) msgs))
+                   selected (contains? msg-types active-type)]
+               ^{:key (str tag first-ts)}
+               [:tr {:class (when selected "selected")}
+                [:td first-seen]
+                [:td last-seen]
+                [:td.number (if (> duration 10000)
+                              (str (.floor js/Math (/ duration 1000)) "s")
+                              (str duration "ms"))]
+                [:td [:ul (for [msg-type msg-types]
+                            ^{:key (str tag first-ts msg-type)}
+                            [:li (str msg-type)])]]
+                [:td.number max-size]
+                [:td tag]]))]]]))))
 
 (defn re-frame-ui
   "Main view component"

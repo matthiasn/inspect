@@ -46,7 +46,7 @@
                                        :install-deps   true
                                        :language-in    :ecmascript5
                                        :language-out   :ecmascript5
-                                       :optimizations  :none
+                                       :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "view"
                         :source-paths ["src/inspect/specs" "src/inspect/view"]
@@ -66,7 +66,7 @@
                                                         :react-dom        "15.6.1"
                                                         :electron         "1.7.6"}
                                        :install-deps   true
-                                       :optimizations  :none
+                                       :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "updater"
                         :source-paths ["src/inspect/specs" "src/inspect/update"]

@@ -103,8 +103,8 @@ h1, h2, h3, h4, h5, h6 {
     margin-right: 0.5em;
   }
 
-  .active {
-    background-color: #7FDBFF;
+  .active, .selected {
+    background-color: #7FDBFF!important;
   }
 
   .force-wrapper {
