@@ -40,10 +40,13 @@
                       (update-in [:edges-by-type msg-type] add-edge)
                       (update-in [:msg-types] conj msg-type))
         subscription (:subscription current-state)
-        type-and-size (update-in msg-payload [:msg] (fn [[t m]] [t (count (str m))]))
-        #_#_match (when (= msg-type (:msg-type subscription))
-                    (with-meta [:subscription/match msg-payload]
-                               (:msg-meta subscription)))
+        map-stats (fn [m]
+                    (when (map? m)
+                      (into {} (map (fn [[k v]] [k (count (str v))]) m))))
+        msg-stats (map-stats (-> msg-payload :msg second))
+        type-and-size (-> msg-payload
+                          (update-in [:msg] (fn [[t m]] [t (count (str m))]))
+                          (assoc-in [:msg-stats] msg-stats))
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
                            (:msg-meta subscription)))]
