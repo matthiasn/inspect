@@ -75,7 +75,7 @@
                   :to   #{:electron/window-manager}}]
 
      [:cmd/send {:to  :electron/window-manager
-                 :msg [:window/new {:url "view.html"}]}]
+                 :msg [:window/new {:url (:index-page rt/runtime-info)}]}]
 
      [:cmd/send {:to  :electron/scheduler-cmp
                  :msg [:cmd/schedule-new {:timeout 1000

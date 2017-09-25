@@ -11,6 +11,7 @@
         app-path (if (s/includes? rp "Electron.app")
                    cwd
                    (str rp "/app"))
+        repo-dir (s/includes? rp "Electron.app")
         platform (.-platform process)
         info {:platform       (.-platform process)
               :downloads      (.getPath app "downloads")
@@ -21,4 +22,5 @@
               :pid-file       (str user-data "/inspect.pid")
               :resources-path rp
               :app-path       app-path}]
-    (into {} (map (fn [[k v]] [k (normalize v)]) info))))
+    (into {:index-page (if repo-dir "view-dev.html" "view.html")}
+          (map (fn [[k v]] [k (normalize v)]) info))))

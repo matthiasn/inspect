@@ -4,16 +4,16 @@
             [clojure.set :as set]))
 
 (defn state-fn [put-fn]
-  (let [state (atom {:count      0
-                     :cmp-ids    #{}
-                     :components {}
-                     :msg-types  #{}})]
+  (let [state (atom {:stats {:count      0
+                             :cmp-ids    #{}
+                             :components {}
+                             :msg-types  #{}}})]
     {:state state}))
 
 (defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta]}]
-  (let [cnt (:cnt current-state)
+  (let [cnt (:cnt (:stats current-state))
         in-out (if (= msg-type :firehose/cmp-recv) :in :out)
-        {:keys [cmp-id msg msg-meta]} msg-payload
+        {:keys [cmp-id msg msg-meta firehose-id]} msg-payload
         msg-type (first msg)
         add-edge (fn [prev-edges]
                    (let [cmps (:cmp-seq msg-meta)
@@ -32,13 +32,15 @@
                                          pairs))]
                      (debug (set/union prev-edges edges))
                      (set/union prev-edges edges)))
+        inc-cnt #(inc (or % 0))
         new-state (-> current-state
-                      (update-in [:cnt] inc)
-                      (update-in [:cmp-ids] conj cmp-id)
-                      (update-in [:components cmp-id in-out msg-type] #(inc (or % 0)))
-                      (update-in [:edges] add-edge)
-                      (update-in [:edges-by-type msg-type] add-edge)
-                      (update-in [:msg-types] conj msg-type))
+                      (update-in [:stats :cnt] inc)
+                      (update-in [:stats :cmp-ids] conj cmp-id)
+                      (update-in [:stats :components cmp-id in-out msg-type] inc-cnt)
+                      (assoc-in [:messages firehose-id] msg-payload)
+                      (update-in [:stats :edges] add-edge)
+                      (update-in [:stats :edges-by-type msg-type] add-edge)
+                      (update-in [:stats :msg-types] conj msg-type))
         subscription (:subscription current-state)
         map-stats (fn [m]
                     (when (map? m)
@@ -50,17 +52,25 @@
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
                            (:msg-meta subscription)))]
+
+    (let [msg-type (-> msg-payload :msg first)
+          msg (-> msg-payload :msg second)]
+      (when (= msg-type :state/stats-tags)
+        (info msg-type (-> msg-payload :msg first) msg-stats)
+        (info (take 10 (:hashtags msg)))
+        (info (map-stats (:hashtags msg)))))
+
     (when match (debug "Subscription match:" match))
     {:new-state new-state
      :emit-msg  match}))
 
 (defn state-publish [{:keys [current-state]}]
-  (let [{:keys [cnt prev-cnt]} current-state
+  (let [{:keys [cnt prev-cnt]} (:stats current-state)
         new-state (assoc-in current-state [:prev-cnt] cnt)]
     (when (not= cnt prev-cnt) (debug "STORE received:" cnt))
     {:new-state new-state
      :emit-msg  (when (not= cnt prev-cnt)
-                  (with-meta [:observer/cmps-msgs new-state]
+                  (with-meta [:observer/cmps-msgs (:stats new-state)]
                              {:window-id :broadcast}))}))
 
 (defn subscribe [{:keys [current-state msg-payload msg-meta]}]

@@ -48,6 +48,30 @@
                                        :language-out   :ecmascript5
                                        :optimizations  :advanced
                                        :parallel-build true}}
+                       {:id           "main-dev"
+                        :source-paths ["src/inspect/specs" "src/inspect/main"]
+                        :compiler     {:main           inspect.main.core
+                                       :target         :nodejs
+                                       :output-to      "dev/main/main.js"
+                                       :output-dir     "dev/main"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-dl       "1.10.0"
+                                                        :decompress        "4.2.0"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :kafka-node        "2.2.1"
+                                                        :sinek             "6.0.3"
+                                                        :electron          "1.7.6"}
+                                       ;:install-deps   true
+                                       :language-in    :ecmascript5
+                                       :language-out   :ecmascript5
+                                       :optimizations  :none
+                                       :parallel-build true}}
                        {:id           "view"
                         :source-paths ["src/inspect/specs" "src/inspect/view"]
                         :compiler     {:main           inspect.view.core
@@ -68,6 +92,26 @@
                                        ;:install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}
+                       {:id           "view-dev"
+                        :source-paths ["src/inspect/specs" "src/inspect/view"]
+                        :compiler     {:main           inspect.view.core
+                                       :output-to      "dev/view/core.js"
+                                       :target         :nodejs
+                                       :output-dir     "dev/view"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log     "2.2.7"
+                                                        :moment           "2.18.1"
+                                                        :d3-force         "1.0.6"
+                                                        :d3               "4.10.0"
+                                                        :d3-ellipse-force "0.1.1"
+                                                        :randomcolor      "0.5.3"
+                                                        :viz.js           "1.8.0"
+                                                        :react            "15.6.1"
+                                                        :react-dom        "15.6.1"
+                                                        :electron         "1.7.6"}
+                                       ;:install-deps   true
+                                       :optimizations  :none
+                                       :parallel-build true}}
                        {:id           "updater"
                         :source-paths ["src/inspect/specs" "src/inspect/update"]
                         :compiler     {:main           inspect.update.core
@@ -85,4 +129,22 @@
                                                         :electron          "1.7.6"}
                                        ;:install-deps   true
                                        :optimizations  :advanced
+                                       :parallel-build true}}
+                       {:id           "updater-dev"
+                        :source-paths ["src/inspect/specs" "src/inspect/update"]
+                        :compiler     {:main           inspect.update.core
+                                       :output-to      "dev/updater/update.js"
+                                       :target         :nodejs
+                                       :output-dir     "dev/updater"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :electron          "1.7.6"}
+                                       ;:install-deps   true
+                                       :optimizations  :none
                                        :parallel-build true}}]})

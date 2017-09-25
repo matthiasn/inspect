@@ -40,7 +40,7 @@
         new-state (-> current-state
                       (update-in [:matches] add msg-payload)
                       (assoc-in [:ordered-msgs tag firehose-id] msg-payload))]
-    (debug "Match" msg-payload)
+    (info "Match" msg-payload)
     {:new-state new-state}))
 
 (defn cmp-map [cmp-id]

@@ -1,10 +1,12 @@
 (ns inspect.main.menu
   (:require [taoensso.timbre :as timbre :refer-macros [info debug]]
             [electron :refer [app Menu]]
-            [cljs.nodejs :as nodejs :refer [process]]))
+            [cljs.nodejs :as nodejs :refer [process]]
+            [inspect.main.runtime :as rt]))
 
 (defn state-fn [put-fn]
-  (let [menu-tpl
+  (let [index-page (:index-page rt/runtime-info)
+        menu-tpl
         [{:label   "Application"
           :submenu [{:label    "About"
                      :selector "orderFrontStandardAboutPanel:"}
@@ -55,7 +57,7 @@
          {:label   "View"
           :submenu [{:label       "New Window"
                      :accelerator "Option+Cmd+N"
-                     :click       #(put-fn [:window/new {:url "view.html"}])}
+                     :click       #(put-fn [:window/new {:url index-page}])}
                     {:label "Open Dev Tools"
                      :click #(put-fn [:window/dev-tools])}]}]
         menu (.buildFromTemplate Menu (clj->js menu-tpl))
