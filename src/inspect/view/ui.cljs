@@ -16,6 +16,7 @@
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
 (reg-sub :matches (fn [db _] (:matches db)))
+(reg-sub :show-flow (fn [db _] (:show-flow db)))
 (reg-sub :ordered-msgs (fn [db _] (:ordered-msgs db)))
 (reg-sub :active-type (fn [db _] (:active-type db)))
 (reg-sub :kafka-status (fn [db _] (:kafka-status db)))
@@ -89,6 +90,7 @@
 
 (defn matches [put-fn]
   (let [matches (subscribe [:matches])
+        msg-flow (subscribe [:show-flow])
         active-type (subscribe [:active-type])
         ordered-msgs (subscribe [:ordered-msgs])
         #_#_ordered-msgs (reaction
@@ -101,8 +103,9 @@
                              @ordered-msgs))]
     (fn [put-fn]
       (let [active-type @active-type
-            ordered-msgs @ordered-msgs]
-        [:div.msg-flow
+            ordered-msgs @ordered-msgs
+            msg-flow @msg-flow]
+        [:div.msg-flows
          [:h2 "Message Flows"]
          [:table
           [:tbody
@@ -128,9 +131,11 @@
                    processing-time (apply + (map #(-> % second :duration) msgs))
                    last-seen (format-time last-ts)
                    duration (- last-ts first-ts)
-                   selected (contains? max-per-type active-type)]
+                   selected (contains? max-per-type active-type)
+                   active (= tag (:tag msg-flow))]
                ^{:key (str tag first-ts)}
-               [:tr {:class (when selected "selected")}
+               [:tr {:class    (if active "active-flow" (when selected "selected"))
+                     :on-click #(put-fn [:flow/show {:tag tag :msgs msgs}])}
                 [:td first-seen]
                 [:td last-seen]
                 [:td.number (if (> duration 10000)
@@ -148,6 +153,46 @@
                 [:td (subs tag 0 8)]
                 [:td {:on-click #(prn :click)}
                  [:span.fa.fa-eye-slash]]]))]]]))))
+
+(defn msg-mapper [[firehose-id firehose-msg]]
+  (let [{:keys [cmp-id msg duration msg-meta firehose-type]} firehose-msg
+        [msg-type msg-size] msg]
+    (-> firehose-msg
+        (assoc-in [:msg-type] msg-type)
+        (assoc-in [:msg-size] msg-size))))
+
+(defn msg-flow [put-fn]
+  (let [msg-flow (subscribe [:show-flow])]
+    (fn [put-fn]
+      (let [{:keys [tag msgs]} @msg-flow
+            sorted-by-ts (sort-by :ts (map msg-mapper msgs))]
+        (when tag
+          [:div.msg-flow
+           [:h3 "Tag: " tag]
+           [:table
+            [:tbody
+             [:tr
+              [:th "Time"]
+              [:th "Cmp ID"]
+              [:th "Msg type"]
+              [:th "Duration"]
+              [:th "Size"]
+              [:th "Direction"]
+              [:th "Cmp seq"]]
+             (for [firehose-msg sorted-by-ts]
+               (let [{:keys [cmp-id duration msg-type msg-meta firehose-type
+                             firehose-id ts msg-size]} firehose-msg]
+                 ^{:key firehose-id}
+                 [:tr
+                  [:td (format-time ts)]
+                  [:td (str cmp-id)]
+                  [:td (str msg-type)]
+                  [:td.number (when duration (str duration "ms"))]
+                  [:td.number msg-size]
+                  [:td.number (if (= firehose-type :firehose/cmp-recv) "IN" "OUT")]
+                  [:td (str (:cmp-seq msg-meta))]]))]]
+           ;[:pre [:code (with-out-str (pp/pprint sorted-by-ts))]]
+           ])))))
 
 (defn re-frame-ui
   "Main view component"
@@ -188,7 +233,8 @@
         [:div
          [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
          [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]
-        [matches put-fn]]])))
+        [matches put-fn]
+        [msg-flow put-fn]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

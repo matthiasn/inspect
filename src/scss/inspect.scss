@@ -53,7 +53,7 @@ h1, h2, h3, h4, h5, h6 {
       padding: 8px 20px;
     }
   }
-  .msg-flow {
+  .msg-flow, .msg-flows {
     table {
       font-size: 0.8em;
       border-spacing:0;
@@ -117,6 +117,10 @@ h1, h2, h3, h4, h5, h6 {
 
   .active, .selected {
     background-color: #7FDBFF!important;
+  }
+
+  .active-flow {
+    background-color: lighten($green, 35)!important;
   }
 
   .force-wrapper {

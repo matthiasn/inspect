@@ -14,6 +14,7 @@
   (let [cnt (:cnt (:stats current-state))
         in-out (if (= msg-type :firehose/cmp-recv) :in :out)
         {:keys [cmp-id msg msg-meta firehose-id]} msg-payload
+        firehose-type msg-type
         msg-type (first msg)
         add-edge (fn [prev-edges]
                    (let [cmps (:cmp-seq msg-meta)
@@ -48,11 +49,11 @@
         msg-stats (map-stats (-> msg-payload :msg second))
         type-and-size (-> msg-payload
                           (update-in [:msg] (fn [[t m]] [t (count (str m))]))
-                          (assoc-in [:msg-stats] msg-stats))
+                          (assoc-in [:msg-stats] msg-stats)
+                          (assoc-in [:firehose-type] firehose-type))
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
                            (:msg-meta subscription)))]
-
     (let [msg-type (-> msg-payload :msg first)
           msg (-> msg-payload :msg second)]
       (when (= msg-type :state/stats-tags)

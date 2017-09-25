@@ -32,6 +32,12 @@
     (debug msg-payload)
     {:new-state new-state}))
 
+(defn show-flow [{:keys [current-state msg-payload]}]
+  (let [toggle #(when-not (= (:tag msg-payload) (:tag %)) msg-payload)
+        new-state (update-in current-state [:show-flow] toggle)]
+    (debug msg-payload)
+    {:new-state new-state}))
+
 (defn match [{:keys [current-state msg-payload]}]
   (let [add (fn [matches match] (take 10 (conj matches match)))
         firehose-id (:firehose-id msg-payload)
@@ -40,7 +46,7 @@
         new-state (-> current-state
                       (update-in [:matches] add msg-payload)
                       (assoc-in [:ordered-msgs tag firehose-id] msg-payload))]
-    (info "Match" msg-payload)
+    (debug "Match" msg-payload)
     {:new-state new-state}))
 
 (defn cmp-map [cmp-id]
@@ -49,6 +55,7 @@
    :handler-map {:observer/cmps-msgs cmps-msgs
                  :cell/active        cell-active
                  :state/freeze       freeze
-                 :state/clear       clear
+                 :state/clear        clear
+                 :flow/show          show-flow
                  :subscription/match match
                  :kafka/status       kafka-status}})
