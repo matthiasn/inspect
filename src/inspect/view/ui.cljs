@@ -212,7 +212,7 @@
         clear #(put-fn [:state/clear])]
     (fn [_]
       [:div.observer
-       [gv/wiring put-fn]
+       [gv/wiring-view put-fn]
        [:div
         [:div.header
          [:div

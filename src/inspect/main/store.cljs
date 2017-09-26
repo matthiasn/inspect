@@ -54,13 +54,6 @@
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
                            (:msg-meta subscription)))]
-    (let [msg-type (-> msg-payload :msg first)
-          msg (-> msg-payload :msg second)]
-      (when (= msg-type :state/stats-tags)
-        (info msg-type (-> msg-payload :msg first) msg-stats)
-        (info (take 10 (:hashtags msg)))
-        (info (map-stats (:hashtags msg)))))
-
     (when match (debug "Subscription match:" match))
     {:new-state new-state
      :emit-msg  match}))

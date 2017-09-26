@@ -1,8 +1,8 @@
 {
   "name": "inspect",
-  "version": "0.2.24",
+  "version": "0.2.25",
   "description": "",
-  "main": "dev/main/main.js",
+  "main": "prod/main/main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
