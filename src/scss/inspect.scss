@@ -36,6 +36,11 @@ h1, h2, h3, h4, h5, h6 {
 .observer {
   padding: 2em;
 
+  pre {
+    font-size: 0.7em;
+    line-height: 1em;
+  }
+
   h2 {
     margin: 0.6em 0 0 0;
     font-size: 1em;

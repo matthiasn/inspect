@@ -92,15 +92,7 @@
   (let [matches (subscribe [:matches])
         msg-flow (subscribe [:show-flow])
         active-type (subscribe [:active-type])
-        ordered-msgs (subscribe [:ordered-msgs])
-        #_#_ordered-msgs (reaction
-                           (if @active-type
-                             (filter
-                               (fn [[tag msgs]]
-                                 (let [types (set (map #(-> % second :msg first) msgs))]
-                                   (contains? types @active-type)))
-                               (vec @ordered-msgs))
-                             @ordered-msgs))]
+        ordered-msgs (subscribe [:ordered-msgs])]
     (fn [put-fn]
       (let [active-type @active-type
             ordered-msgs @ordered-msgs
@@ -161,6 +153,8 @@
         (assoc-in [:msg-type] msg-type)
         (assoc-in [:msg-size] msg-size))))
 
+(def chf (u/consistent-hash-fn hash hash))
+
 (defn msg-flow [put-fn]
   (let [msg-flow (subscribe [:show-flow])]
     (fn [put-fn]
@@ -169,6 +163,7 @@
         (when tag
           [:div.msg-flow
            [:h3 "Tag: " tag]
+           [gv/flow-graph put-fn]
            [:table
             [:tbody
              [:tr
@@ -181,18 +176,20 @@
               [:th "Cmp seq"]]
              (for [firehose-msg sorted-by-ts]
                (let [{:keys [cmp-id duration msg-type msg-meta firehose-type
-                             firehose-id ts msg-size]} firehose-msg]
+                             firehose-id ts msg-size]} firehose-msg
+                     color (chf msg-type u/colors)]
                  ^{:key firehose-id}
                  [:tr
                   [:td (format-time ts)]
                   [:td (str cmp-id)]
-                  [:td (str msg-type)]
+                  [:td
+                   [:span {:style {:background-color color
+                                   :padding-right    "10px"}}]
+                   (str msg-type)]
                   [:td.number (when duration (str duration "ms"))]
                   [:td.number msg-size]
                   [:td.number (if (= firehose-type :firehose/cmp-recv) "IN" "OUT")]
-                  [:td (str (:cmp-seq msg-meta))]]))]]
-           ;[:pre [:code (with-out-str (pp/pprint sorted-by-ts))]]
-           ])))))
+                  [:td (str (:cmp-seq msg-meta))]]))]]])))))
 
 (defn re-frame-ui
   "Main view component"
