@@ -29,7 +29,7 @@
             sorted-by-ts (sort msg-compare (map msg-mapper msgs))
             active-detail @active-detail]
         (when tag
-          [:div.msg-flow
+          [:div.msg-flow.section
            [:h3 "Tag: " tag]
            [gv/flow-graph put-fn]
            [:table
@@ -40,8 +40,7 @@
               [:th "Msg type"]
               [:th "Duration"]
               [:th "Size"]
-              [:th "Direction"]
-              [:th "Cmp seq"]]
+              [:th "Direction"]]
              (for [firehose-msg sorted-by-ts]
                (let [{:keys [cmp-id duration msg-type msg-meta firehose-type
                              firehose-id ts msg-size]} firehose-msg
@@ -58,5 +57,4 @@
                    (str msg-type)]
                   [:td.number (when duration (str duration "ms"))]
                   [:td.number msg-size]
-                  [:td.number (if (= firehose-type :firehose/cmp-recv) "IN" "OUT")]
-                  [:td.cmp-seq (str (:cmp-seq msg-meta))]]))]]])))))
+                  [:td.number (if (= firehose-type :firehose/cmp-recv) "IN" "OUT")]]))]]])))))

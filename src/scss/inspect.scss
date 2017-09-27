@@ -1,7 +1,9 @@
 @import "variables.scss";
+@import "edn.scss";
 
 body {
   color: $font-color;
+  background-color: white;
   font-size: 12px;
   font-weight: 300;
   font-family: $font-family;
@@ -17,14 +19,13 @@ h1, h2, h3, h4, h5, h6 {
 #logo {
   width: 150px;
   position: absolute;
-  top: 2em;
+  top: 1em;
   right: 2em;
 }
 
 #graphviz {
-  width: 1fr;
   svg {
-    width: 100%;
+    max-width: calc(100vw - 50px);
     height: 100vh;
   }
 }
@@ -34,14 +35,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .observer {
-  padding: 2em;
 
   pre {
     font-size: 0.7em;
     line-height: 1em;
   }
 
-  h2 {
+  h3 {
     margin: 0.6em 0 0 0;
     font-size: 1em;
     font-family: monospace;
@@ -58,6 +58,15 @@ h1, h2, h3, h4, h5, h6 {
       padding: 8px 20px;
     }
   }
+
+  .section {
+    background-color: white;
+    padding: 12px;
+    margin-bottom: 10px;
+    width: calc(100vw - 24px);
+    min-height: 40px;
+  }
+
   .msg-flow, .msg-flows {
     table {
       font-size: 0.8em;
@@ -75,7 +84,7 @@ h1, h2, h3, h4, h5, h6 {
         }
       }
 
-      td {
+      td, th {
         padding-right: 8px;
         vertical-align: middle;
       }
@@ -108,7 +117,6 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .status {
-    margin-bottom: 10px;
     font-family: monospace;
 
     &.error {

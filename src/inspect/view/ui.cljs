@@ -44,8 +44,7 @@
         clear #(put-fn [:state/clear])]
     (fn [_]
       [:div.observer
-       [gv/wiring-view put-fn]
-       [:div
+       [:div.section
         [:div.header
          [:div
           [:input {:type      :text
@@ -58,16 +57,19 @@
              [:span.fa.fa-play] "subscribe"])]
          [:div.cnt " Count: " [:strong @count]]]
         [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
-         (:text @kafka-status)]
-        (for [cmp-id @cmp-ids]
-          ^{:key (str cmp-id)}
-          [uc/component-table cmp-id put-fn])
-        [:div
-         [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
-         [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]
-        [um/matches put-fn]
-        [uf/msg-flow put-fn]
-        [ud/detailed-msg put-fn]]])))
+         (:text @kafka-status)]]
+       [gv/wiring-view put-fn]
+       (when @cmp-ids
+         [:div.section
+          (for [cmp-id @cmp-ids]
+            ^{:key (str cmp-id)}
+            [uc/component-table cmp-id put-fn])])
+       [:div
+        [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
+        [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]
+       [um/matches put-fn]
+       [uf/msg-flow put-fn]
+       [ud/detailed-msg put-fn]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

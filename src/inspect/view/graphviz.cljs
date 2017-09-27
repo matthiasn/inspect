@@ -80,23 +80,23 @@
   (let [msg-flow (subscribe [:show-flow])
         msgs (reaction (vals (:msgs @msg-flow)))
         find-edge (fn [{:keys [msg-meta msg firehose-type]}]
-                     (let [cmps (:cmp-seq msg-meta)
-                           [from to] (take-last 2 cmps)
-                           msg-type (first msg)]
-                       (if (and from
-                                to
-                                (or (= firehose-type :firehose/cmp-recv)
-                                    (not= (namespace from) (namespace to))))
-                         #{{:source      (str from)
-                            :target      (str to)
-                            :from        from
-                            :to          to
-                            :source-name (name from)
-                            :source-ns   (namespace from)
-                            :target-name (name to)
-                            :target-ns   (namespace to)
-                            :msg-type    msg-type}}
-                         #{})))
+                    (let [cmps (:cmp-seq msg-meta)
+                          [from to] (take-last 2 cmps)
+                          msg-type (first msg)]
+                      (if (and from
+                               to
+                               (or (= firehose-type :firehose/cmp-recv)
+                                   (not= (namespace from) (namespace to))))
+                        #{{:source      (str from)
+                           :target      (str to)
+                           :from        from
+                           :to          to
+                           :source-name (name from)
+                           :source-ns   (namespace from)
+                           :target-name (name to)
+                           :target-ns   (namespace to)
+                           :msg-type    msg-type}}
+                        #{})))
         edges (reaction (apply set/union (map find-edge @msgs)))
         active-type (subscribe [:active-type])
         edge-mapper (fn edge-mapper [{:keys [source target msg-type]}]

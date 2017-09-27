@@ -13,7 +13,7 @@
       (let [active-type @active-type
             ordered-msgs @ordered-msgs
             msg-flow @msg-flow]
-        [:div.msg-flows
+        [:div.msg-flows.section
          [:h2 "Message Flows"]
          [:table
           [:tbody
