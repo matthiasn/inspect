@@ -1,5 +1,6 @@
 (ns inspect.view.util
-  (:require [randomcolor]))
+  (:require [randomcolor]
+            [moment]))
 
 (defn random-color [seed]
   (randomcolor (clj->js {:seed (str (hash (str seed)))})))
@@ -34,6 +35,8 @@
     (let [hashed-nodes (hash-nodes nodes node-hash-fn)]
       (clockwise-node (item-hash-fn item) hashed-nodes))))
 
+(def chf (consistent-hash-fn hash hash))
+
 (def colors
   #{"aliceblue" "aqua" "aquamarine" "bisque" "black" "blue"
     "blueviolet" "brown" "burlywood" "cadetblue" "chocolate" "coral"
@@ -49,3 +52,5 @@
     "navy" "orange" "orangered" "orchid" "plum" "powderblue" "purple"
     "red" "rosybrown" "royalblue" "salmon" "seagreen" "sienna" "skyblue"
     "slateblue" "springgreen" "steelblue" "tomato" "turquoise"})
+
+(defn format-time [m] (.format (moment m) "HH:mm:ss:SSS"))

@@ -1,17 +1,15 @@
 (ns inspect.view.ui
   (:require-macros [reagent.ratom :refer [reaction]])
-  (:require [reagent.core :as rc]
+  (:require [reagent.core :as r]
             [re-frame.core :refer [reg-sub subscribe]]
             [re-frame.db :as rdb]
             [taoensso.timbre :as timbre :refer-macros [info debug]]
-            [inspect.view.force :as f]
-            [inspect.view.force2 :as f2]
             [inspect.view.graphviz :as gv]
-            [moment]
-            [inspect.view.util :as u]
-            [cljs.pprint :as pp]
-            [clojure.set :as set]
-            [reagent.core :as r]))
+            [inspect.view.ui.matches :as um]
+            [inspect.view.ui.detail :as ud]
+            [inspect.view.ui.flow :as uf]
+            [inspect.view.ui.cmp :as uc]
+            [inspect.view.util :as u]))
 
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
@@ -27,184 +25,6 @@
 (reg-sub :cmp-ids (fn [db _] (:cmp-ids (:cmps-msgs db))))
 (reg-sub :edges (fn [db _] (:edges (:cmps-msgs db))))
 (reg-sub :cnt (fn [db _] (-> db :cmps-msgs :cnt)))
-
-(defn cnt-cell
-  [cmp-id msg-type dir]
-  (let [components (subscribe [:components])
-        cnt (reaction (-> @components cmp-id dir msg-type))
-        prev-cmps (subscribe [:prev-cmps])
-        prev-cnt (reaction (-> @prev-cmps cmp-id dir msg-type))]
-    (fn [cmp-id msg-type dir]
-      (let [changed (not= @cnt @prev-cnt)]
-        [:td.cnt {:class (when changed "changed")}
-         @cnt]))))
-
-(defn delta-cell
-  [cmp-id msg-type dir]
-  (let [components (subscribe [:components])
-        cnt (reaction (-> @components cmp-id dir msg-type))
-        frozen-cmps (subscribe [:frozen])
-        frozen-cnt (reaction (-> @frozen-cmps cmp-id dir msg-type))]
-    (fn [cmp-id msg-type dir]
-      (let [delta (- @cnt @frozen-cnt)]
-        [:td.cnt (if (and @frozen-cnt (pos? delta))
-                   [:strong (str "+" delta)]
-                   " ")]))))
-
-(defn msg-table
-  [cmp-id dir put-fn]
-  (let [components (subscribe [:components])
-        active-type (subscribe [:active-type])
-        cmp-map (reaction (cmp-id @components))]
-    (fn [cmp-id dir put-fn]
-      (let [active-type @active-type]
-        [:table
-         [:tbody
-          (for [[msg-type cnt] (dir @cmp-map)]
-            ^{:key (str msg-type)}
-            [:tr
-             [:td.dir [:strong (str dir)]]
-             [:td.cmp-id {:on-click #(let [subscription {:msg-type msg-type
-                                                         :cmp-id   cmp-id
-                                                         :dir      dir}]
-                                       (if (= msg-type active-type)
-                                         (put-fn [:observer/stop])
-                                         (put-fn [:observer/subscribe subscription]))
-                                       (put-fn [:cell/active msg-type]))
-                          :class    (when (= msg-type active-type) "active")}
-              (str msg-type)]
-             [cnt-cell cmp-id msg-type dir]
-             [delta-cell cmp-id msg-type dir]])]]))))
-
-(defn component [cmp-id put-fn]
-  (let [components (subscribe [:components])]
-    (fn [cmp-id put-fn]
-      [:div
-       [:h2
-        ;[:span.color {:style {:background-color (u/random-color cmp-id)}}]
-        (str cmp-id)]
-       [:div.tables
-        [msg-table cmp-id :in put-fn]
-        [msg-table cmp-id :out put-fn]]])))
-
-(defn format-time [m] (.format (moment m) "HH:mm:ss:SSS"))
-
-(defn matches [put-fn]
-  (let [matches (subscribe [:matches])
-        msg-flow (subscribe [:show-flow])
-        active-type (subscribe [:active-type])
-        ordered-msgs (subscribe [:ordered-msgs])]
-    (fn [put-fn]
-      (let [active-type @active-type
-            ordered-msgs @ordered-msgs
-            msg-flow @msg-flow]
-        [:div.msg-flows
-         [:h2 "Message Flows"]
-         [:table
-          [:tbody
-           [:tr
-            [:th "First seen"]
-            [:th "Last seen"]
-            [:th "Duration"]
-            [:th "Processing time"]
-            [:th "Msg type"]
-            [:th "Max size"]
-            [:th "Tag"]]
-           (for [[tag msgs] (take-last 100 ordered-msgs)]
-             (let [first-ts (apply min (map #(-> % second :ts) msgs))
-                   first-seen (format-time first-ts)
-                   last-ts (apply max (map #(-> % second :ts) msgs))
-                   max-size (apply max (map #(-> % second :msg second) msgs))
-                   max-per-type (reduce (fn [acc m]
-                                          (let [msg-type (-> m second :msg first)
-                                                size (-> m second :msg second)]
-                                            (update-in acc [msg-type] max size)))
-                                        {}
-                                        msgs)
-                   processing-time (apply + (map #(-> % second :duration) msgs))
-                   last-seen (format-time last-ts)
-                   duration (- last-ts first-ts)
-                   selected (contains? max-per-type active-type)
-                   active (= tag (:tag msg-flow))]
-               ^{:key (str tag first-ts)}
-               [:tr {:class    (if active "active-flow" (when selected "selected"))
-                     :on-click #(put-fn [:flow/show {:tag tag :msgs msgs}])}
-                [:td first-seen]
-                [:td last-seen]
-                [:td.number (if (> duration 10000)
-                              (str (.floor js/Math (/ duration 1000)) "s")
-                              (str duration "ms"))]
-                [:td.number (str processing-time "ms")]
-                [:td [:table.max-per-type
-                      [:tbody
-                       (for [[msg-type size] max-per-type]
-                         ^{:key (str tag first-ts msg-type)}
-                         [:tr
-                          [:td (str msg-type)]
-                          [:td size]])]]]
-                [:td.number max-size]
-                [:td (subs tag 0 8)]
-                [:td {:on-click #(prn :click)}
-                 [:span.fa.fa-eye-slash]]]))]]]))))
-
-(defn msg-mapper [[firehose-id firehose-msg]]
-  (let [{:keys [cmp-id msg duration msg-meta firehose-type]} firehose-msg
-        [msg-type msg-size] msg]
-    (-> firehose-msg
-        (assoc-in [:msg-type] msg-type)
-        (assoc-in [:msg-size] msg-size))))
-
-(def chf (u/consistent-hash-fn hash hash))
-
-(defn msg-compare [x y]
-  (let [c (compare (:ts x) (:ts y))]
-    (if (not= c 0)
-      c
-      (compare (-> x :msg-meta :cmp-seq count)
-               (-> y :msg-meta :cmp-seq count)))))
-
-(defn msg-flow [put-fn]
-  (let [msg-flow (subscribe [:show-flow])]
-    (fn [put-fn]
-      (let [{:keys [tag msgs]} @msg-flow
-            sorted-by-ts (sort msg-compare (map msg-mapper msgs))]
-        (when tag
-          [:div.msg-flow
-           [:h3 "Tag: " tag]
-           [gv/flow-graph put-fn]
-           [:table
-            [:tbody
-             [:tr
-              [:th "Time"]
-              [:th "Cmp ID"]
-              [:th "Msg type"]
-              [:th "Duration"]
-              [:th "Size"]
-              [:th "Direction"]
-              [:th "Cmp seq"]]
-             (for [firehose-msg sorted-by-ts]
-               (let [{:keys [cmp-id duration msg-type msg-meta firehose-type
-                             firehose-id ts msg-size]} firehose-msg
-                     color (chf msg-type u/colors)
-                     click #(put-fn [:msg/get firehose-id])]
-                 ^{:key firehose-id}
-                 [:tr {:on-click click}
-                  [:td (format-time ts)]
-                  [:td (str cmp-id)]
-                  [:td
-                   [:span {:style {:background-color color
-                                   :padding-right    "10px"}}]
-                   (str msg-type)]
-                  [:td.number (when duration (str duration "ms"))]
-                  [:td.number msg-size]
-                  [:td.number (if (= firehose-type :firehose/cmp-recv) "IN" "OUT")]
-                  [:td.cmp-seq (str (:cmp-seq msg-meta))]]))]]])))))
-
-(defn detailed-msg [put-fn]
-  (let [detailed-msg (subscribe [:detailed-msg])]
-    (fn [put-fn]
-      (when @detailed-msg
-        [:div [:pre [:code (with-out-str (pp/pprint @detailed-msg))]]]))))
 
 (defn re-frame-ui
   "Main view component"
@@ -241,20 +61,20 @@
          (:text @kafka-status)]
         (for [cmp-id @cmp-ids]
           ^{:key (str cmp-id)}
-          [component cmp-id put-fn])
+          [uc/component-table cmp-id put-fn])
         [:div
          [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
          [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]
-        [matches put-fn]
-        [msg-flow put-fn]
-        [detailed-msg put-fn]]])))
+        [um/matches put-fn]
+        [uf/msg-flow put-fn]
+        [ud/detailed-msg put-fn]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the
    observed component state, which will then be updated whenever the store-cmp
    changes."
   [put-fn]
-  (rc/render [re-frame-ui put-fn] (.getElementById js/document "app"))
+  (r/render [re-frame-ui put-fn] (.getElementById js/document "app"))
   {:observed rdb/app-db})
 
 (defn cmp-map

@@ -76,8 +76,6 @@
        :component-did-update did-mount-or-update
        :display-name         "wiring-view2"})))
 
-(def chf (u/consistent-hash-fn hash hash))
-
 (defn flow-graph [put-fn]
   (let [msg-flow (subscribe [:show-flow])
         msgs (reaction (vals (:msgs @msg-flow)))
@@ -102,7 +100,7 @@
         edges (reaction (apply set/union (map find-edge @msgs)))
         active-type (subscribe [:active-type])
         edge-mapper (fn edge-mapper [{:keys [source target msg-type]}]
-                      (let [color (chf msg-type u/colors)]
+                      (let [color (u/chf msg-type u/colors)]
                         (prn color msg-type)
                         (str (sanitize source) " -> " (sanitize target)
                              " [color=" color

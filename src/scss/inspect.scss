@@ -63,6 +63,7 @@ h1, h2, h3, h4, h5, h6 {
       font-size: 0.8em;
       font-family: monospace;
       border-spacing:0;
+      cursor: pointer;
 
       tr:nth-child(even) {
         background-color: lighten($hashtag-blue, 40%);
@@ -151,6 +152,7 @@ h1, h2, h3, h4, h5, h6 {
       line-height: 1em;
       font-family: monospace;
       font-size: 0.8em;
+      cursor: pointer;
 
       tr:nth-child(even) {
         background-color: lighten($hashtag-blue, 40%);
