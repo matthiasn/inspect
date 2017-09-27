@@ -23,6 +23,7 @@
                 :kafka/status
                 :subscription/match
                 :update/status
+                :msg/res
                 :observer/cmps-msgs})
 
 (def app-path (:app-path rt/runtime-info))

@@ -15,6 +15,7 @@
 
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
+(reg-sub :detailed-msg (fn [db _] (:detailed-msg db)))
 (reg-sub :matches (fn [db _] (:matches db)))
 (reg-sub :show-flow (fn [db _] (:show-flow db)))
 (reg-sub :ordered-msgs (fn [db _] (:ordered-msgs db)))
@@ -155,11 +156,18 @@
 
 (def chf (u/consistent-hash-fn hash hash))
 
+(defn msg-compare [x y]
+  (let [c (compare (:ts x) (:ts y))]
+    (if (not= c 0)
+      c
+      (compare (-> x :msg-meta :cmp-seq count)
+               (-> y :msg-meta :cmp-seq count)))))
+
 (defn msg-flow [put-fn]
   (let [msg-flow (subscribe [:show-flow])]
     (fn [put-fn]
       (let [{:keys [tag msgs]} @msg-flow
-            sorted-by-ts (sort-by :ts (map msg-mapper msgs))]
+            sorted-by-ts (sort msg-compare (map msg-mapper msgs))]
         (when tag
           [:div.msg-flow
            [:h3 "Tag: " tag]
@@ -177,9 +185,10 @@
              (for [firehose-msg sorted-by-ts]
                (let [{:keys [cmp-id duration msg-type msg-meta firehose-type
                              firehose-id ts msg-size]} firehose-msg
-                     color (chf msg-type u/colors)]
+                     color (chf msg-type u/colors)
+                     click #(put-fn [:msg/get firehose-id])]
                  ^{:key firehose-id}
-                 [:tr
+                 [:tr {:on-click click}
                   [:td (format-time ts)]
                   [:td (str cmp-id)]
                   [:td
@@ -189,7 +198,13 @@
                   [:td.number (when duration (str duration "ms"))]
                   [:td.number msg-size]
                   [:td.number (if (= firehose-type :firehose/cmp-recv) "IN" "OUT")]
-                  [:td (str (:cmp-seq msg-meta))]]))]]])))))
+                  [:td.cmp-seq (str (:cmp-seq msg-meta))]]))]]])))))
+
+(defn detailed-msg [put-fn]
+  (let [detailed-msg (subscribe [:detailed-msg])]
+    (fn [put-fn]
+      (when @detailed-msg
+        [:div [:pre [:code (with-out-str (pp/pprint @detailed-msg))]]]))))
 
 (defn re-frame-ui
   "Main view component"
@@ -231,7 +246,8 @@
          [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
          [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]
         [matches put-fn]
-        [msg-flow put-fn]]])))
+        [msg-flow put-fn]
+        [detailed-msg put-fn]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

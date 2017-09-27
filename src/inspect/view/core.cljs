@@ -13,6 +13,7 @@
                    :update/check-beta
                    :update/download
                    :update/install
+                   :msg/get
                    :kafka/start
                    :kafka/stop
                    :observer/subscribe

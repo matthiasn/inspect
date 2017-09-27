@@ -70,6 +70,11 @@
                   (with-meta [:observer/cmps-msgs (:stats new-state)]
                              {:window-id :broadcast}))}))
 
+(defn get-msg [{:keys [current-state msg-payload]}]
+  (let [res (get-in current-state [:messages msg-payload])]
+    (debug :get-msg msg-payload)
+    {:emit-msg      [:msg/res res]}))
+
 (defn subscribe [{:keys [current-state msg-payload msg-meta]}]
   (let [subscription (assoc-in msg-payload [:msg-meta] msg-meta)
         new-state (assoc-in current-state [:subscription] subscription)]
@@ -86,6 +91,7 @@
    :state-fn    state-fn
    :handler-map {:firehose/cmp-recv  firehose-msg
                  :firehose/cmp-put   firehose-msg
+                 :msg/get            get-msg
                  :observer/subscribe subscribe
                  :observer/stop      stop
                  :state/publish      state-publish}})

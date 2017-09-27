@@ -49,6 +49,10 @@
     (debug "Match" msg-payload)
     {:new-state new-state}))
 
+(defn msg-res [{:keys [current-state msg-payload]}]
+  (debug :msg-res msg-payload)
+  {:new-state (assoc-in current-state [:detailed-msg] msg-payload)})
+
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (fn [_] {:state (atom {:ordered-msgs (linked/map)})})
@@ -58,4 +62,5 @@
                  :state/clear        clear
                  :flow/show          show-flow
                  :subscription/match match
+                 :msg/res            msg-res
                  :kafka/status       kafka-status}})
