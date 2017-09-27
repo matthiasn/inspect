@@ -103,9 +103,12 @@
         active-type (subscribe [:active-type])
         edge-mapper (fn edge-mapper [{:keys [source target msg-type]}]
                       (let [color (chf msg-type u/colors)]
-                        (prn color)
+                        (prn color msg-type)
                         (str (sanitize source) " -> " (sanitize target)
-                             " [color = " color " penwidth=2]"
+                             " [color=" color
+                             " penwidth=2 label=" (sanitize msg-type)
+                             " fontcolor=" color
+                             " fontsize=8]"
                              "; ")))
         links (reaction (apply str (map edge-mapper @edges)))
         clusters (reaction

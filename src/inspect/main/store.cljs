@@ -18,19 +18,22 @@
         msg-type (first msg)
         add-edge (fn [prev-edges]
                    (let [cmps (:cmp-seq msg-meta)
-                         pairs (set/union (set (partition 2 cmps))
-                                          (set (partition 2 (drop 1 cmps))))
-                         edges (set (map (fn [[from to]]
-                                           {:source      (str from)
-                                            :target      (str to)
-                                            :from        from
-                                            :to          to
-                                            :source-name (name from)
-                                            :source-ns   (namespace from)
-                                            :target-name (name to)
-                                            :target-ns   (namespace to)
-                                            :msg-type    msg-type})
-                                         pairs))]
+                         [from to] (take-last 2 cmps)
+                         edges (if (and from
+                                        to
+                                        (or (= firehose-type :firehose/cmp-recv)
+                                            (not= (namespace from)
+                                                  (namespace to))))
+                                 #{{:source      (str from)
+                                    :target      (str to)
+                                    :from        from
+                                    :to          to
+                                    :source-name (name from)
+                                    :source-ns   (namespace from)
+                                    :target-name (name to)
+                                    :target-ns   (namespace to)
+                                    :msg-type    msg-type}}
+                                 #{})]
                      (debug (set/union prev-edges edges))
                      (set/union prev-edges edges)))
         inc-cnt #(inc (or % 0))
