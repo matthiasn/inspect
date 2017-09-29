@@ -55,16 +55,16 @@
                              msgs)
         processing-time (apply + (map #(-> % second :duration) msgs))
         last-seen (u/format-time last-ts)
-        duration (- last-ts first-ts)
-        res {:duration        duration
-             :tag             tag
-             :msgs            msgs
-             :first-seen      first-seen
-             :last-seen       last-seen
-             :processing-time processing-time
-             :max-per-type    max-per-type
-             :max-size        max-size}]
-    (assoc-in state [:flows tag] res)))
+        duration (- last-ts first-ts)]
+    {:duration        duration
+     :tag             tag
+     :msgs            msgs
+     :first-seen      first-seen
+     :first-seen-ts   first-ts
+     :last-seen       last-seen
+     :processing-time processing-time
+     :max-per-type    max-per-type
+     :max-size        max-size}))
 
 (defn match [{:keys [current-state msg-payload]}]
   (let [firehose-id (:firehose-id msg-payload)
@@ -72,9 +72,12 @@
         tag (-> msg-payload :msg-meta :tag)
         ts (:ts msg-payload)
         new-state (-> current-state
-                      (update-in [:avl-map ts] conj msg-payload)
                       (assoc-in [:ordered-msgs tag firehose-id] msg-payload))
-        new-state (update-flow new-state tag)]
+        flow (update-flow new-state tag)
+        first-seen-ts (:first-seen-ts flow)
+        new-state (-> new-state
+                      (assoc-in [:flows tag] flow)
+                      (assoc-in [:avl-map first-seen-ts tag] flow))]
     (debug "Match" msg-payload)
     {:new-state new-state}))
 
