@@ -13,8 +13,9 @@
 
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
+(reg-sub :flows (fn [db _] (:flows db)))
 (reg-sub :detailed-msg (fn [db _] (:detailed-msg db)))
-(reg-sub :matches (fn [db _] (:matches db)))
+(reg-sub :avl-map (fn [db _] (:avl-map db)))
 (reg-sub :show-flow (fn [db _] (:show-flow db)))
 (reg-sub :ordered-msgs (fn [db _] (:ordered-msgs db)))
 (reg-sub :active-type (fn [db _] (:active-type db)))

@@ -6,6 +6,7 @@
                  [matthiasn/systems-toolbox "0.6.17"]
                  [matthiasn/systems-toolbox-electron "0.6.8"]
                  [timbre-ns-pattern-level "0.1.2"]
+                 [org.clojure/data.avl "0.0.17"]
                  [frankiesardo/linked "1.2.9"]
                  [com.cognitect/transit-cljs "0.8.239"]]
 
