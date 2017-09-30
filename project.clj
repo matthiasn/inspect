@@ -67,7 +67,7 @@
                                                         :electron-packager "8.7.2"
                                                         :kafka-node        "2.2.1"
                                                         :sinek             "6.0.3"
-                                                        :electron          "1.7.6"}
+                                                        :electron          "1.7.8"}
                                        ;:install-deps   true
                                        :language-in    :ecmascript5
                                        :language-out   :ecmascript5
@@ -89,7 +89,7 @@
                                                         :viz.js           "1.8.0"
                                                         :react            "15.6.1"
                                                         :react-dom        "15.6.1"
-                                                        :electron         "1.7.6"}
+                                                        :electron         "1.7.8"}
                                        ;:install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}
@@ -109,7 +109,7 @@
                                                         :viz.js           "1.8.0"
                                                         :react            "15.6.1"
                                                         :react-dom        "15.6.1"
-                                                        :electron         "1.7.6"}
+                                                        :electron         "1.7.8"}
                                        ;:install-deps   true
                                        :optimizations  :none
                                        :parallel-build true}}
@@ -124,10 +124,10 @@
                                                         :moment            "2.18.1"
                                                         :react             "15.6.1"
                                                         :react-dom         "15.6.1"
-                                                        :electron-builder  "19.24.1"
+                                                        :electron-builder  "19.32.2"
                                                         :electron-updater  "2.8.7"
                                                         :electron-packager "8.7.2"
-                                                        :electron          "1.7.6"}
+                                                        :electron          "1.7.8"}
                                        ;:install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}
@@ -142,10 +142,10 @@
                                                         :moment            "2.18.1"
                                                         :react             "15.6.1"
                                                         :react-dom         "15.6.1"
-                                                        :electron-builder  "19.24.1"
+                                                        :electron-builder  "19.32.2"
                                                         :electron-updater  "2.8.7"
                                                         :electron-packager "8.7.2"
-                                                        :electron          "1.7.6"}
+                                                        :electron          "1.7.8"}
                                        ;:install-deps   true
                                        :optimizations  :none
                                        :parallel-build true}}]})

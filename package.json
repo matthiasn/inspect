@@ -1,6 +1,6 @@
 {
   "name": "inspect",
-  "version": "0.2.34",
+  "version": "0.2.36",
   "description": "",
   "main": "prod/main/main.js",
   "scripts": {
@@ -34,8 +34,8 @@
     "moment": "^2.18.1",
     "npid": "^0.4.0",
     "randomcolor": "^0.5.3",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
     "s": "^0.1.1",
     "sinek": "^6.2.2",
     "tcp-port-used": "^0.1.2",
