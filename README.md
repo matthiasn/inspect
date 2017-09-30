@@ -9,15 +9,16 @@ This Electron-based application lets you look inside systems built with the **[s
 
 If you don't want to build this application yourself, you can download an already packaged application:
 
-* **[Mac](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.28.dmg)**
-* **[Linux](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.28-x86_64.AppImage)**
-* **[Windows](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect+Setup+0.2.28.exe)**
+* **[Mac](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.32.dmg)**
+* **[Linux](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.32-x86_64.AppImage)**
+* **[Windows](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect+Setup+0.2.32.exe)**
 
 The Mac and Windows versions will notify you when there's an update. For Linux, that feature is still missing, unfortunately. If you believe that should be different, maybe you can help out with the [electron-builder](https://github.com/electron-userland/electron-builder/issues/1138) project.
 
 
 ## Building inspect
 
+    $ yarn install
     $ lein cljsbuild auto main
     $ lein cljsbuild auto view
     $ lein cljsbuild auto updater
