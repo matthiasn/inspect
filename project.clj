@@ -38,6 +38,7 @@
                                                         :react-dom         "15.6.1"
                                                         :electron-dl       "1.10.0"
                                                         :decompress        "4.2.0"
+                                                        :level             "1.7.0"
                                                         :electron-builder  "19.24.1"
                                                         :electron-updater  "2.8.7"
                                                         :electron-packager "8.7.2"
