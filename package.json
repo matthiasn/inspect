@@ -1,6 +1,6 @@
 {
   "name": "inspect",
-  "version": "0.2.36",
+  "version": "0.2.37",
   "description": "",
   "main": "prod/main/main.js",
   "scripts": {
@@ -30,7 +30,7 @@
     "electron-log": "^2.2.9",
     "electron-updater": "^2.10.1",
     "font-awesome": "^4.7.0",
-    "kafka-node": "^2.2.3",
+    "level": "1.7.0",
     "moment": "^2.18.1",
     "npid": "^0.4.0",
     "randomcolor": "^0.5.3",
@@ -42,12 +42,12 @@
     "viz.js": "^1.8.0"
   },
   "devDependencies": {
-    "browser-resolve": "^1.11.2",
-    "electron": "^1.7.8",
-    "electron-builder": "^19.32.2",
-    "electron-packager": "^9.1.0",
-    "electron-publisher-s3": "^19.32.0",
-    "module-deps": "^4.1.1",
-    "resolve": "^1.4.0"
+    "browser-resolve": "1.11.2",
+    "electron": "1.7.8",
+    "electron-builder": "19.32.2",
+    "electron-packager": "9.1.0",
+    "electron-publisher-s3": "19.32.0",
+    "module-deps": "4.1.1",
+    "resolve": "1.4.0"
   }
 }
