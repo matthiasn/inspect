@@ -1,8 +1,6 @@
 (ns inspect.main.store
-  (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
+  (:require [taoensso.timbre :as timbre :refer-macros [info debug]]
             [clojure.pprint :as pp]
-            [level]
-            [cljs.reader :refer [read-string]]
             [clojure.set :as set]))
 
 (defn state-fn [put-fn]
@@ -11,8 +9,6 @@
                              :components {}
                              :msg-types  #{}}})]
     {:state state}))
-
-(def db (level "/tmp/inspect.db"))
 
 (defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta]}]
   (let [cnt (:cnt (:stats current-state))
@@ -45,6 +41,7 @@
                       (update-in [:stats :cnt] inc)
                       (update-in [:stats :cmp-ids] conj cmp-id)
                       (update-in [:stats :components cmp-id in-out msg-type] inc-cnt)
+                      (assoc-in [:messages firehose-id] msg-payload)
                       (update-in [:stats :edges] add-edge)
                       (update-in [:stats :edges-by-type msg-type] add-edge)
                       (update-in [:stats :msg-types] conj msg-type))
@@ -60,7 +57,6 @@
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
                            (:msg-meta subscription)))]
-    (.put db firehose-id (pr-str msg-payload) #(when % (error %)))
     (when match (debug "Subscription match:" match))
     {:new-state new-state
      :emit-msg  match}))
@@ -74,13 +70,10 @@
                   (with-meta [:observer/cmps-msgs (:stats new-state)]
                              {:window-id :broadcast}))}))
 
-(defn get-msg [{:keys [current-state put-fn msg-payload]}]
+(defn get-msg [{:keys [current-state msg-payload]}]
   (let [res (get-in current-state [:messages msg-payload])]
     (debug :get-msg msg-payload)
-    (.get db msg-payload (fn [err res]
-                           (if err (error err)
-                                   (put-fn [:msg/res (read-string res)]))))
-    {}))
+    {:emit-msg      [:msg/res res]}))
 
 (defn subscribe [{:keys [current-state msg-payload msg-meta]}]
   (let [subscription (assoc-in msg-payload [:msg-meta] msg-meta)
@@ -102,3 +95,4 @@
                  :observer/subscribe subscribe
                  :observer/stop      stop
                  :state/publish      state-publish}})
+
