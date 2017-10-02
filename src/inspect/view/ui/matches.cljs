@@ -6,11 +6,17 @@
             [inspect.view.ui.detail :as ud]
             [clojure.pprint :as pp]
             [reagent.core :as r]
-            [clojure.data.avl :as avl]))
+            [clojure.data.avl :as avl]
+            [inspect.view.ui.timeline :as ut]))
 
 (defn matches [put-fn]
   (let [local (r/atom {:ts 9999999999999})
         avl-map (subscribe [:avl-map])
+        from-avl (reaction (->> @avl-map
+                                (map second)
+                                (apply concat)
+                                (map second)))
+
         msg-flow (subscribe [:show-flow])
         flows (subscribe [:flows])
         active-type (subscribe [:active-type])
@@ -28,12 +34,9 @@
     (fn [put-fn]
       (let [msg-flow @msg-flow
             active-type @active-type
-            from-avl (->> @avl-map
-                          (map second)
-                          (apply concat)
-                          (map second))
-            first-flow-ts (:first-seen-ts (first from-avl))
-            time-span (- (:first-seen-ts (last from-avl)) first-flow-ts)
+
+            first-flow-ts (:first-seen-ts (first @from-avl))
+            time-span (- (:first-seen-ts (last @from-avl)) first-flow-ts)
             slider-val (* (/ (- (:ts @local)
                                 first-flow-ts)
                              time-span)
@@ -53,8 +56,8 @@
          [:h2 "Message Flows"]
          [:div
           "Recorded message flows starting between "
-          [:span.time (:first-seen (first from-avl))] " and "
-          [:span.time (:first-seen (last from-avl))]]
+          [:span.time (:first-seen (first @from-avl))] " and "
+          [:span.time (:first-seen (last @from-avl))]]
          [:div "Recorded time span: " [:span.time time-span "ms"]]
          (if (= slider-val 100)
            [:div "Showing " [:span.time "latest"] " message flows."]
@@ -68,6 +71,7 @@
                     :max       max
                     :style     {:width "100%"}
                     :on-change slider-input}])
+         [:div [ut/timeline-view first-flow-ts time-span (:ts @local) put-fn]]
          [:table
           [:tbody
            [:tr

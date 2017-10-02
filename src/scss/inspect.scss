@@ -68,6 +68,12 @@ h1, h2, h3, h4, h5, h6 {
     min-height: 40px;
   }
 
+  .timeline {
+    svg {
+      width: 1100px;
+    }
+  }
+
   .msg-flow, .msg-flows {
     min-height: 600px;
     .time {

@@ -6,6 +6,7 @@
             [taoensso.timbre :as timbre :refer-macros [info debug]]
             [inspect.view.graphviz :as gv]
             [inspect.view.ui.matches :as um]
+            [inspect.view.ui.timeline :as ut]
             [inspect.view.ui.detail :as ud]
             [inspect.view.ui.flow :as uf]
             [inspect.view.ui.cmp :as uc]
@@ -14,6 +15,10 @@
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
 (reg-sub :flows (fn [db _] (:flows db)))
+
+(reg-sub :res1 (fn [db _] []))
+(reg-sub :res2 (fn [db _] []))
+
 (reg-sub :detailed-msg (fn [db _] (:detailed-msg db)))
 (reg-sub :avl-map (fn [db _] (:avl-map db)))
 (reg-sub :show-flow (fn [db _] (:show-flow db)))
