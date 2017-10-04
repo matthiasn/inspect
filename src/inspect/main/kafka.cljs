@@ -52,6 +52,7 @@
     (info "stopping consumer")
     (swap! cmp-state assoc-in [:count] 0)
     (put-fn [:kafka/status {:status :stopped :text "stopped"}])
+    (put-fn [:observer/stop])
     (.close consumer)))
 
 (defn start [{:keys [put-fn cmp-state put-chan current-state msg-payload

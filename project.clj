@@ -1,6 +1,6 @@
 (defproject matthiasn/inspect "0.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
-                 [org.clojure/clojurescript "1.9.908"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+                 [org.clojure/clojurescript "1.9.946"]
                  [re-frame "0.10.1"]
                  [com.taoensso/timbre "4.10.0"]
                  [matthiasn/systems-toolbox "0.6.17"]
@@ -68,6 +68,7 @@
                                                         :electron-packager "8.7.2"
                                                         :kafka-node        "2.2.1"
                                                         :sinek             "6.0.3"
+                                                        :neon-sled         "0.1.2"
                                                         :electron          "1.7.8"}
                                        ;:install-deps   true
                                        :language-in    :ecmascript5

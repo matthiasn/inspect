@@ -69,4 +69,4 @@
      (fn [ev]
        (info "window-all-closed")
        (when-not (= (:platform rt/runtime-info) "darwin")
-         (.quit app))))
+         (shutdown {}))))

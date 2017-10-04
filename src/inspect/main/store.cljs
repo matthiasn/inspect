@@ -1,7 +1,7 @@
 (ns inspect.main.store
   (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
             [clojure.pprint :as pp]
-            [level]
+            [neon-sled]
             [cljs.reader :refer [read-string]]
             [clojure.set :as set]))
 
@@ -12,7 +12,7 @@
                              :msg-types  #{}}})]
     {:state state}))
 
-(def db (level "/tmp/inspect.db"))
+(def sled (neon-sled "/tmp/inspect.db"))
 
 (defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta]}]
   (let [cnt (:cnt (:stats current-state))
@@ -60,7 +60,7 @@
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
                            (:msg-meta subscription)))]
-    (.put db firehose-id (pr-str msg-payload) #(when % (error %)))
+    (.set sled firehose-id (pr-str msg-payload))
     (when match (debug "Subscription match:" match))
     {:new-state new-state
      :emit-msg  match}))
@@ -75,12 +75,9 @@
                              {:window-id :broadcast}))}))
 
 (defn get-msg [{:keys [current-state put-fn msg-payload]}]
-  (let [res (get-in current-state [:messages msg-payload])]
+  (let [res (read-string (.get sled msg-payload))]
     (debug :get-msg msg-payload)
-    (.get db msg-payload (fn [err res]
-                           (if err (error err)
-                                   (put-fn [:msg/res (read-string res)]))))
-    {}))
+    {:emit-msg [:msg/res res]}))
 
 (defn subscribe [{:keys [current-state msg-payload msg-meta]}]
   (let [subscription (assoc-in msg-payload [:msg-meta] msg-meta)
@@ -90,6 +87,7 @@
 
 (defn stop [{:keys [current-state]}]
   (let [new-state (assoc-in current-state [:subscription] nil)]
+    (.syncAndClose sled)
     (info "OBSERVER: subscription stopped")
     {:new-state new-state}))
 
