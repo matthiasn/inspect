@@ -134,3 +134,9 @@ sinek.Consumer.close = function() {};
 
 var moment = function () {};
 moment.format = function () {};
+
+var neonSlade = function () {};
+neonSlade.get = function () {};
+neonSlade.set = function () {};
+neonSlade.del = function () {};
+neonSlade.syncAndClose = function () {};

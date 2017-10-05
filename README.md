@@ -22,7 +22,8 @@ The Mac and Windows versions will notify you when there's an update. For Linux, 
     $ lein cljsbuild auto main
     $ lein cljsbuild auto view
     $ lein cljsbuild auto updater
-    $ lein sass auto
+    $ sass src/scss/inspect.scss:resources/public/css/inspect.css
+    $ sass --watch src/scss/inspect.scss:resources/public/css/inspect.css
     $ npm start
 
 

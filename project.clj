@@ -18,12 +18,13 @@
 
   :clean-targets ^{:protect false} ["resources/public/css/" "target/" "prod/" "dev/"]
 
-  :aliases {"dist" ["do"
-                    ["clean"]
-                    ["cljsbuild" "once" "main"]
-                    ["cljsbuild" "once" "view"]
-                    ["cljsbuild" "once" "updater"]
-                    ["sass" "once"]]}
+  :aliases {"dist"
+            ["do"
+             ["clean"]
+             ["cljsbuild" "once" "main"]
+             ["cljsbuild" "once" "view"]
+             ["cljsbuild" "once" "updater"]
+             ["shell" "sass" "src/scss/inspect.scss" "resources/public/css/inspect.css"]]}
 
   :cljsbuild {:builds [{:id           "main"
                         :source-paths ["src/inspect/specs" "src/inspect/main"]
@@ -144,7 +145,7 @@
                                                         :moment            "2.18.1"
                                                         :react             "15.6.1"
                                                         :react-dom         "15.6.1"
-                                                        :electron-builder  "19.32.2"
+                                                        :electron-builder  "19.34.1"
                                                         :electron-updater  "2.8.7"
                                                         :electron-packager "8.7.2"
                                                         :electron          "1.7.8"}
