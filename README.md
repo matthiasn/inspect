@@ -18,13 +18,19 @@ The Mac and Windows versions will notify you when there's an update. For Linux, 
 
 ## Building inspect
 
+    $ npm install -g electron-builder
+    $ npm install -g electron-publisher-s3
     $ yarn install
     $ lein cljsbuild auto main
     $ lein cljsbuild auto view
     $ lein cljsbuild auto updater
     $ sass src/scss/inspect.scss:resources/public/css/inspect.css
-    $ sass --watch src/scss/inspect.scss:resources/public/css/inspect.css
+    $ sass src/scss/updater.scss:resources/public/css/updater.css
+    $ sass src/scss/loader.scss:resources/public/css/loader.css
+    $ npm run build
     $ npm start
+
+    $ sass --watch src/scss/inspect.scss:resources/public/css/inspect.css
 
 
 ## Publishing inspect

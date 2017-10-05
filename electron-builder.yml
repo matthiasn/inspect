@@ -6,6 +6,7 @@ files:
     - "package/main/**"
     - "package/render/**"
     - "!bin/"
+    - "!node_modules/neon-sled/native/target/"
 publish:
     provider: "s3"
     bucket: "matthiasn-inspect"

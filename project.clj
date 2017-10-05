@@ -25,7 +25,9 @@
              ["cljsbuild" "once" "main"]
              ["cljsbuild" "once" "view"]
              ["cljsbuild" "once" "updater"]
-             ["shell" "sass" "src/scss/inspect.scss" "resources/public/css/inspect.css"]]}
+             ["shell" "sass" "src/scss/inspect.scss" "resources/public/css/inspect.css"]
+             ["shell" "sass" "src/scss/loader.scss" "resources/public/css/loader.css"]
+             ["shell" "sass" "src/scss/updater.scss" "resources/public/css/updater.css"]]}
 
   :cljsbuild {:builds [{:id           "main"
                         :source-paths ["src/inspect/specs" "src/inspect/main"]
@@ -41,9 +43,7 @@
                                                         :electron-dl       "1.10.0"
                                                         :decompress        "4.2.0"
                                                         :level             "1.7.0"
-                                                        :electron-builder  "19.24.1"
                                                         :electron-updater  "2.8.7"
-                                                        :electron-packager "8.7.2"
                                                         :kafka-node        "2.2.1"
                                                         :sinek             "6.0.3"
                                                         :electron          "1.7.6"}
@@ -65,9 +65,7 @@
                                                         :react-dom         "15.6.1"
                                                         :electron-dl       "1.10.0"
                                                         :decompress        "4.2.0"
-                                                        :electron-builder  "19.24.1"
                                                         :electron-updater  "2.8.7"
-                                                        :electron-packager "8.7.2"
                                                         :kafka-node        "2.2.1"
                                                         :sinek             "6.0.3"
                                                         :neon-sled         "0.1.2"
@@ -128,9 +126,7 @@
                                                         :moment            "2.18.1"
                                                         :react             "15.6.1"
                                                         :react-dom         "15.6.1"
-                                                        :electron-builder  "19.32.2"
                                                         :electron-updater  "2.8.7"
-                                                        :electron-packager "8.7.2"
                                                         :electron          "1.7.8"}
                                        ;:install-deps   true
                                        :optimizations  :advanced
@@ -146,9 +142,7 @@
                                                         :moment            "2.18.1"
                                                         :react             "15.6.1"
                                                         :react-dom         "15.6.1"
-                                                        :electron-builder  "19.34.1"
                                                         :electron-updater  "2.8.7"
-                                                        :electron-packager "8.7.2"
                                                         :electron          "1.7.8"}
                                        ;:install-deps   true
                                        :optimizations  :none
