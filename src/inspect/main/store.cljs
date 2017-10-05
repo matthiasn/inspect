@@ -2,17 +2,21 @@
   (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
             [clojure.pprint :as pp]
             [neon-sled]
+            [fs :refer [existsSync unlinkSync]]
             [cljs.reader :refer [read-string]]
             [clojure.set :as set]))
 
+(def DB_PATH "/tmp/inspect.db")
+
 (defn state-fn [put-fn]
-  (let [state (atom {:stats {:count      0
+  (when (existsSync DB_PATH) (unlinkSync DB_PATH))
+  (let [sled (neon-sled DB_PATH)
+        state (atom {:stats {:count      0
                              :cmp-ids    #{}
                              :components {}
-                             :msg-types  #{}}})]
+                             :msg-types  #{}}
+                     :db    sled})]
     {:state state}))
-
-(def sled (neon-sled "/tmp/inspect.db"))
 
 (defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta]}]
   (let [cnt (:cnt (:stats current-state))
@@ -59,7 +63,8 @@
                           (assoc-in [:firehose-type] firehose-type))
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
-                           (:msg-meta subscription)))]
+                           (:msg-meta subscription)))
+        sled (:db current-state)]
     (.set sled firehose-id (pr-str msg-payload))
     (when match (debug "Subscription match:" match))
     {:new-state new-state
@@ -75,7 +80,8 @@
                              {:window-id :broadcast}))}))
 
 (defn get-msg [{:keys [current-state put-fn msg-payload]}]
-  (let [res (read-string (.get sled msg-payload))]
+  (let [sled (:db current-state)
+        res (read-string (.get sled msg-payload))]
     (debug :get-msg msg-payload)
     {:emit-msg [:msg/res res]}))
 
@@ -86,7 +92,8 @@
     {:new-state new-state}))
 
 (defn stop [{:keys [current-state]}]
-  (let [new-state (assoc-in current-state [:subscription] nil)]
+  (let [sled (:db current-state)
+        new-state (assoc-in current-state [:subscription] nil)]
     (.syncAndClose sled)
     (info "OBSERVER: subscription stopped")
     {:new-state new-state}))

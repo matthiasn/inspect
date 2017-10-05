@@ -17,7 +17,7 @@
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}
 
-  :clean-targets ^{:protect false} ["resources/public/css/" "target/" "prod/" "dev/"]
+  :clean-targets ^{:protect false} ["target/" "prod/" "dev/"]
 
   :aliases {"dist"
             ["do"

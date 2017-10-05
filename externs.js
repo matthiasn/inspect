@@ -123,6 +123,7 @@ var fs = {};
 fs.renameSync = function(oldPath, newPath) {};
 fs.existsSync = function(path) {};
 fs.readFileSync = function(path) {};
+fs.unlinkSync = function(path) {};
 
 var sinek = {};
 sinek.Consumer = function() {};
