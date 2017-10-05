@@ -11,6 +11,7 @@
                  [com.cognitect/transit-cljs "0.8.239"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
+            [lein-shell "0.5.0"]
             [lein-sassy "1.0.8"]]
 
   :sass {:src "src/scss/"
