@@ -1,21 +1,14 @@
 (ns inspect.main.store
   (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
             [clojure.pprint :as pp]
-            [neon-sled]
-            [fs :refer [existsSync unlinkSync]]
             [cljs.reader :refer [read-string]]
             [clojure.set :as set]))
 
-(def DB_PATH "/tmp/inspect.db")
-
 (defn state-fn [put-fn]
-  (when (existsSync DB_PATH) (unlinkSync DB_PATH))
-  (let [sled (neon-sled DB_PATH)
-        state (atom {:stats {:count      0
+  (let [state (atom {:stats {:count      0
                              :cmp-ids    #{}
                              :components {}
-                             :msg-types  #{}}
-                     :db    sled})]
+                             :msg-types  #{}}})]
     {:state state}))
 
 (defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta]}]
@@ -63,12 +56,11 @@
                           (assoc-in [:firehose-type] firehose-type))
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
-                           (:msg-meta subscription)))
-        sled (:db current-state)]
-    (.set sled firehose-id (pr-str msg-payload))
+                           (:msg-meta subscription)))]
     (when match (debug "Subscription match:" match))
     {:new-state new-state
-     :emit-msg  match}))
+     :emit-msg  [[:sled/put {:k firehose-id :v msg-payload}]
+                 match]}))
 
 (defn state-publish [{:keys [current-state]}]
   (let [{:keys [cnt prev-cnt]} (:stats current-state)
@@ -79,12 +71,6 @@
                   (with-meta [:observer/cmps-msgs (:stats new-state)]
                              {:window-id :broadcast}))}))
 
-(defn get-msg [{:keys [current-state put-fn msg-payload]}]
-  (let [sled (:db current-state)
-        res (read-string (.get sled msg-payload))]
-    (debug :get-msg msg-payload)
-    {:emit-msg [:msg/res res]}))
-
 (defn subscribe [{:keys [current-state msg-payload msg-meta]}]
   (let [subscription (assoc-in msg-payload [:msg-meta] msg-meta)
         new-state (assoc-in current-state [:subscription] subscription)]
@@ -92,9 +78,7 @@
     {:new-state new-state}))
 
 (defn stop [{:keys [current-state]}]
-  (let [sled (:db current-state)
-        new-state (assoc-in current-state [:subscription] nil)]
-    (.syncAndClose sled)
+  (let [new-state (assoc-in current-state [:subscription] nil)]
     (info "OBSERVER: subscription stopped")
     {:new-state new-state}))
 
@@ -103,7 +87,6 @@
    :state-fn    state-fn
    :handler-map {:firehose/cmp-recv  firehose-msg
                  :firehose/cmp-put   firehose-msg
-                 :msg/get            get-msg
                  :observer/subscribe subscribe
                  :observer/stop      stop
                  :state/publish      state-publish}})

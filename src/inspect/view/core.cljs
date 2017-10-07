@@ -13,7 +13,9 @@
                    :update/check-beta
                    :update/download
                    :update/install
-                   :msg/get
+                   :sled/get
+                   :sled/put
+                   :sled/bench
                    :kafka/start
                    :kafka/stop
                    :observer/subscribe

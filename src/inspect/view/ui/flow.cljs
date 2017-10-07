@@ -45,7 +45,7 @@
                (let [{:keys [cmp-id duration msg-type msg-meta firehose-type
                              firehose-id ts msg-size]} firehose-msg
                      color (u/chf msg-type u/colors)
-                     click #(put-fn [:msg/get firehose-id])]
+                     click #(put-fn [:sled/get {:k firehose-id}])]
                  ^{:key firehose-id}
                  [:tr {:class    (when (= firehose-id active-detail) "active")
                        :on-click click}

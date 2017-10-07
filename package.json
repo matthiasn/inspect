@@ -1,8 +1,8 @@
 {
   "name": "inspect",
-  "version": "0.2.47",
+  "version": "0.2.48",
   "description": "",
-  "main": "prod/main/main.js",
+  "main": "dev/main/main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-build-env neon build neon-sled",

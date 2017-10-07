@@ -18,3 +18,11 @@
                                :update/error})
 
 (s/def :update/status (s/keys :req-un [:inspect.update/status]))
+
+(s/def :sled/msg (s/keys :req-un [:inspect.sled/k]
+                         :opt-un [:inspect.sled/v
+                                  :inspect.sled/status]))
+
+(s/def :sled/put :sled/msg)
+(s/def :sled/get :sled/msg)
+(s/def :sled/res :sled/msg)

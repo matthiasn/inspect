@@ -11,6 +11,7 @@
             [inspect.main.kafka :as kafka]
             [inspect.main.download :as dl]
             [inspect.main.store :as st]
+            [inspect.main.sled :as db]
             [inspect.main.startup :as startup]
             [electron :refer [app]]
             [cljs.nodejs :as nodejs :refer [process]]
@@ -23,7 +24,7 @@
                 :kafka/status
                 :subscription/match
                 :update/status
-                :msg/res
+                :sled/res
                 :observer/cmps-msgs})
 
 (def app-path (:app-path rt/runtime-info))
@@ -35,6 +36,7 @@
     [[:cmd/init-comp #{(wm/cmp-map :electron/window-manager wm-relay app-path)
                        (kafka/cmp-map :electron/kafka-cmp)
                        (st/cmp-map :electron/store-cmp)
+                       (db/cmp-map :electron/db-cmp)
                        (dl/cmp-map :electron/download-cmp)
                        (ipc/cmp-map :electron/ipc-cmp)
                        (startup/cmp-map :electron/startup-cmp)
@@ -61,6 +63,7 @@
      [:cmd/route {:from :electron/ipc-cmp
                   :to   #{:electron/store-cmp
                           :electron/kafka-cmp
+                          :electron/db-cmp
                           :electron/window-manager
                           :electron/update-cmp}}]
 
@@ -68,12 +71,14 @@
                   :to   :electron/kafka-cmp}]
 
      [:cmd/route {:from #{:electron/kafka-cmp
+                          :electron/db-cmp
                           :electron/scheduler-cmp}
                   :to   #{:electron/store-cmp
                           :electron/window-manager}}]
 
      [:cmd/route {:from :electron/store-cmp
-                  :to   #{:electron/window-manager}}]
+                  :to   #{:electron/window-manager
+                          :electron/db-cmp}}]
 
      [:cmd/send {:to  :electron/window-manager
                  :msg [:window/new {:url (:index-page rt/runtime-info)}]}]

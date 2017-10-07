@@ -31,12 +31,14 @@
 (reg-sub :cmp-ids (fn [db _] (:cmp-ids (:cmps-msgs db))))
 (reg-sub :edges (fn [db _] (:edges (:cmps-msgs db))))
 (reg-sub :cnt (fn [db _] (-> db :cmps-msgs :cnt)))
+(reg-sub :db-counter (fn [db _] (-> db :db-counter)))
 
 (defn re-frame-ui
   "Main view component"
   [put-fn]
   (let [cmp-ids (subscribe [:cmp-ids])
         count (subscribe [:cnt])
+        db-counter (subscribe [:db-counter])
         kafka-status (subscribe [:kafka-status])
         local (r/atom {:kafka-host "localhost:9092"})
         input-fn (fn [ev]
@@ -47,6 +49,7 @@
                      (put-fn [:kafka/start kafka-host]))
         stop #(put-fn [:kafka/stop])
         freeze #(put-fn [:state/freeze])
+        bench #(put-fn [:db/bench])
         clear #(put-fn [:state/clear])]
     (fn [_]
       [:div.observer
@@ -61,7 +64,8 @@
              [:span.fa.fa-stop] "stop"]
             [:button {:on-click subscribe}
              [:span.fa.fa-play] "subscribe"])]
-         [:div.cnt " Count: " [:strong @count]]]
+         [:div.cnt " Count: " [:strong @count]]
+         [:div.cnt " DB count: " [:strong @db-counter]]]
         [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
          (:text @kafka-status)]]
        [gv/wiring-view put-fn]
@@ -72,6 +76,7 @@
             [uc/component-table cmp-id put-fn])])
        [:div
         [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
+        ;[:button.freeze {:on-click bench} [:span.fa.fa-bolt] "db bench"]
         [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]
        [um/matches put-fn]
        [uf/msg-flow put-fn]

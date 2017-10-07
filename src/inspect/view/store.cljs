@@ -82,13 +82,17 @@
     {:new-state new-state}))
 
 (defn msg-res [{:keys [current-state msg-payload]}]
-  (debug :msg-res msg-payload)
-  {:new-state (assoc-in current-state [:detailed-msg] msg-payload)})
+  (let [new-state (if-let [v (:v msg-payload)]
+                    (assoc-in current-state [:detailed-msg] (:v msg-payload))
+                    (update-in current-state [:db-counter] inc))]
+    (debug :msg-res msg-payload)
+    {:new-state new-state}))
 
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (fn [_] {:state (atom {:ordered-msgs (linked/map)
                                        :flows        (linked/map)
+                                       :db-counter   0
                                        :avl-map      (avl/sorted-map)})})
    :handler-map {:observer/cmps-msgs cmps-msgs
                  :cell/active        cell-active
@@ -96,5 +100,5 @@
                  :state/clear        clear
                  :flow/show          show-flow
                  :subscription/match match
-                 :msg/res            msg-res
+                 :sled/res           msg-res
                  :kafka/status       kafka-status}})
