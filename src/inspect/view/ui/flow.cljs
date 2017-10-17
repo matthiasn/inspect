@@ -31,7 +31,6 @@
         (when tag
           [:div.msg-flow.section
            [:h3 "Tag: " tag]
-           [gv/flow-graph put-fn]
            [:table
             [:tbody
              [:tr

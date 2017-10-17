@@ -34,6 +34,11 @@
     (debug msg-payload)
     {:new-state new-state}))
 
+(defn svg-overview [{:keys [current-state msg-payload]}]
+  (let [new-state (assoc-in current-state [:svg-overview] msg-payload)]
+    (debug msg-payload)
+    {:new-state new-state}))
+
 (defn show-flow [{:keys [current-state msg-payload]}]
   (let [toggle #(when-not (= (:tag msg-payload) (:tag %)) msg-payload)
         new-state (update-in current-state [:show-flow] toggle)]
@@ -101,4 +106,5 @@
                  :flow/show          show-flow
                  :subscription/match match
                  :sled/res           msg-res
+                 :svg/overview       svg-overview
                  :kafka/status       kafka-status}})

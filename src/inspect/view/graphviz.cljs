@@ -25,10 +25,10 @@
   (let [render-fn (fn [] (info :reagent-render) [:div#graphviz1])
         did-mount (fn [] (info :component-did-mount))
         did-update (fn [this]
-                     (let [[_ digraph] (r/argv this)
-                           svg-elem (by-id "graphviz1")
-                           svg (Viz digraph)]
-                       (aset svg-elem "innerHTML" svg)))]
+                     (time
+                       (let [[_ svg] (r/argv this)
+                             svg-elem (by-id "graphviz1")]
+                         (aset svg-elem "innerHTML" svg))))]
     (r/create-class
       {:reagent-render       render-fn
        :component-did-mount  did-mount
@@ -36,31 +36,10 @@
        :display-name         "wiring-view"})))
 
 (defn wiring-view [_put-fn]
-  (let [cmp-ids (subscribe [:cmp-ids])
-        edges (subscribe [:edges])
-        active-type (subscribe [:active-type])
-        edge-mapper (fn edge-mapper [{:keys [source target msg-type]}]
-                      (str (sanitize source) " -> " (sanitize target)
-                           (if (= msg-type @active-type)
-                             " [color = red penwidth=4]"
-                             (when @active-type
-                               " [color = lightgrey]"))
-                           "; "))
-        links (reaction (apply str (map edge-mapper @edges)))
-        clusters (reaction
-                   (reduce
-                     (fn [acc in]
-                       (let [{:keys [source-ns source target-ns target]} in]
-                         (-> acc
-                             (update-in [source-ns] #(set (conj % (sanitize source))))
-                             (update-in [target-ns] #(set (conj % (sanitize target)))))))
-                     {}
-                     @edges))
-        sub-graphs (reaction (map sub-graph @clusters))
-        digraph (reaction (str "digraph { " @links (apply str @sub-graphs) "}"))]
+  (let [svg-overview (subscribe [:svg-overview])]
     (fn [put-fn]
       [:div
-       [inner-wiring-view @digraph put-fn]])))
+       [inner-wiring-view @svg-overview put-fn]])))
 
 (defn inner-wiring-view2 [_ put-fn]
   (info :inner-wiring-view2)

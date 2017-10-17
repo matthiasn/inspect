@@ -25,6 +25,7 @@
                 :subscription/match
                 :update/status
                 :sled/res
+                :svg/overview
                 :observer/cmps-msgs})
 
 (def app-path (:app-path rt/runtime-info))
@@ -84,7 +85,7 @@
                  :msg [:window/new {:url (:index-page rt/runtime-info)}]}]
 
      [:cmd/send {:to  :electron/scheduler-cmp
-                 :msg [:cmd/schedule-new {:timeout 1000
+                 :msg [:cmd/schedule-new {:timeout 2000
                                           :message [:state/publish]
                                           :repeat  true}]}]
 

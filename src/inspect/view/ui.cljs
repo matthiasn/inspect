@@ -15,11 +15,8 @@
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
 (reg-sub :flows (fn [db _] (:flows db)))
-
-(reg-sub :res1 (fn [db _] []))
-(reg-sub :res2 (fn [db _] []))
-
 (reg-sub :detailed-msg (fn [db _] (:detailed-msg db)))
+(reg-sub :svg-overview (fn [db _] (:svg-overview db)))
 (reg-sub :avl-map (fn [db _] (:avl-map db)))
 (reg-sub :show-flow (fn [db _] (:show-flow db)))
 (reg-sub :ordered-msgs (fn [db _] (:ordered-msgs db)))
@@ -52,35 +49,43 @@
         bench #(put-fn [:db/bench])
         clear #(put-fn [:state/clear])]
     (fn [_]
-      [:div.observer
-       [:div.section
-        [:div.header
-         [:div
-          [:input {:type      :text
-                   :on-change input-fn
-                   :value     (:kafka-host @local)}]
-          (if (= :connected (:status @kafka-status))
-            [:button.stop {:on-click stop}
-             [:span.fa.fa-stop] "stop"]
-            [:button {:on-click subscribe}
-             [:span.fa.fa-play] "subscribe"])]
-         [:div.cnt " Count: " [:strong @count]]
-         [:div.cnt " DB count: " [:strong @db-counter]]]
-        [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
-         (:text @kafka-status)]]
-       [gv/wiring-view put-fn]
-       (when @cmp-ids
+      [:div.grid.observer
+       [:div.wrapper
+        [:div.menu
          [:div.section
-          (for [cmp-id @cmp-ids]
-            ^{:key (str cmp-id)}
-            [uc/component-table cmp-id put-fn])])
-       [:div
-        [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
-        ;[:button.freeze {:on-click bench} [:span.fa.fa-bolt] "db bench"]
-        [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]
-       [um/matches put-fn]
-       [uf/msg-flow put-fn]
-       [ud/detailed-msg put-fn]])))
+          [:div.header
+           [:div
+            [:input {:type      :text
+                     :on-change input-fn
+                     :value     (:kafka-host @local)}]
+            (if (= :connected (:status @kafka-status))
+              [:button.stop {:on-click stop}
+               [:span.fa.fa-stop] "stop"]
+              [:button {:on-click subscribe}
+               [:span.fa.fa-play] "subscribe"])]
+           [:div.cnt " Count: " [:strong @count]]
+           [:div.cnt " DB count: " [:strong @db-counter]]]
+          [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
+           (:text @kafka-status)]]]
+        [:div.col-1
+         [gv/wiring-view put-fn]]
+        [:div.col-2
+         (when @cmp-ids
+           [:div.section
+            (for [cmp-id @cmp-ids]
+              ^{:key (str cmp-id)}
+              [uc/component-table cmp-id put-fn])])
+         [:div
+          [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
+          [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]]
+        [:div.col-3
+         [um/matches put-fn]]
+        [:div.col-4
+         [gv/flow-graph put-fn]]
+        [:div.col-5
+         [uf/msg-flow put-fn]]
+        [:div.col-6
+         [ud/detailed-msg put-fn]]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

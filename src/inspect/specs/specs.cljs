@@ -26,3 +26,5 @@
 (s/def :sled/put :sled/msg)
 (s/def :sled/get :sled/msg)
 (s/def :sled/res :sled/msg)
+
+(s/def :svg/overview string?)

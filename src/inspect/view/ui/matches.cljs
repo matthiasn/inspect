@@ -69,9 +69,9 @@
                     :value     slider-val
                     :min       min
                     :max       max
-                    :style     {:width "100%"}
+                    :style     {:width "600px"}
                     :on-change slider-input}])
-         [:div [ut/timeline-view first-flow-ts time-span (:ts @local) put-fn]]
+         ;[:div [ut/timeline-view first-flow-ts time-span (:ts @local) put-fn]]
          [:table
           [:tbody
            [:tr

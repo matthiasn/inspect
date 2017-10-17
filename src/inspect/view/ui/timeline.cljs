@@ -11,15 +11,16 @@
   "Renders individual timeline tick."
   [ts pos color w h base-y local]
   (let [half-h (/ h 2)]
-    [:line
-     {:x1             pos
-      :y1             (- base-y half-h)
-      :x2             pos
-      :y2             (+ base-y half-h)
-      :on-mouse-enter #(swap! local assoc-in [:mouse-over] ts)
-      :on-mouse-leave (fn [_ev] (.setTimeout js/window #(swap! local dissoc :mouse-over) 5000))
-      :stroke         color
-      :stroke-width   w}]))
+    (when-not (js/isNaN pos)
+      [:line
+       {:x1             pos
+        :y1             (- base-y half-h)
+        :x2             pos
+        :y2             (+ base-y half-h)
+        :on-mouse-enter #(swap! local assoc-in [:mouse-over] ts)
+        :on-mouse-leave (fn [_ev] (.setTimeout js/window #(swap! local dissoc :mouse-over) 5000))
+        :stroke         color
+        :stroke-width   w}])))
 
 (def ymd-hms "YYYY-MM-DD HH:mm:ss")
 (def hm "HH:mm:ss:SSS")
@@ -72,8 +73,9 @@
                                         (assoc-in [:rect-down-out] (:scale-out @local))
                                         (assoc-in [:rect-down-x] x)))))
         render (fn zoom-render [local tl-start ts-range flows]
-                 (let [calc-pos #(+ 10 (* slider-width
-                                          (/ (- % tl-start) ts-range)))]
+                 (let [calc-pos #(when ts-range
+                                   (+ 10 (* slider-width
+                                            (/ (- % tl-start) ts-range))))]
                    [:div.timeline-zoom
                     [:svg {:viewBox        (str "0 0 1000 40")
                            :on-mouse-up    mouse-up
@@ -83,9 +85,8 @@
                            scale-out (:scale-out @local)
                            w (- scale-out scale-in)]
                        [:g
-
                         (for [{:keys [first-seen-ts max-per-type]} @flows]
-                          ^{:key (str first-seen-ts (keys max-per-type))}
+                          ^{:key (str first-seen-ts (hash max-per-type))}
                           [tick nil (calc-pos first-seen-ts) "green" 1 10 10 local])
                         [:line {:x1           10
                                 :x2           (+ slider-width 10)
@@ -184,7 +185,8 @@
                        x-offset (:x-offset @local)
                        tl-start @hour-before-mn
                        tl-start first-flow-ts
-                       calc-pos #(* tl-width (/ (- % tl-start) ts-range))
+                       calc-pos #(when ts-range
+                                   (* tl-width (/ (- % tl-start) ts-range)))
                        hr-ticks (condp < hrs-shown
                                   144 (take-nth 6 @hour-tick-timestamps)
                                   72 (take-nth 3 @hour-tick-timestamps)
@@ -218,7 +220,7 @@
                           ^{:key ts}
                           [tick ts (calc-pos ts) "black" 1 (if (hr-label ts hrs-total) 10 6) 35 local])
                       (for [{:keys [first-seen-ts max-per-type]} @flows]
-                        ^{:key (str first-seen-ts (keys max-per-type))}
+                        ^{:key (str first-seen-ts (hash max-per-type))}
                         [tick ts (calc-pos first-seen-ts) "green" 3 10 10 local])
                       #_(for [ts @hour-tick-timestamps]
                           ^{:key ts}
