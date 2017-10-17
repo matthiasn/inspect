@@ -16,6 +16,7 @@
                    :sled/get
                    :sled/put
                    :sled/bench
+                   :svg/set-active
                    :kafka/start
                    :kafka/stop
                    :observer/subscribe

@@ -220,6 +220,11 @@ a .toggle {
   top: 1em;
   left: 2em; }
 
+.cmp-table h2 {
+  margin-bottom: 3px;
+  font-family: monospace;
+  font-size: 0.9em; }
+
 #graphviz1 svg, #graphviz2 svg {
   max-width: 880px; }
 

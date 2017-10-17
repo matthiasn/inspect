@@ -24,6 +24,13 @@ h1, h2, h3, h4, h5, h6 {
   left: 2em;
 }
 
+.cmp-table {
+  h2 {
+    margin-bottom: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+}
 
 #graphviz1, #graphviz2 {
   svg {

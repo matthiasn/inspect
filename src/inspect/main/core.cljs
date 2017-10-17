@@ -68,6 +68,7 @@
                           :electron/kafka-cmp
                           :electron/db-cmp
                           :electron/window-manager
+                          :electron/graphviz
                           :electron/update-cmp}}]
 
      [:cmd/route {:from :electron/scheduler-cmp

@@ -47,6 +47,7 @@
                                        (if (= msg-type active-type)
                                          (put-fn [:observer/stop])
                                          (put-fn [:observer/subscribe subscription]))
+                                       (put-fn [:svg/set-active msg-type])
                                        (put-fn [:cell/active msg-type]))
                           :class    (when (= msg-type active-type) "active")}
               (str msg-type)]
@@ -56,7 +57,7 @@
 (defn component-table [cmp-id put-fn]
   (let [components (subscribe [:components])]
     (fn [cmp-id put-fn]
-      [:div
+      [:div.cmp-table
        [:h2
         ;[:span.color {:style {:background-color (u/random-color cmp-id)}}]
         (str cmp-id)]
