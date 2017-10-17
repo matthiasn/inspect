@@ -28,3 +28,4 @@
 (s/def :sled/res :sled/msg)
 
 (s/def :svg/overview string?)
+(s/def :svg/gen-overview map?)

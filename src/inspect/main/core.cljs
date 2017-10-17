@@ -8,6 +8,7 @@
             [matthiasn.systems-toolbox.switchboard :as sb]
             [inspect.main.menu :as menu]
             [inspect.main.update :as upd]
+            [inspect.main.graphviz :as gv]
             [inspect.main.kafka :as kafka]
             [inspect.main.download :as dl]
             [inspect.main.store :as st]
@@ -38,6 +39,7 @@
                        (kafka/cmp-map :electron/kafka-cmp)
                        (st/cmp-map :electron/store-cmp)
                        (db/cmp-map :electron/db-cmp)
+                       (gv/cmp-map :electron/graphviz)
                        (dl/cmp-map :electron/download-cmp)
                        (ipc/cmp-map :electron/ipc-cmp)
                        (startup/cmp-map :electron/startup-cmp)
@@ -71,6 +73,9 @@
      [:cmd/route {:from :electron/scheduler-cmp
                   :to   :electron/kafka-cmp}]
 
+     [:cmd/route {:from :electron/graphviz
+                  :to   :electron/window-manager}]
+
      [:cmd/route {:from #{:electron/kafka-cmp
                           :electron/db-cmp
                           :electron/scheduler-cmp}
@@ -79,6 +84,7 @@
 
      [:cmd/route {:from :electron/store-cmp
                   :to   #{:electron/window-manager
+                          :electron/graphviz
                           :electron/db-cmp}}]
 
      [:cmd/send {:to  :electron/window-manager

@@ -1,11 +1,9 @@
 (ns inspect.main.store
   (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
             [clojure.pprint :as pp]
-            [viz.js :as Viz]
             [matthiasn.systems-toolbox.component :as st]
             [cljs.reader :refer [read-string]]
             [clojure.set :as set]
-            [fs :refer [writeFileSync]]
             [inspect.main.runtime :as rt]))
 
 (defn state-fn [put-fn]
@@ -66,45 +64,6 @@
      :emit-msg  [[:sled/put {:k firehose-id :v msg-payload}]
                  match]}))
 
-
-(defn sanitize [cmp-id] (str "\"" cmp-id "\""))
-
-(defn sub-graph [[label nodes]]
-  (let [cluster-name (str "cluster_" label)]
-    (str "subgraph " cluster-name " { label =< <B>" label " </B>>; "
-         (apply str (map (fn [n] (str n "; ")) nodes))
-         "} ")))
-
-(defn generate-svg [state put-fn]
-  (let [stats (select-keys (:stats state) [:cmp-ids :edges])
-        prev-stats (select-keys (:prev-stats state) [:cmp-ids :edges])]
-    (when-not (= stats prev-stats)
-      (let [{:keys [cmp-ids edges]} stats
-            active-type nil
-            edge-mapper (fn edge-mapper [{:keys [source target msg-type]}]
-                          (str (sanitize source) " -> " (sanitize target)
-                               (if (= msg-type active-type)
-                                 " [color = red penwidth=4]"
-                                 (when active-type
-                                   " [color = lightgrey]"))
-                               "; "))
-            links (apply str (map edge-mapper edges))
-            clusters
-            (reduce
-              (fn [acc in]
-                (let [{:keys [source-ns source target-ns target]} in]
-                  (-> acc
-                      (update-in [source-ns] #(set (conj % (sanitize source))))
-                      (update-in [target-ns] #(set (conj % (sanitize target)))))))
-              {}
-              edges)
-            sub-graphs (map sub-graph clusters)
-            digraph (str "digraph { " links (apply str sub-graphs) "}")
-            svg (Viz digraph)]
-        (writeFileSync "/tmp/inspect.dot" digraph "utf-8")
-        (writeFileSync "/tmp/inspect.svg" svg "utf-8")
-        (put-fn [:svg/overview svg])))))
-
 (defn state-publish [{:keys [current-state put-fn]}]
   (let [stats (:stats current-state)
         {:keys [cnt prev-cnt]} stats
@@ -112,12 +71,13 @@
         new-state (-> current-state
                       (assoc-in [:prev-cnt] cnt)
                       (assoc-in [:prev-stats] stats))
-        svg (time (generate-svg current-state put-fn))]
+        svg-data (select-keys stats [:cmp-ids :edges])]
     (when (not= cnt prev-cnt)
       (debug "STORE received:" cnt)
       (put-fn (with-meta [:observer/cmps-msgs (:stats new-state)]
                          {:window-id :broadcast})))
-    {:new-state new-state}))
+    {:new-state new-state
+     :emit-msg  [:svg/gen-overview svg-data]}))
 
 (defn subscribe [{:keys [current-state msg-payload msg-meta]}]
   (let [subscription (assoc-in msg-payload [:msg-meta] msg-meta)

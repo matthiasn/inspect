@@ -86,8 +86,7 @@
                                 (swap! cmp-state assoc-in [:last-ts] now)
                                 (put-fn [:kafka/status
                                          {:status :connected
-                                          :text   (str "Messages analyzed: " cnt
-                                                       " - " per-sec " msg/s")}])
+                                          :text   (str per-sec " msg/s")}])
                                 (info "KAFKA received:" cnt
                                       "-" per-sec "msg/s"
                                       "- Offset" (.-offset kafka-msg)))))

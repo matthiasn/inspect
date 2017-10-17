@@ -63,8 +63,9 @@
                [:span.fa.fa-stop] "stop"]
               [:button {:on-click subscribe}
                [:span.fa.fa-play] "subscribe"])]
-           [:div.cnt " Count: " [:strong @count]]
-           [:div.cnt " DB count: " [:strong @db-counter]]]
+           (let [cnt @count]
+             (when (pos? cnt)
+               [:div.cnt [:strong cnt] " messages analyzed"]))]
           [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
            (:text @kafka-status)]]]
         [:div.col-1
