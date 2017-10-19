@@ -9,11 +9,17 @@ This Electron-based application lets you look inside systems built with the **[s
 
 If you don't want to build this application yourself, you can download an already packaged application:
 
-* **[Mac](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.37.dmg)**
-* **[Linux](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.37-x86_64.AppImage)**
-* **[Windows](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect+Setup+0.2.37.exe)**
+* **[Mac](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.52.dmg)**
+* **[Linux](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.52-x86_64.AppImage)**
 
-The Mac and Windows versions will notify you when there's an update. For Linux, that feature is still missing, unfortunately. If you believe that should be different, maybe you can help out with the [electron-builder](https://github.com/electron-userland/electron-builder/issues/1138) project.
+The Mac version will notify you when there's an update. For Linux, that feature is still missing, unfortunately. If you believe that should be different, maybe you can help out with the [electron-builder](https://github.com/electron-userland/electron-builder/issues/1138) project.
+
+
+## Preparing your machine
+
+For a fresh Ubuntu 17 VM, you can run the following script:
+
+    $ install_ubuntu.sh
 
 
 ## Building inspect
