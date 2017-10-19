@@ -58,6 +58,10 @@
           :submenu [{:label       "New Window"
                      :accelerator "Option+Cmd+N"
                      :click       #(put-fn [:window/new {:url index-page}])}
+                    {:type "separator"}
+                    {:role "zoomin"}
+                    {:role "zoomout"}
+                    {:type "separator"}
                     {:label "Open Dev Tools"
                      :click #(put-fn [:window/dev-tools])}]}]
         menu (.buildFromTemplate Menu (clj->js menu-tpl))

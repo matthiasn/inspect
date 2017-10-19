@@ -227,11 +227,11 @@ h1, h2, h3, h4, h5, h6 {
     width: 3840px;
     grid-gap: 10px;
     grid-template-rows: 80px calc(100vh - 100px);
-    grid-template-columns: 900px 600px 600px 900px 600px 600px;
+    grid-template-columns: 1000px 600px 600px 1000px 600px 600px 600px;
   }
 
   .menu {
-    grid-column: 1/7;
+    grid-column: 1/8;
     grid-row: 1;
   }
   .col-1 {
@@ -257,5 +257,22 @@ h1, h2, h3, h4, h5, h6 {
   .col-6 {
     grid-column: 6;
     grid-row: 2;
+  }
+  .col-7 {
+    grid-column: 7;
+    grid-row: 2;
+  }
+}
+
+.spec-errors {
+  .header {
+    font-weight: bold;
+
+    time {
+      margin-right: 1em;
+    }
+  }
+  pre {
+    font-size: 1.2em;
   }
 }
