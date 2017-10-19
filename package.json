@@ -1,7 +1,7 @@
 {
   "name": "inspect",
-  "version": "0.2.52",
-  "description": "",
+  "version": "0.2.53",
+  "description": "a tool for inspecting systems-toolbox based systems",
   "main": "prod/main/main.js",
   "scripts": {
     "start": "electron .",
@@ -13,7 +13,7 @@
     "url": "git+https://github.com/matthiasn/inspect.git"
   },
   "author": "Matthias Nehlsen",
-  "license": "EPL",
+  "license": "EPL-1.0",
   "bugs": {
     "url": "https://github.com/matthiasn/inspect/issues"
   },
