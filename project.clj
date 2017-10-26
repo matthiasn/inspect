@@ -1,9 +1,9 @@
 (defproject matthiasn/inspect "0.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-beta2"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta3"]
                  [org.clojure/clojurescript "1.9.946"]
                  [re-frame "0.10.1"]
                  [com.taoensso/timbre "4.10.0"]
-                 [matthiasn/systems-toolbox "0.6.21"]
+                 [matthiasn/systems-toolbox "0.6.23"]
                  [matthiasn/systems-toolbox-electron "0.6.13"]
                  [timbre-ns-pattern-level "0.1.2"]
                  [org.clojure/data.avl "0.0.17"]
@@ -12,6 +12,7 @@
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-shell "0.5.0"]
+            [lein-ancient "0.6.14"]
             [lein-sassy "1.0.8"]]
 
   :sass {:src "src/scss/"

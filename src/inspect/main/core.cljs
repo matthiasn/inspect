@@ -24,6 +24,7 @@
                 :import/listen
                 :kafka/status
                 :subscription/match
+                :spec/error
                 :update/status
                 :sled/res
                 :svg/overview

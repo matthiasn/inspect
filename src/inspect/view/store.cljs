@@ -93,6 +93,11 @@
     (debug :msg-res msg-payload)
     {:new-state new-state}))
 
+(defn spec-error [{:keys [current-state msg-payload]}]
+  (let [new-state (update-in current-state [:spec-errors] conj msg-payload)]
+    (info :spec-error msg-payload)
+    {:new-state new-state}))
+
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (fn [_] {:state (atom {:ordered-msgs (linked/map)
@@ -106,5 +111,6 @@
                  :flow/show          show-flow
                  :subscription/match match
                  :sled/res           msg-res
+                 :spec/error         spec-error
                  :svg/overview       svg-overview
                  :kafka/status       kafka-status}})

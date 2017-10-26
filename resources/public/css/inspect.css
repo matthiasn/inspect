@@ -344,9 +344,9 @@ a .toggle {
   width: 3840px;
   grid-gap: 10px;
   grid-template-rows: 80px calc(100vh - 100px);
-  grid-template-columns: 900px 600px 600px 900px 600px 600px; }
+  grid-template-columns: 1000px 600px 600px 1000px 600px 600px 600px; }
 .grid .menu {
-  grid-column: 1/7;
+  grid-column: 1/8;
   grid-row: 1; }
 .grid .col-1 {
   grid-column: 1;
@@ -366,5 +366,15 @@ a .toggle {
 .grid .col-6 {
   grid-column: 6;
   grid-row: 2; }
+.grid .col-7 {
+  grid-column: 7;
+  grid-row: 2; }
+
+.spec-errors .header {
+  font-weight: bold; }
+  .spec-errors .header time {
+    margin-right: 1em; }
+.spec-errors pre {
+  font-size: 1.2em; }
 
 /*# sourceMappingURL=inspect.css.map */

@@ -13,10 +13,10 @@
                              :msg-types  #{}}})]
     {:state state}))
 
-(defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta]}]
+(defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta put-fn]}]
   (let [cnt (:cnt (:stats current-state))
         in-out (if (= msg-type :firehose/cmp-recv) :in :out)
-        {:keys [cmp-id msg msg-meta firehose-id]} msg-payload
+        {:keys [cmp-id msg msg-meta firehose-id spec-error]} msg-payload
         firehose-type msg-type
         msg-type (first msg)
         add-edge (fn [prev-edges]
@@ -59,10 +59,13 @@
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
                            (:msg-meta subscription)))]
-    (when match (debug "Subscription match:" match))
+    (when match
+      (debug "Subscription match:" match)
+      (put-fn match))
+    (when spec-error
+      (put-fn [:spec/error msg-payload]))
     {:new-state new-state
-     :emit-msg  [[:sled/put {:k firehose-id :v msg-payload}]
-                 match]}))
+     :emit-msg  [[:sled/put {:k firehose-id :v msg-payload}]]}))
 
 (defn state-publish [{:keys [current-state put-fn]}]
   (let [stats (:stats current-state)

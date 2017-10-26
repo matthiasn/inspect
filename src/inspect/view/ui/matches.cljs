@@ -34,7 +34,6 @@
     (fn [put-fn]
       (let [msg-flow @msg-flow
             active-type @active-type
-
             first-flow-ts (:first-seen-ts (first @from-avl))
             time-span (- (:first-seen-ts (last @from-avl)) first-flow-ts)
             slider-val (* (/ (- (:ts @local)

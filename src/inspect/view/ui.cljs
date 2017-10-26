@@ -10,10 +10,12 @@
             [inspect.view.ui.detail :as ud]
             [inspect.view.ui.flow :as uf]
             [inspect.view.ui.cmp :as uc]
-            [inspect.view.util :as u]))
+            [inspect.view.util :as u]
+            [clojure.pprint :as pp]))
 
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
+(reg-sub :spec-errors (fn [db _] (:spec-errors db)))
 (reg-sub :flows (fn [db _] (:flows db)))
 (reg-sub :detailed-msg (fn [db _] (:detailed-msg db)))
 (reg-sub :svg-overview (fn [db _] (:svg-overview db)))
@@ -35,6 +37,7 @@
   [put-fn]
   (let [cmp-ids (subscribe [:cmp-ids])
         count (subscribe [:cnt])
+        spec-errors (subscribe [:spec-errors])
         db-counter (subscribe [:db-counter])
         kafka-status (subscribe [:kafka-status])
         local (r/atom {:kafka-host "localhost:9092"})
@@ -86,7 +89,18 @@
         [:div.col-5
          [uf/msg-flow put-fn]]
         [:div.col-6
-         [ud/detailed-msg put-fn]]]])))
+         [ud/detailed-msg put-fn]]
+        [:div.col-7.spec-errors
+         [:h2 "Spec Validation Errors"]
+         (for [err @spec-errors]
+           (let [{:keys [firehose-id msg spec-error]} err
+                 click #(put-fn [:sled/get {:k firehose-id}])]
+             ^{:key firehose-id}
+             [:div {:on-click click}
+              [:div.header
+               [:time (u/format-time (:ts err))]
+               (str (first msg))]
+              [:pre [:code spec-error]]]))]]])))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the
