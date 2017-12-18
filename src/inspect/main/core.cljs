@@ -18,6 +18,10 @@
             [cljs.nodejs :as nodejs :refer [process]]
             [inspect.main.runtime :as rt]))
 
+(when-not (aget js/goog "global" "setTimeout")
+  (info "goog.global.setTimeout not defined - let's change that")
+  (aset js/goog "global" "setTimeout" js/setTimeout))
+
 (defonce switchboard (sb/component :electron/switchboard))
 
 (def wm-relay #{:exec/js

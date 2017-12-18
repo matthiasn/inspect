@@ -70,9 +70,10 @@
         local (r/atom {})]
     (fn [put-fn]
       (when-let [detailed-msg @detailed-msg]
-        (let [{:keys [msg msg-meta]} detailed-msg]
+        (let [{:keys [msg msg-meta system-info]} detailed-msg]
           [:div.section
            [:div.value.block [:h3 "Message payload"]]
            [edn-tree (second msg) local :expanded-body]
            [:div.value.block [:h3 "Message meta"]]
-           [edn-tree msg-meta local :expanded-meta]])))))
+           [edn-tree msg-meta local :expanded-meta]
+           [:pre [:code (with-out-str (pp/pprint system-info))]]])))))

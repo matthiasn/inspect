@@ -1,14 +1,12 @@
 (ns inspect.main.kafka
   (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [taoensso.timbre :as timbre :refer-macros [info debug warn error]]
-            [cljs.reader :refer [read-string]]
+  (:require [taoensso.timbre :refer-macros [info debug warn error]]
             [sinek :refer [Consumer]]
             [electron :refer [dialog]]
             [cognitect.transit :as t]
-            [cljs.core.async :as async :refer [put! chan <! >! close!]]
-            [clojure.pprint :as pp]
+            [cljs.core.async :refer [put! chan <! >! close!]]
             [fs :refer [existsSync readFileSync]]
-            [cljs.nodejs :as nodejs :refer [process]]
+            [cljs.nodejs :refer [process]]
             [matthiasn.systems-toolbox.component :as stc]
             [clojure.string :as str]))
 
@@ -18,7 +16,7 @@
                                  :warn  #(warn %)
                                  :debug #(debug %)
                                  :error #(error %)}
-            :groupId            (stc/make-uuid)
+            :groupId            (str (stc/make-uuid))
             :clientName         (str "client-name-" (stc/now))
             :workerPerPartition 1
             :options            {:sessionTimeout       8000
@@ -35,8 +33,7 @@
                                  :ackTimeoutMs         100
                                  :partitionerType      3}}))
 
-(defn state-fn
-  [put-fn]
+(defn state-fn [put-fn]
   (let [state (atom {:count 0 :last-ts (stc/now)})
         err-handler (fn [title content]
                       (error "showErrorBox" title content)
@@ -46,8 +43,7 @@
     (aset dialog "showErrorBox" err-handler)
     {:state state}))
 
-(defn stop
-  [{:keys [put-fn cmp-state current-state]}]
+(defn stop [{:keys [put-fn cmp-state current-state]}]
   (when-let [consumer (:consumer current-state)]
     (info "stopping consumer")
     (swap! cmp-state assoc-in [:count] 0)
@@ -55,16 +51,16 @@
     (put-fn [:observer/stop])
     (.close consumer)))
 
-(defn start [{:keys [put-fn cmp-state put-chan current-state msg-payload
-                     msg-meta] :as msg-map}]
+(defn start [{:keys [put-fn cmp-state put-chan current-state msg-payload msg-meta]
+              :as   msg-map}]
   (info "Kafka config" msg-payload)
   (try
     (stop msg-map)
     (put-fn [:kafka/status {:status :starting
                             :text   (str "attempting to connect to "
                                          msg-payload)}])
+
     (let [kafka-host msg-payload
-          window-id (:window-id msg-meta)
           consumer (Consumer. "firehose" (config kafka-host))
           msg-handler (fn [kafka-msg cb]
                         (try
@@ -110,8 +106,7 @@
                         {:emit-msg [:kafka/status {:status :error
                                                    :text   "KAFKA Error"}]}))))
 
-(defn cmp-map
-  [cmp-id]
+(defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
    :handler-map {:kafka/start start

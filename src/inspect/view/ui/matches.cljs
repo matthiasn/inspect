@@ -79,8 +79,7 @@
             [:th "Duration"]
             [:th "Processing time"]
             [:th "Msg type"]
-            [:th "Max size"]
-            [:th "Tag"]]
+            [:th "Max size"]]
            (for [{:keys [tag first-seen max-per-type duration last-seen
                          selected msgs max-size processing-time]} @filtered]
              ^{:key (str tag first-seen)}
@@ -100,5 +99,4 @@
                        [:tr
                         [:td (str msg-type)]
                         [:td size]])]]]
-              [:td.number max-size]
-              [:td (subs tag 0 8)]])]]]))))
+              [:td.number max-size]])]]]))))

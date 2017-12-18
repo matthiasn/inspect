@@ -47,7 +47,6 @@
 
 (defn update-flow [state tag]
   (let [msgs (get-in state [:ordered-msgs tag])
-        msg-flow (:show-flow state)
         first-ts (apply min (map #(-> % second :ts) msgs))
         first-seen (u/format-time first-ts)
         last-ts (apply max (map #(-> % second :ts) msgs))
@@ -75,7 +74,6 @@
   (let [firehose-id (:firehose-id msg-payload)
         ; TODO: all messages MUST have a tag -> s-t (see publish state)
         tag (-> msg-payload :msg-meta :tag)
-        ts (:ts msg-payload)
         new-state (-> current-state
                       (assoc-in [:ordered-msgs tag firehose-id] msg-payload))
         flow (update-flow new-state tag)

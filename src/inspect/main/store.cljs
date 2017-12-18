@@ -1,10 +1,7 @@
 (ns inspect.main.store
-  (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
-            [clojure.pprint :as pp]
-            [matthiasn.systems-toolbox.component :as st]
+  (:require [taoensso.timbre :refer-macros [info error debug]]
             [cljs.reader :refer [read-string]]
-            [clojure.set :as set]
-            [inspect.main.runtime :as rt]))
+            [clojure.set :as set]))
 
 (defn state-fn [put-fn]
   (let [state (atom {:stats {:count      0
@@ -13,9 +10,8 @@
                              :msg-types  #{}}})]
     {:state state}))
 
-(defn firehose-msg [{:keys [current-state msg-type msg msg-payload msg-meta put-fn]}]
-  (let [cnt (:cnt (:stats current-state))
-        in-out (if (= msg-type :firehose/cmp-recv) :in :out)
+(defn firehose-msg [{:keys [current-state msg-type msg-payload put-fn]}]
+  (let [in-out (if (= msg-type :firehose/cmp-recv) :in :out)
         {:keys [cmp-id msg msg-meta firehose-id spec-error]} msg-payload
         firehose-type msg-type
         msg-type (first msg)
@@ -55,22 +51,21 @@
         type-and-size (-> msg-payload
                           (update-in [:msg] (fn [[t m]] [t (count (str m))]))
                           (assoc-in [:msg-stats] msg-stats)
+                          (update-in [:msg-meta :cmp-seq] #(take-last 20 %))
                           (assoc-in [:firehose-type] firehose-type))
         match (when (-> type-and-size :msg-meta :tag)
                 (with-meta [:subscription/match type-and-size]
                            (:msg-meta subscription)))]
     (when match
-      (debug "Subscription match:" match)
-      (put-fn match))
+      (debug "Subscription match:" match) (put-fn match))
     (when spec-error
       (put-fn [:spec/error msg-payload]))
     {:new-state new-state
-     :emit-msg  [[:sled/put {:k firehose-id :v msg-payload}]]}))
+     :emit-msg  [[:sled/put {:k (str firehose-id) :v msg-payload}]]}))
 
 (defn state-publish [{:keys [current-state put-fn]}]
   (let [stats (:stats current-state)
         {:keys [cnt prev-cnt]} stats
-        ts (st/now)
         new-state (-> current-state
                       (assoc-in [:prev-cnt] cnt)
                       (assoc-in [:prev-stats] stats))

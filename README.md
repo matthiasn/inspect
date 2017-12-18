@@ -30,14 +30,9 @@ For a fresh Ubuntu 17 VM, you can run the following script:
     $ lein cljsbuild auto main
     $ lein cljsbuild auto view
     $ lein cljsbuild auto updater
-    $ sass src/scss/inspect.scss:resources/public/css/inspect.css
-    $ sass src/scss/updater.scss:resources/public/css/updater.css
-    $ sass src/scss/loader.scss:resources/public/css/loader.css
+    $ lein sass4clj auto
     $ npm run build
     $ npm start
-
-    $ sass --watch src/scss/inspect.scss:resources/public/css/inspect.css
-
 
 ## Publishing inspect
 
