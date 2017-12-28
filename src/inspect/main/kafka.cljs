@@ -62,11 +62,11 @@
 
     (let [kafka-host msg-payload
           consumer (Consumer. "firehose" (config kafka-host))
+          r (t/reader :json)
           msg-handler (fn [kafka-msg cb]
                         (try
                           (swap! cmp-state update-in [:count] inc)
                           (let [cnt (:count @cmp-state)
-                                r (t/reader :json)
                                 parsed (t/read r (.-value kafka-msg))
                                 {:keys [msg-type msg-payload msg-meta]} parsed
                                 msg (with-meta [msg-type msg-payload] msg-meta)]

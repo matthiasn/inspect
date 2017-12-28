@@ -1,11 +1,14 @@
 (ns inspect.main.sled
-  (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
+  (:require [taoensso.timbre :refer-macros [info error debug]]
             [clojure.pprint :as pp]
             [neon-sled]
-            [fs :refer [existsSync unlinkSync]]
-            [cljs.reader :refer [read-string]]))
+            [cognitect.transit :as t]
+            [fs :refer [existsSync unlinkSync]]))
 
 (def DB_PATH "/tmp/inspect.db")
+
+(def r (t/reader :json))
+(def w (t/writer :json))
 
 (defn state-fn [put-fn]
   (when (existsSync DB_PATH) (unlinkSync DB_PATH))
@@ -17,14 +20,14 @@
 (defn get-msg [{:keys [current-state put-fn msg-payload]}]
   (let [sled (:db current-state)
         {:keys [k]} msg-payload
-        res (read-string (.get sled (str k)))]
+        res (t/read r (.get sled (str k)))]
     (debug :get-msg msg-payload)
     {:emit-msg [:sled/res {:k k :v res}]}))
 
 (defn put-msg [{:keys [current-state put-fn msg-payload]}]
   (let [sled (:db current-state)
         {:keys [k v]} msg-payload]
-    (.set sled (str k) (pr-str v))
+    (.set sled (str k) (t/write w v))
     (debug :put-msg msg-payload)
     {:emit-msg [:sled/res {:k k :status :saved}]}))
 
@@ -35,10 +38,10 @@
     (info "Writing 100,000 values into sled")
     (time (dotimes [n 100000]
             (swap! sum + n)
-            (.set sled (str n) (pr-str {:n n}))))
+            (.set sled (str n) (t/write w {:n n}))))
     (info "Finished writing 100,000 values, check sum" @sum)
     (time (dotimes [n 100000]
-            (let [res (read-string (.get sled (str n)))]
+            (let [res (t/read r (.get sled (str n)))]
               (swap! from-db + (:n res)))))
     (info "Finished reading 1,000,000 messages, check sum" @from-db)
     {}))

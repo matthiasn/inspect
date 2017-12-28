@@ -1,6 +1,6 @@
 {
   "name": "inspect",
-  "version": "0.2.56",
+  "version": "0.2.57",
   "description": "a tool for inspecting systems-toolbox based systems",
   "main": "prod/main/main.js",
   "scripts": {
