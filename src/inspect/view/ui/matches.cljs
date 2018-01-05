@@ -81,8 +81,8 @@
             [:th "Msg type"]
             [:th "Max size"]]
            (for [{:keys [tag first-seen max-per-type duration last-seen
-                         selected msgs max-size processing-time]} @filtered]
-             ^{:key (str tag first-seen)}
+                         msgs max-size processing-time]} @filtered]
+             ^{:key (str tag)}
              [:tr {:class    (when (= tag (:tag msg-flow))
                                "active-flow")
                    :on-click #(put-fn [:flow/show {:tag tag :msgs msgs}])}
@@ -95,7 +95,7 @@
               [:td [:table.max-per-type
                     [:tbody
                      (for [[msg-type size] max-per-type]
-                       ^{:key (str tag first-seen msg-type)}
+                       ^{:key (str tag msg-type)}
                        [:tr
                         [:td (str msg-type)]
                         [:td size]])]]]

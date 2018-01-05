@@ -45,7 +45,7 @@
     (debug msg-payload)
     {:new-state new-state}))
 
-(defn update-flow [state tag]
+(defn update-flow [state tag tag-ts]
   (let [msgs (get-in state [:ordered-msgs tag])
         first-ts (apply min (map #(-> % second :ts) msgs))
         first-seen (u/format-time first-ts)
@@ -62,6 +62,7 @@
         duration (- last-ts first-ts)]
     {:duration        duration
      :tag             tag
+     :tag-ts          tag-ts
      :msgs            msgs
      :first-seen      first-seen
      :first-seen-ts   first-ts
@@ -74,13 +75,13 @@
   (let [firehose-id (:firehose-id msg-payload)
         ; TODO: all messages MUST have a tag -> s-t (see publish state)
         tag (-> msg-payload :msg-meta :tag)
+        tag-ts (-> msg-payload :msg-meta :tag-ts)
         new-state (-> current-state
                       (assoc-in [:ordered-msgs tag firehose-id] msg-payload))
-        flow (update-flow new-state tag)
-        first-seen-ts (:first-seen-ts flow)
+        flow (update-flow new-state tag tag-ts)
         new-state (-> new-state
                       (assoc-in [:flows tag] flow)
-                      (assoc-in [:avl-map first-seen-ts tag] flow))]
+                      (assoc-in [:avl-map tag-ts tag] flow))]
     (debug "Match" msg-payload)
     {:new-state new-state}))
 
