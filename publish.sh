@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+yarn install
 rm -rf ./dist
 lein dist
 

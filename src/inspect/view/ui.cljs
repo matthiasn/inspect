@@ -3,10 +3,9 @@
   (:require [reagent.core :as r]
             [re-frame.core :refer [reg-sub subscribe]]
             [re-frame.db :as rdb]
-            [taoensso.timbre :as timbre :refer-macros [info debug]]
+            [taoensso.timbre :refer-macros [info debug]]
             [inspect.view.graphviz :as gv]
             [inspect.view.ui.matches :as um]
-            [inspect.view.ui.timeline :as ut]
             [inspect.view.ui.detail :as ud]
             [inspect.view.ui.flow :as uf]
             [inspect.view.ui.cmp :as uc]
@@ -32,15 +31,12 @@
 (reg-sub :cnt (fn [db _] (-> db :cmps-msgs :cnt)))
 (reg-sub :db-counter (fn [db _] (-> db :db-counter)))
 
-(defn re-frame-ui
-  "Main view component"
-  [put-fn]
+(defn re-frame-ui [put-fn]
   (let [cmp-ids (subscribe [:cmp-ids])
         count (subscribe [:cnt])
         spec-errors (subscribe [:spec-errors])
-        db-counter (subscribe [:db-counter])
         kafka-status (subscribe [:kafka-status])
-        local (r/atom {:kafka-host "localhost:9092"})
+        local (r/atom {:kafka-hosts ["localhost:9092"]})
         input-fn (fn [ev]
                    (let [address (-> ev .-nativeEvent .-target .-value)]
                      (swap! local assoc-in [:kafka-host] address)))
@@ -49,7 +45,6 @@
                      (put-fn [:kafka/start kafka-host]))
         stop #(put-fn [:kafka/stop])
         freeze #(put-fn [:state/freeze])
-        bench #(put-fn [:db/bench])
         clear #(put-fn [:state/clear])]
     (fn [_]
       [:div.grid.observer
@@ -110,7 +105,6 @@
   (r/render [re-frame-ui put-fn] (.getElementById js/document "app"))
   {:observed rdb/app-db})
 
-(defn cmp-map
-  [cmp-id]
+(defn cmp-map [cmp-id]
   {:cmp-id   cmp-id
    :state-fn state-fn})

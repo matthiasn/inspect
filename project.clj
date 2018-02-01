@@ -1,9 +1,9 @@
 (defproject matthiasn/inspect "0.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.9.946"]
-                 [re-frame "0.10.1"]
+                 [re-frame "0.10.2"]
                  [com.taoensso/timbre "4.10.0"]
-                 [matthiasn/systems-toolbox "0.6.27"]
+                 [matthiasn/systems-toolbox "0.6.29"]
                  [matthiasn/systems-toolbox-electron "0.6.20"]
                  [timbre-ns-pattern-level "0.1.2"]
                  [org.clojure/data.avl "0.0.17"]
