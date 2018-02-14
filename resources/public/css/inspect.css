@@ -151,7 +151,7 @@ button {
   background-color: #4CAF50;
   border: none;
   color: white;
-  padding: 0.5em 1em;
+  padding: 4px 12px 6px 12px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -266,7 +266,9 @@ a .toggle {
   margin-bottom: 10px; }
   .observer .header input {
     height: 28px;
-    min-width: 260px; }
+    width: 320px;
+    border: 0;
+    outline: none; }
   .observer .header .cnt {
     padding: 8px 20px; }
 
@@ -418,3 +420,14 @@ a .toggle {
 
 .spec-errors pre {
   font-size: 1.2em; }
+
+.known-hosts {
+  line-height: 1.6em;
+  position: absolute;
+  background-color: lightblue;
+  padding: 5px;
+  font-family: monospace;
+  width: 300px; }
+  .known-hosts .known-host {
+    padding: 5px;
+    cursor: pointer; }

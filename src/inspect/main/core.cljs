@@ -27,6 +27,7 @@
 (def wm-relay #{:exec/js
                 :import/listen
                 :kafka/status
+                :kafka/hosts
                 :subscription/match
                 :spec/error
                 :update/status

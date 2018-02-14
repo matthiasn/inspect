@@ -2,13 +2,15 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [taoensso.timbre :refer-macros [info debug warn error]]
             [sinek :refer [Consumer]]
+            [inspect.main.runtime :as rt]
             [electron :refer [dialog]]
             [cognitect.transit :as t]
             [cljs.core.async :refer [put! chan <! >! close!]]
-            [fs :refer [existsSync readFileSync]]
+            [fs :refer [existsSync readFileSync writeFileSync]]
             [cljs.nodejs :refer [process]]
             [matthiasn.systems-toolbox.component :as stc]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [cljs.tools.reader.edn :as edn]))
 
 (defn config [kafka-host]
   (clj->js {:kafkaHost          kafka-host
@@ -51,7 +53,24 @@
     (put-fn [:observer/stop])
     (.close consumer)))
 
-(defn start [{:keys [put-fn cmp-state put-chan current-state msg-payload msg-meta]
+(def hosts-file (str (:user-data rt/runtime-info) "/kafka-hosts.edn"))
+
+(defn read-known-hosts []
+  (if (existsSync hosts-file)
+    (edn/read-string (readFileSync hosts-file "utf-8"))
+    #{}))
+
+(defn add-host [kafka-host]
+  (let [known-hosts (read-known-hosts)
+        updated (conj known-hosts kafka-host)]
+    (writeFileSync hosts-file (pr-str updated) "utf-8")))
+
+(defn get-known-hosts [_]
+  (let [hosts (read-known-hosts)]
+    (info "read known hosts" hosts)
+    {:emit-msg [:kafka/hosts hosts]}))
+
+(defn start [{:keys [put-fn cmp-state put-chan current-state msg-payload]
               :as   msg-map}]
   (info "Kafka config" msg-payload)
   (try
@@ -59,9 +78,9 @@
     (put-fn [:kafka/status {:status :starting
                             :text   (str "attempting to connect to "
                                          msg-payload)}])
-
     (let [kafka-host msg-payload
-          consumer (Consumer. "firehose" (config kafka-host))
+          kafka-cfg (config kafka-host)
+          consumer (Consumer. "firehose" kafka-cfg)
           r (t/reader :json)
           msg-handler (fn [kafka-msg cb]
                         (try
@@ -87,6 +106,7 @@
                                       "-" per-sec "msg/s"
                                       "- Offset" (.-offset kafka-msg)))))
                           (catch :default e (error "Something went wrong" e))))]
+      (add-host kafka-host)
       (-> consumer
           (.connect true)
           (.then (fn [_]
@@ -109,5 +129,6 @@
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:kafka/start start
-                 :kafka/stop  stop}})
+   :handler-map {:kafka/start     start
+                 :kafka/stop      stop
+                 :kafka/get-hosts get-known-hosts}})

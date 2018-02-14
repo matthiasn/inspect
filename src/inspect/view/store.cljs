@@ -97,6 +97,10 @@
     (info :spec-error msg-payload)
     {:new-state new-state}))
 
+(defn save-hosts [{:keys [current-state msg-payload]}]
+  (let [new-state (assoc-in current-state [:known-hosts] msg-payload)]
+    {:new-state new-state}))
+
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (fn [_] {:state (atom {:ordered-msgs (linked/map)
@@ -112,4 +116,5 @@
                  :sled/res           msg-res
                  :spec/error         spec-error
                  :svg/overview       svg-overview
+                 :kafka/hosts        save-hosts
                  :kafka/status       kafka-status}})

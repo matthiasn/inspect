@@ -65,7 +65,9 @@ h1, h2, h3, h4, h5, h6 {
 
     input {
       height: 28px;
-      min-width: 260px;
+      width: 320px;
+      border: 0;
+      outline: none;
     }
     .cnt {
       padding: 8px 20px;
@@ -274,5 +276,19 @@ h1, h2, h3, h4, h5, h6 {
   }
   pre {
     font-size: 1.2em;
+  }
+}
+
+.known-hosts {
+  line-height: 1.6em;
+  position: absolute;
+  background-color: lightblue;
+  padding: 5px;
+  font-family: monospace;
+  width: 300px;
+
+  .known-host {
+    padding: 5px;
+    cursor: pointer;
   }
 }

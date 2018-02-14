@@ -10,7 +10,8 @@
             [inspect.view.ui.flow :as uf]
             [inspect.view.ui.cmp :as uc]
             [inspect.view.util :as u]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [clojure.string :as s]))
 
 ;; Subscription Handlers
 (reg-sub :cmps-msgs (fn [db _] (:cmps-msgs db)))
@@ -23,6 +24,7 @@
 (reg-sub :ordered-msgs (fn [db _] (:ordered-msgs db)))
 (reg-sub :active-type (fn [db _] (:active-type db)))
 (reg-sub :kafka-status (fn [db _] (:kafka-status db)))
+(reg-sub :known-hosts (fn [db _] (:known-hosts db)))
 (reg-sub :components (fn [db _] (:components (:cmps-msgs db))))
 (reg-sub :prev-cmps (fn [db _] (:components (:cmps-msgs-prev db))))
 (reg-sub :frozen (fn [db _] (:components (:frozen db))))
@@ -36,14 +38,19 @@
         count (subscribe [:cnt])
         spec-errors (subscribe [:spec-errors])
         kafka-status (subscribe [:kafka-status])
-        local (r/atom {:kafka-hosts ["localhost:9092"]})
+        known-hosts (subscribe [:known-hosts])
+        local (r/atom {:kafka-host ""
+                       :expanded   true})
         input-fn (fn [ev]
                    (let [address (-> ev .-nativeEvent .-target .-value)]
                      (swap! local assoc-in [:kafka-host] address)))
         subscribe #(let [kafka-host (:kafka-host @local)]
                      (info :start kafka-host)
-                     (put-fn [:kafka/start kafka-host]))
-        stop #(put-fn [:kafka/stop])
+                     (put-fn [:kafka/start kafka-host])
+                     (swap! local assoc-in [:expanded] false))
+        stop #(do (put-fn [:kafka/stop])
+                  (swap! local assoc-in [:expanded] true)
+                  (swap! local assoc-in [:kafka-host] ""))
         freeze #(put-fn [:state/freeze])
         clear #(put-fn [:state/clear])]
     (fn [_]
@@ -52,15 +59,26 @@
         [:div.menu
          [:div.section
           [:div.header
-           [:div
-            [:input {:type      :text
-                     :on-change input-fn
-                     :value     (:kafka-host @local)}]
-            (if (= :connected (:status @kafka-status))
-              [:button.stop {:on-click stop}
-               [:span.fa.fa-stop] "stop"]
-              [:button {:on-click subscribe}
-               [:span.fa.fa-play] "subscribe"])]
+           [:div.hosts
+            [:div.host-input
+             [:input {:type      :text
+                      :on-change input-fn
+                      :value     (:kafka-host @local)}]
+             (if (contains? #{:starting :connected} (:status @kafka-status))
+               [:button.stop {:on-click stop}
+                [:span.fa.fa-stop] "stop"]
+               [:button {:on-click subscribe}
+                [:span.fa.fa-play] "subscribe"])]
+            (when (and (:expanded @local) (not-empty @known-hosts))
+              [:div.known-hosts
+               (for [host (filter #(s/includes? % (:kafka-host @local))
+                                  @known-hosts)]
+                 ^{:key host}
+                 [:div.known-host
+                  {:on-click (fn [_]
+                               (swap! local assoc-in [:kafka-host] host)
+                               (subscribe))}
+                  host])])]
            (let [cnt @count]
              (when (pos? cnt)
                [:div.cnt [:strong cnt] " messages analyzed"]))]
