@@ -29,9 +29,66 @@
 (reg-sub :prev-cmps (fn [db _] (:components (:cmps-msgs-prev db))))
 (reg-sub :frozen (fn [db _] (:components (:frozen db))))
 (reg-sub :cmp-ids (fn [db _] (:cmp-ids (:cmps-msgs db))))
+(reg-sub :msg-types (fn [db _] (:msg-types (:cmps-msgs db))))
 (reg-sub :edges (fn [db _] (:edges (:cmps-msgs db))))
 (reg-sub :cnt (fn [db _] (-> db :cmps-msgs :cnt)))
 (reg-sub :db-counter (fn [db _] (-> db :db-counter)))
+
+(defn msg-types [put-fn]
+  (let [msg-types (subscribe [:msg-types])
+        active-type (subscribe [:active-type])
+        sort-fns {:by-name first
+                  :by-cnt  last}
+        local (r/atom {:sort      :by-cnt
+                       :search    ""
+                       :ascending true})
+        input-fn (fn [ev]
+                   (let [s (-> ev .-nativeEvent .-target .-value)]
+                     (swap! local assoc-in [:search] s)))]
+    (fn msg-types-render [put-fn]
+      (let [active-type @active-type
+            sort-fn (get sort-fns (:sort @local))
+            filtered (filter (fn [[k _]] (s/includes? (str k) (:search @local)))
+                             @msg-types)
+            sorted (sort-by sort-fn filtered)
+            sorted (if (:ascending @local) sorted (reverse sorted))]
+        [:div.msg-types
+         [:input {:type      :text
+                  :on-change input-fn
+                  :value     (:search @local)}]
+         [:table
+          [:tbody
+           [:tr
+            [:th
+             "message type"
+             [:span.fa {:class    (str (if (:ascending @local)
+                                         "fa-sort-alpha-asc"
+                                         "fa-sort-alpha-desc")
+                                       (when (= :by-name (:sort @local))
+                                         " sort-active"))
+                        :on-click #(do
+                                     (swap! local assoc :sort :by-name)
+                                     (swap! local update :ascending not))}]]
+            [:th
+             [:span.fa {:class    (str (if (:ascending @local)
+                                         "fa-sort-amount-asc"
+                                         "fa-sort-amount-desc")
+                                       (when (= :by-cnt (:sort @local))
+                                         " sort-active"))
+                        :on-click #(do
+                                     (swap! local assoc :sort :by-cnt)
+                                     (swap! local update :ascending not))}]]]
+           (for [[msg-type cnt] sorted]
+             ^{:key (str msg-type)}
+             [:tr {:on-click #(let [subscription {:msg-type msg-type}]
+                                (if (= msg-type active-type)
+                                  (put-fn [:observer/stop])
+                                  (put-fn [:observer/subscribe subscription]))
+                                (put-fn [:svg/set-active msg-type])
+                                (put-fn [:cell/active msg-type]))}
+              [:td.cmp-id {:class (when (= msg-type active-type) "active")}
+               (str msg-type)]
+              [:td.cnt cnt]])]]]))))
 
 (defn re-frame-ui [put-fn]
   (let [cmp-ids (subscribe [:cmp-ids])
@@ -88,10 +145,12 @@
          [gv/wiring-view put-fn]]
         [:div.col-2
          (when @cmp-ids
-           [:div.section
-            (for [cmp-id @cmp-ids]
-              ^{:key (str cmp-id)}
-              [uc/component-table cmp-id put-fn])])
+           [:div.section.msg-cmp
+            [msg-types put-fn]
+            [:div
+             (for [cmp-id @cmp-ids]
+               ^{:key (str cmp-id)}
+               [uc/component-table cmp-id put-fn])]])
          [:div
           [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
           [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]]

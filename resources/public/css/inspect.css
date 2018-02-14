@@ -350,7 +350,7 @@ a .toggle {
   .observer .tables table {
     background-color: white;
     margin: 0 1em 0 0;
-    min-width: 270px;
+    min-width: 220px;
     line-height: 1em;
     font-family: monospace;
     font-size: 0.8em;
@@ -379,7 +379,7 @@ a .toggle {
   width: 3840px;
   grid-gap: 10px;
   grid-template-rows: 80px calc(100vh - 100px);
-  grid-template-columns: 1000px 600px 600px 1000px 600px 600px 600px; }
+  grid-template-columns: 1000px 800px 600px 1000px 600px 600px 600px; }
 
 .grid .menu {
   grid-column: 1/8;
@@ -431,3 +431,45 @@ a .toggle {
   .known-hosts .known-host {
     padding: 5px;
     cursor: pointer; }
+
+.msg-cmp {
+  display: flex;
+  flex-direction: row; }
+  .msg-cmp .msg-types {
+    padding-right: 30px;
+    white-space: nowrap; }
+    .msg-cmp .msg-types input {
+      margin-bottom: 20px;
+      width: 180px; }
+    .msg-cmp .msg-types table {
+      background-color: white;
+      margin: 0 1em 0 0;
+      min-width: 220px;
+      line-height: 1em;
+      font-family: monospace;
+      font-size: 0.8em;
+      cursor: pointer; }
+      .msg-cmp .msg-types table tr:nth-child(even) {
+        background-color: #eff9fc; }
+      .msg-cmp .msg-types table td {
+        min-width: 20px; }
+        .msg-cmp .msg-types table td ul {
+          margin: 0; }
+        .msg-cmp .msg-types table td.dir {
+          width: 30px; }
+        .msg-cmp .msg-types table td.cmp-id {
+          min-width: 170px; }
+      .msg-cmp .msg-types table .cnt {
+        text-align: end;
+        padding-right: 5px;
+        background-color: white; }
+      .msg-cmp .msg-types table .changed {
+        font-weight: bold;
+        background-color: orange; }
+    .msg-cmp .msg-types th {
+      user-select: none; }
+    .msg-cmp .msg-types .fa {
+      padding: 5px 10px;
+      color: #AAA; }
+      .msg-cmp .msg-types .fa.sort-active {
+        color: #006c91; }

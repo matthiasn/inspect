@@ -182,7 +182,7 @@ h1, h2, h3, h4, h5, h6 {
     table {
       background-color: white;
       margin: 0 1em 0 0;
-      min-width: 270px;
+      min-width: 220px;
       line-height: 1em;
       font-family: monospace;
       font-size: 0.8em;
@@ -229,7 +229,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 3840px;
     grid-gap: 10px;
     grid-template-rows: 80px calc(100vh - 100px);
-    grid-template-columns: 1000px 600px 600px 1000px 600px 600px 600px;
+    grid-template-columns: 1000px 800px 600px 1000px 600px 600px 600px;
   }
 
   .menu {
@@ -290,5 +290,73 @@ h1, h2, h3, h4, h5, h6 {
   .known-host {
     padding: 5px;
     cursor: pointer;
+  }
+}
+
+.msg-cmp {
+  display: flex;
+  flex-direction: row;
+
+  .msg-types {
+    padding-right: 30px;
+    white-space: nowrap;
+
+    input {
+      margin-bottom: 20px;
+      width: 180px;
+    }
+
+    table {
+      background-color: white;
+      margin: 0 1em 0 0;
+      min-width: 220px;
+      line-height: 1em;
+      font-family: monospace;
+      font-size: 0.8em;
+      cursor: pointer;
+
+      tr:nth-child(even) {
+        background-color: lighten($hashtag-blue, 40%);
+      }
+
+      td {
+        min-width: 20px;
+
+        ul {
+          margin: 0;
+        }
+
+        &.dir {
+          width: 30px;
+        }
+        &.cmp-id {
+          min-width: 170px;
+        }
+      }
+
+      .cnt {
+        text-align: end;
+        padding-right: 5px;
+        background-color: white;
+      }
+
+      .changed {
+        font-weight: bold;
+        background-color: orange;
+        //transition: background-color 1s;
+      }
+    }
+
+    th {
+      user-select: none;
+    }
+
+    .fa {
+      padding: 5px 10px;
+      color: #AAA;
+      &.sort-active {
+        color: #006c91;
+      }
+    }
   }
 }

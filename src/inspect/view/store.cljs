@@ -1,19 +1,18 @@
 (ns inspect.view.store
-  (:require [taoensso.timbre :as timbre :refer-macros [info debug]]
+  (:require [taoensso.timbre :refer-macros [info debug]]
             [linked.core :as linked]
             [clojure.data.avl :as avl]
-            [matthiasn.systems-toolbox.component :as stc]
             [inspect.view.util :as u]))
 
-(defn cmps-msgs [{:keys [current-state msg msg-type msg-meta msg-payload]}]
+(defn cmps-msgs [{:keys [current-state msg-payload]}]
   (let [prev (:cmps-msgs current-state)
         new-state (-> current-state
                       (assoc-in [:cmps-msgs] msg-payload)
                       (assoc-in [:cmps-msgs-prev] prev))]
-    (debug "Received:" msg-payload)
+    (info "Received:" (keys msg-payload))
     {:new-state new-state}))
 
-(defn freeze [{:keys [current-state msg msg-type msg-meta msg-payload]}]
+(defn freeze [{:keys [current-state msg]}]
   (let [prev (:cmps-msgs current-state)
         new-state (assoc-in current-state [:frozen] prev)]
     (info msg)

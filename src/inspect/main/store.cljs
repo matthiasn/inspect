@@ -7,7 +7,7 @@
   (let [state (atom {:stats {:count      0
                              :cmp-ids    #{}
                              :components {}
-                             :msg-types  #{}}})]
+                             :msg-types  {}}})]
     {:state state}))
 
 (defn firehose-msg [{:keys [current-state msg-type msg-payload put-fn]}]
@@ -40,9 +40,9 @@
                       (update-in [:stats :cnt] inc)
                       (update-in [:stats :cmp-ids] conj cmp-id)
                       (update-in [:stats :components cmp-id in-out msg-type] inc-cnt)
+                      (update-in [:stats :msg-types msg-type] inc-cnt)
                       (update-in [:stats :edges] add-edge)
-                      (update-in [:stats :edges-by-type msg-type] add-edge)
-                      (update-in [:stats :msg-types] conj msg-type))
+                      (update-in [:stats :edges-by-type msg-type] add-edge))
         subscription (:subscription current-state)
         map-stats (fn [m]
                     (when (map? m)
