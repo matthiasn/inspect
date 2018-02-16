@@ -126,7 +126,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.8em;
   cursor: pointer;
   white-space: nowrap; }
-  .btn .fa {
+  .btn .fas {
     padding-right: 0.1em; }
 
 .save {
@@ -151,7 +151,7 @@ button {
   background-color: #4CAF50;
   border: none;
   color: white;
-  padding: 4px 12px 6px 12px;
+  padding: 5px 12px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -159,6 +159,8 @@ button {
   cursor: pointer;
   white-space: nowrap;
   outline: 0; }
+  button i {
+    margin-right: 6px; }
 
 .menu-new {
   background-color: #0078e7; }
@@ -302,9 +304,6 @@ a .toggle {
     .observer .msg-flow table .number, .observer .msg-flows table .number {
       text-align: right;
       font-weight: bold; }
-
-.observer .fa {
-  margin-right: 5px; }
 
 .observer .stop {
   background-color: #ca3c3c; }

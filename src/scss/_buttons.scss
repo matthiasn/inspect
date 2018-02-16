@@ -7,7 +7,7 @@
   cursor: pointer;
   white-space: nowrap;
 
-  .fa {
+  .fas {
     padding-right: 0.1em;
   }
 }
@@ -37,7 +37,7 @@ button {
   background-color: $green;
   border: none;
   color: white;
-  padding: 4px 12px 6px 12px;
+  padding: 5px 12px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -45,6 +45,10 @@ button {
   cursor: pointer;
   white-space: nowrap;
   outline: 0;
+
+  i {
+    margin-right: 6px;
+  }
 }
 
 .menu-new {

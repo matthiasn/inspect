@@ -123,9 +123,9 @@
                       :value     (:kafka-host @local)}]
              (if (contains? #{:starting :connected} (:status @kafka-status))
                [:button.stop {:on-click stop}
-                [:span.fa.fa-stop] "stop"]
+                [:i.fas.fa-stop] "stop"]
                [:button {:on-click subscribe}
-                [:span.fa.fa-play] "subscribe"])]
+                [:i.fas.fa-play] "subscribe"])]
             (when (and (:expanded @local) (not-empty @known-hosts))
               [:div.known-hosts
                (for [host (filter #(s/includes? % (:kafka-host @local))
@@ -152,8 +152,8 @@
                ^{:key (str cmp-id)}
                [uc/component-table cmp-id put-fn])]])
          [:div
-          [:button.freeze {:on-click freeze} [:span.fa.fa-bolt] "freeze"]
-          [:button.clear {:on-click clear} [:span.fa.fa-trash] "clear"]]]
+          [:button.freeze {:on-click freeze} [:i.fas.fa-bolt] "freeze"]
+          [:button.clear {:on-click clear} [:i.fas.fa-trash] "clear"]]]
         [:div.col-3
          [um/matches put-fn]]
         [:div.col-4
