@@ -9,8 +9,7 @@ This Electron-based application lets you look inside systems built with the **[s
 
 If you don't want to build this application yourself, you can download an already packaged application:
 
-* **[Mac](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.59.dmg)**
-* **[Linux](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.59-x86_64.AppImage)**
+* **[Mac](https://s3.eu-central-1.amazonaws.com/matthiasn-inspect/inspect-0.2.63.dmg)**
 
 The Mac version will notify you when there's an update. For Linux, that feature is still missing, unfortunately. If you believe that should be different, maybe you can help out with the [electron-builder](https://github.com/electron-userland/electron-builder/issues/1138) project.
 
