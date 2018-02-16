@@ -1,6 +1,6 @@
 {
   "name": "inspect",
-  "version": "0.2.65",
+  "version": "0.2.66",
   "description": "a tool for inspecting systems-toolbox based systems",
   "main": "prod/main/main.js",
   "scripts": {
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/matthiasn/inspect",
   "dependencies": {
     "@cljs-oss/module-deps": "^1.1.1",
+    "@fortawesome/fontawesome-free-webfonts": "^1.0.3",
     "asar": "0.14.0",
     "cookie-parser": "^1.4.3",
     "d3": "^4.10.2",
@@ -31,7 +32,6 @@
     "electron-fetch": "1.1.0",
     "electron-log": "2.2.14",
     "electron-updater": "2.20.1",
-    "@fortawesome/fontawesome": "^1.1.3",
     "moment": "^2.20.1",
     "neon-sled": "0.1.3",
     "npid": "^0.4.0",
