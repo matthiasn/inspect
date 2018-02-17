@@ -111,68 +111,69 @@
         freeze #(put-fn [:state/freeze])
         clear #(put-fn [:state/clear])]
     (fn [_]
-      [:div.grid.observer
-       [:div.wrapper
-        [:div.menu
-         [:div.section
-          [:div.header
-           [:div.hosts
-            [:div.host-input
-             [:input {:type      :text
-                      :on-change input-fn
-                      :value     (:kafka-host @local)}]
-             (if (contains? #{:starting :connected} (:status @kafka-status))
-               [:button.stop {:on-click stop}
-                [:i.fas.fa-stop] "stop"]
-               [:button {:on-click subscribe}
-                [:i.fas.fa-play] "subscribe"])]
-            (when (and (:expanded @local) (not-empty @known-hosts))
-              [:div.known-hosts
-               (for [host (filter #(s/includes? % (:kafka-host @local))
-                                  @known-hosts)]
-                 ^{:key host}
-                 [:div.known-host
-                  {:on-click (fn [_]
-                               (swap! local assoc-in [:kafka-host] host)
-                               (subscribe))}
-                  host])])]
-           (let [cnt @count]
-             (when (pos? cnt)
-               [:div.cnt [:strong cnt] " messages analyzed"]))]
-          [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
-           (:text @kafka-status)]]]
-        [:div.col-1
-         [gv/wiring-view put-fn]]
-        [:div.col-2
-         (when @cmp-ids
-           [:div.section.msg-cmp
-            [msg-types put-fn]
-            [:div
-             (for [cmp-id @cmp-ids]
-               ^{:key (str cmp-id)}
-               [uc/component-table cmp-id put-fn])]])
-         [:div
-          [:button.freeze {:on-click freeze} [:i.fas.fa-bolt] "freeze"]
-          [:button.clear {:on-click clear} [:i.fas.fa-trash] "clear"]]]
-        [:div.col-3
-         [um/matches put-fn]]
-        [:div.col-4
-         [gv/flow-graph put-fn]]
-        [:div.col-5
-         [uf/msg-flow put-fn]]
-        [:div.col-6
-         [ud/detailed-msg put-fn]]
-        [:div.col-7.spec-errors
-         [:h2 "Spec Validation Errors"]
-         (for [err @spec-errors]
-           (let [{:keys [firehose-id msg spec-error]} err
-                 click #(put-fn [:sled/get {:k firehose-id}])]
-             ^{:key firehose-id}
-             [:div {:on-click click}
-              [:div.header
-               [:time (u/format-time (:ts err))]
-               (str (first msg))]
-              [:pre [:code spec-error]]]))]]])))
+      (let [entered (:kafka-host @local)
+            hosts (filter #(s/includes? % entered) @known-hosts)]
+        [:div.grid.observer
+         [:div.wrapper
+          [:div.menu
+           [:div.section
+            [:div.header
+             [:div.hosts
+              [:div.host-input
+               [:input {:type      :text
+                        :on-change input-fn
+                        :value     (:kafka-host @local)}]
+               (if (contains? #{:starting :connected} (:status @kafka-status))
+                 [:button.stop {:on-click stop}
+                  [:i.fas.fa-stop] "stop"]
+                 [:button {:on-click subscribe}
+                  [:i.fas.fa-play] "subscribe"])]
+              (when (and (:expanded @local) (not-empty @known-hosts))
+                [:div.known-hosts
+                 (for [host hosts]
+                   ^{:key host}
+                   [:div.known-host
+                    {:on-click (fn [_]
+                                 (swap! local assoc-in [:kafka-host] host)
+                                 (subscribe))}
+                    host])])]
+             (let [cnt @count]
+               (when (pos? cnt)
+                 [:div.cnt [:strong cnt] " messages analyzed"]))]
+            [:div.status {:class (when (= :error (:status @kafka-status)) "error")}
+             (:text @kafka-status)]]]
+          [:div.col-1
+           [gv/wiring-view put-fn]]
+          [:div.col-2
+           (when @cmp-ids
+             [:div.section.msg-cmp
+              [msg-types put-fn]
+              [:div
+               (for [cmp-id @cmp-ids]
+                 ^{:key (str cmp-id)}
+                 [uc/component-table cmp-id put-fn])]])
+           [:div
+            [:button.freeze {:on-click freeze} [:i.fas.fa-bolt] "freeze"]
+            [:button.clear {:on-click clear} [:i.fas.fa-trash] "clear"]]]
+          [:div.col-3
+           [um/matches put-fn]]
+          [:div.col-4
+           [gv/flow-graph put-fn]]
+          [:div.col-5
+           [uf/msg-flow put-fn]]
+          [:div.col-6
+           [ud/detailed-msg put-fn]]
+          [:div.col-7.spec-errors
+           [:h2 "Spec Validation Errors"]
+           (for [err @spec-errors]
+             (let [{:keys [firehose-id msg spec-error]} err
+                   click #(put-fn [:sled/get {:k firehose-id}])]
+               ^{:key firehose-id}
+               [:div {:on-click click}
+                [:div.header
+                 [:time (u/format-time (:ts err))]
+                 (str (first msg))]
+                [:pre [:code spec-error]]]))]]]))))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the
