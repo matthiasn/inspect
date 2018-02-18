@@ -28,6 +28,14 @@
     (info "activated" (:active-type new-state))
     {:new-state new-state}))
 
+(defn active-cmps [{:keys [current-state msg-payload]}]
+  (let [active #(if (contains? % msg-payload)
+                  (disj % msg-payload)
+                  (conj % msg-payload))
+        new-state (update-in current-state [:active-cmps] active)]
+    (info "active components" (:active-cmps new-state))
+    {:new-state new-state}))
+
 (defn kafka-status [{:keys [current-state msg-payload]}]
   (let [new-state (assoc-in current-state [:kafka-status] msg-payload)]
     (debug msg-payload)
@@ -105,9 +113,11 @@
    :state-fn    (fn [_] {:state (atom {:ordered-msgs (linked/map)
                                        :flows        (linked/map)
                                        :db-counter   0
+                                       :active-cmps  #{}
                                        :avl-map      (avl/sorted-map)})})
    :handler-map {:observer/cmps-msgs cmps-msgs
                  :cell/active        cell-active
+                 :cmp/active         active-cmps
                  :state/freeze       freeze
                  :state/clear        clear
                  :flow/show          show-flow

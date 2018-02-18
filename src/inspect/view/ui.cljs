@@ -23,6 +23,7 @@
 (reg-sub :show-flow (fn [db _] (:show-flow db)))
 (reg-sub :ordered-msgs (fn [db _] (:ordered-msgs db)))
 (reg-sub :active-type (fn [db _] (:active-type db)))
+(reg-sub :active-cmps (fn [db _] (:active-cmps db)))
 (reg-sub :kafka-status (fn [db _] (:kafka-status db)))
 (reg-sub :known-hosts (fn [db _] (:known-hosts db)))
 (reg-sub :components (fn [db _] (:components (:cmps-msgs db))))
@@ -48,7 +49,7 @@
     (fn msg-types-render [put-fn]
       (let [active-type @active-type
             sort-fn (get sort-fns (:sort @local))
-            filtered (filter (fn [[k _]] (s/includes? (str k) (:search @local)))
+            filtered (filter (fn [[k _]] (s/includes? (str k) (:search @local "")))
                              @msg-types)
             sorted (sort-by sort-fn filtered)
             sorted (if (:ascending @local) sorted (reverse sorted))]
@@ -61,23 +62,23 @@
            [:tr
             [:th
              "message type"
-             [:span.fa {:class    (str (if (:ascending @local)
-                                         "fa-sort-alpha-asc"
-                                         "fa-sort-alpha-desc")
-                                       (when (= :by-name (:sort @local))
-                                         " sort-active"))
-                        :on-click #(do
-                                     (swap! local assoc :sort :by-name)
-                                     (swap! local update :ascending not))}]]
+             [:i.fas {:class    (str (if (:ascending @local)
+                                       "fa-sort-alpha-down"
+                                       "fa-sort-alpha-up")
+                                     (when (= :by-name (:sort @local))
+                                       " sort-active"))
+                      :on-click #(do
+                                   (swap! local assoc :sort :by-name)
+                                   (swap! local update :ascending not))}]]
             [:th
-             [:span.fa {:class    (str (if (:ascending @local)
-                                         "fa-sort-amount-asc"
-                                         "fa-sort-amount-desc")
-                                       (when (= :by-cnt (:sort @local))
-                                         " sort-active"))
-                        :on-click #(do
-                                     (swap! local assoc :sort :by-cnt)
-                                     (swap! local update :ascending not))}]]]
+             [:i.fas {:class    (str (if (:ascending @local)
+                                       "fa-sort-amount-down"
+                                       "fa-sort-amount-up")
+                                     (when (= :by-cnt (:sort @local))
+                                       " sort-active"))
+                      :on-click #(do
+                                   (swap! local assoc :sort :by-cnt)
+                                   (swap! local update :ascending not))}]]]
            (for [[msg-type cnt] sorted]
              ^{:key (str msg-type)}
              [:tr {:on-click #(let [subscription {:msg-type msg-type}]
@@ -90,12 +91,50 @@
                (str msg-type)]
               [:td.cnt cnt]])]]]))))
 
+(defn component-filter [put-fn]
+  (let [cmp-ids (subscribe [:cmp-ids])
+        active-cmps (subscribe [:active-cmps])
+        local (r/atom {:search    ""
+                       :ascending true})
+        input-fn (fn [ev]
+                   (let [s (-> ev .-nativeEvent .-target .-value)]
+                     (swap! local assoc-in [:search] s)))]
+    (fn component-filter-render [put-fn]
+      (let [active-cmps @active-cmps
+            filtered (filter (fn [k] (s/includes? (str k) (:search @local "")))
+                             @cmp-ids)
+            sorted (sort filtered)
+            sorted (if (:ascending @local) sorted (reverse sorted))]
+        [:div.msg-types
+         [:input {:type      :text
+                  :on-change input-fn
+                  :value     (:search @local)}]
+         [:table
+          [:tbody
+           [:tr
+            [:th
+             "Components"
+             [:i.fas {:class    (str (if (:ascending @local)
+                                       "fa-sort-alpha-down"
+                                       "fa-sort-alpha-up")
+                                     (when (= :by-name (:sort @local))
+                                       " sort-active"))
+                      :on-click #(do
+                                   (swap! local assoc :sort :by-name)
+                                   (swap! local update :ascending not))}]]]
+           (for [cmp-id sorted]
+             ^{:key (str cmp-id)}
+             [:tr {:on-click #(put-fn [:cmp/active cmp-id])}
+              [:td.cmp-id {:class (when (contains? active-cmps cmp-id) "active")}
+               (str cmp-id)]])]]]))))
+
 (defn re-frame-ui [put-fn]
   (let [cmp-ids (subscribe [:cmp-ids])
         count (subscribe [:cnt])
         spec-errors (subscribe [:spec-errors])
         kafka-status (subscribe [:kafka-status])
         known-hosts (subscribe [:known-hosts])
+        active-cmps (subscribe [:active-cmps])
         local (r/atom {:kafka-host ""
                        :expanded   true})
         input-fn (fn [ev]
@@ -147,11 +186,17 @@
           [:div.col-2
            (when @cmp-ids
              [:div.section.msg-cmp
-              [msg-types put-fn]
-              [:div
-               (for [cmp-id @cmp-ids]
-                 ^{:key (str cmp-id)}
-                 [uc/component-table cmp-id put-fn])]])
+              [:div.filters
+               [component-filter put-fn]
+               [msg-types put-fn]]
+              (let [filtered (if (not-empty @active-cmps)
+                               @active-cmps
+                               @cmp-ids)
+                    sorted (sort filtered)]
+                [:div
+                 (for [cmp-id sorted ]
+                   ^{:key (str cmp-id)}
+                   [uc/component-table cmp-id put-fn])])])
            [:div
             [:button.freeze {:on-click freeze} [:i.fas.fa-bolt] "freeze"]
             [:button.clear {:on-click clear} [:i.fas.fa-trash] "clear"]]]

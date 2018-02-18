@@ -438,7 +438,8 @@ a .toggle {
     padding-right: 30px;
     white-space: nowrap; }
     .msg-cmp .msg-types input {
-      margin-bottom: 20px;
+      margin-top: 20px;
+      margin-bottom: 2px;
       width: 180px; }
     .msg-cmp .msg-types table {
       background-color: white;
@@ -467,8 +468,8 @@ a .toggle {
         background-color: orange; }
     .msg-cmp .msg-types th {
       user-select: none; }
-    .msg-cmp .msg-types .fa {
+    .msg-cmp .msg-types .fas {
       padding: 5px 10px;
       color: #AAA; }
-      .msg-cmp .msg-types .fa.sort-active {
+      .msg-cmp .msg-types .fas.sort-active {
         color: #006c91; }
