@@ -245,7 +245,7 @@ a .toggle {
   font-size: 0.9em; }
 
 #graphviz1 svg, #graphviz2 svg {
-  max-width: 880px; }
+  max-width: 1000px; }
 
 .flex {
   display: flex; }

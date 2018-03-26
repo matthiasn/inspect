@@ -20,7 +20,8 @@
         msg-flow (subscribe [:show-flow])
         flows (subscribe [:flows])
         active-type (subscribe [:active-type])
-        older-than (reaction (->> (avl/subrange @avl-map < (:ts @local))
+        older-than (reaction (->> @avl-map
+                                  ;(avl/subrange @avl-map < (:ts @local))
                                   (map second)
                                   (apply concat)
                                   (map second)))

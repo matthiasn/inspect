@@ -1,10 +1,10 @@
 (defproject matthiasn/inspect "0.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.9.0"]
-                 [org.clojure/clojurescript "1.9.946"]
+                 [org.clojure/clojurescript "1.10.238"]
                  [reagent "0.8.0-alpha2" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [re-frame "0.10.4"]
+                 [re-frame "0.10.5"]
                  [com.taoensso/timbre "4.10.0"]
-                 [matthiasn/systems-toolbox "0.6.33"]
+                 [matthiasn/systems-toolbox "0.6.34"]
                  [matthiasn/systems-toolbox-electron "0.6.22"]
                  [timbre-ns-pattern-level "0.1.2"]
                  [org.clojure/data.avl "0.0.17"]

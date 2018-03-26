@@ -1,6 +1,6 @@
 {
   "name": "inspect",
-  "version": "0.2.68",
+  "version": "0.2.69",
   "description": "a tool for inspecting systems-toolbox based systems",
   "main": "prod/main/main.js",
   "scripts": {
@@ -39,16 +39,16 @@
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "s": "^0.1.1",
-    "sinek": "^6.2.2",
+    "sinek": "6.15.0",
     "tcp-port-used": "^0.1.2",
-    "viz.js": "^1.8.0"
+    "viz.js": "^1.8.1"
   },
   "devDependencies": {
     "browser-resolve": "1.11.2",
-    "electron": "1.8.2",
+    "electron": "1.8.4",
     "electron-build-env": "0.2.0",
-    "electron-builder": "20.0.4",
-    "electron-publisher-s3": "20.0.2",
+    "electron-builder": "20.6.2",
+    "electron-publisher-s3": "20.7.0",
     "module-deps": "4.1.1",
     "neon-cli": "^0.1.22",
     "resolve": "1.5.0"
