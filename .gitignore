@@ -7,3 +7,5 @@ dev/
 resources/
 .sass-cache/
 *.log
+.DS_Store
+*.iml

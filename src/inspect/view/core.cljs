@@ -18,9 +18,9 @@
                    :sled/put
                    :sled/bench
                    :svg/set-active
-                   :kafka/start
-                   :kafka/stop
-                   :kafka/get-hosts
+                   :tail/start
+                   :tail/stop
+                   :tail/get-files
                    :observer/subscribe
                    :observer/stop
                    :window/close})
@@ -49,6 +49,6 @@
                           :to   :observer/ui}]
 
      [:cmd/send {:to  :observer/ipc
-                 :msg [:kafka/get-hosts]}]]))
+                 :msg [:tail/get-files]}]]))
 
 (.addEventListener js/window "load" #(start))

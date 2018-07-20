@@ -2,7 +2,7 @@
   (:require [cljs.spec.alpha :as s]
             [matthiasn.systems-toolbox.spec]))
 
-(s/def :kafka/start string?)
+(s/def :tail/start string?)
 (s/def :kafka/status map?)
 
 (s/def :observer/cmps-msgs map?)

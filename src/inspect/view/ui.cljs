@@ -142,9 +142,9 @@
                      (swap! local assoc-in [:kafka-host] address)))
         subscribe #(let [kafka-host (:kafka-host @local)]
                      (info :start kafka-host)
-                     (put-fn [:kafka/start kafka-host])
+                     (put-fn [:tail/start kafka-host])
                      (swap! local assoc-in [:expanded] false))
-        stop #(do (put-fn [:kafka/stop])
+        stop #(do (put-fn [:tail/stop])
                   (swap! local assoc-in [:expanded] true)
                   (swap! local assoc-in [:kafka-host] ""))
         freeze #(put-fn [:state/freeze])
