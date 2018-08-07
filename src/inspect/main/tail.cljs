@@ -1,4 +1,4 @@
-(ns inspect.main.kafka
+(ns inspect.main.tail
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [taoensso.timbre :refer-macros [info debug warn error]]
             [inspect.main.runtime :as rt]
@@ -75,8 +75,7 @@
   (try
     (stop msg-map)
     (put-fn [:kafka/status {:status :starting
-                            :text   (str "attempting to connect to "
-                                         msg-payload)}])
+                            :text   (str "attempting to read " msg-payload)}])
     (let [file msg-payload
           tail (new Tail file)]
       (info "Starting firehose file reader" file)

@@ -9,7 +9,7 @@
             [inspect.main.menu :as menu]
             [inspect.main.update :as upd]
             [inspect.main.graphviz :as gv]
-            [inspect.main.kafka :as kafka]
+            [inspect.main.tail :as kafka]
             [inspect.main.download :as dl]
             [inspect.main.store :as st]
             [inspect.main.sled :as db]

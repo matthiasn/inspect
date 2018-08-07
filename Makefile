@@ -1,7 +1,7 @@
 # OS detection adapted from: https://gist.github.com/sighingnow/deee806603ec9274fd47
 OSFLAG 	:=
 LEIN 	:=
-YARN := $(shell command -v yarn 2> /dev/null)
+NPM := $(shell command -v npm 2> /dev/null)
 JLINK := $(shell command -v jlink 2> /dev/null)
 
 ifeq ($(OS),Windows_NT)
@@ -28,8 +28,8 @@ build-deps:
 ifndef LEIN
 	$(error "Leiningen not found, please install from https://leiningen.org")
 endif
-ifndef YARN
-	$(error "yarn not found, please install from https://yarnpkg.com")
+ifndef NPM
+	$(error "npm not found, please install from https://nodejs.org")
 endif
 
 clean: build-deps
@@ -43,7 +43,7 @@ deps: clean
 
 npm-deps: clean
 	@echo Fetching NPM dependencies...
-	@yarn install
+	@npm install
 
 sass:
 	@echo Building CSS...
