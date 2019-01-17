@@ -3,7 +3,7 @@
             [matthiasn.systems-toolbox.spec]))
 
 (s/def :tail/start string?)
-(s/def :kafka/status map?)
+(s/def :reader/status map?)
 
 (s/def :observer/cmps-msgs map?)
 (s/def :observer/subscribe map?)

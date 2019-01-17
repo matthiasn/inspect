@@ -125,5 +125,5 @@
                  :sled/res           msg-res
                  :spec/error         spec-error
                  :svg/overview       svg-overview
-                 :kafka/hosts        save-hosts
-                 :kafka/status       kafka-status}})
+                 :reader/files        save-hosts
+                 :reader/status       kafka-status}})

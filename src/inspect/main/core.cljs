@@ -9,7 +9,7 @@
             [inspect.main.menu :as menu]
             [inspect.main.update :as upd]
             [inspect.main.graphviz :as gv]
-            [inspect.main.kafka :as kafka]
+            [inspect.main.reader :as kafka]
             [inspect.main.download :as dl]
             [inspect.main.store :as st]
             [inspect.main.sled :as db]
@@ -26,8 +26,8 @@
 
 (def wm-relay #{:exec/js
                 :import/listen
-                :kafka/status
-                :kafka/hosts
+                :reader/status
+                :reader/files
                 :subscription/match
                 :spec/error
                 :update/status

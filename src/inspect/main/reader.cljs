@@ -1,4 +1,4 @@
-(ns inspect.main.kafka
+(ns inspect.main.reader
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [taoensso.timbre :refer-macros [info debug warn error]]
             [inspect.main.runtime :as rt]
@@ -17,8 +17,8 @@
         err-handler (fn [title content]
                       (error "showErrorBox" title content)
                       (when (str/includes? content "ETIMEDOUT")
-                        (put-fn [:kafka/status {:status :error
-                                                :text   "connection timeout"}])))]
+                        (put-fn [:reader/status {:status :error
+                                                 :text   "connection timeout"}])))]
     (aset dialog "showErrorBox" err-handler)
     {:state state}))
 
@@ -26,26 +26,26 @@
   (when-let [tail (:tail current-state)]
     (info "stopping consumer")
     (swap! cmp-state assoc-in [:count] 0)
-    (put-fn [:kafka/status {:status :stopped :text "stopped"}])
+    (put-fn [:reader/status {:status :stopped :text "stopped"}])
     (put-fn [:observer/stop])
     (.unwatch tail)))
 
-(def hosts-file (str (:user-data rt/runtime-info) "/kafka-hosts.edn"))
+(def files-history (str (:user-data rt/runtime-info) "/files_history.edn"))
 
 (defn read-known-files []
-  (if (existsSync hosts-file)
-    (edn/read-string (readFileSync hosts-file "utf-8"))
+  (if (existsSync files-history)
+    (edn/read-string (readFileSync files-history "utf-8"))
     #{}))
 
 (defn add-file [kafka-host]
   (let [known-hosts (read-known-files)
         updated (conj known-hosts kafka-host)]
-    (writeFileSync hosts-file (pr-str updated) "utf-8")))
+    (writeFileSync files-history (pr-str updated) "utf-8")))
 
 (defn get-known-files [_]
   (let [hosts (read-known-files)]
     (info "read known hosts" hosts)
-    {:emit-msg [:kafka/hosts hosts]}))
+    {:emit-msg [:reader/files hosts]}))
 
 (defn on-line [cmp-state put-chan put-fn]
   (fn [data]
@@ -62,7 +62,7 @@
                 duration (- now last-ts)
                 per-sec (Math/floor (/ 100 (/ duration 1000)))]
             (swap! cmp-state assoc-in [:last-ts] now)
-            (put-fn [:kafka/status
+            (put-fn [:reader/status
                      {:status :connected
                       :text   (str per-sec " msg/s")}])
             (info "Messages received:" cnt
@@ -74,9 +74,8 @@
   (info "Tailing" msg-payload)
   (try
     (stop msg-map)
-    (put-fn [:kafka/status {:status :starting
-                            :text   (str "attempting to connect to "
-                                         msg-payload)}])
+    (put-fn [:reader/status {:status :starting
+                             :text   (str "attempting to read " msg-payload)}])
     (let [file msg-payload
           tail (new Tail file)]
       (info "Starting firehose file reader" file)
@@ -86,7 +85,7 @@
       (add-file file)
       {:new-state (assoc-in current-state [:tail] tail)})
     (catch :default e (do (error "start fn" e)
-                          {:emit-msg [:kafka/status
+                          {:emit-msg [:reader/status
                                       {:status :error
                                        :text   "Firehose Reader Error"}]}))))
 

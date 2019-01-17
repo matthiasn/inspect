@@ -266,11 +266,19 @@ a .toggle {
 .observer .header {
   display: flex;
   margin-bottom: 10px; }
+  .observer .header .host-input {
+    display: flex; }
   .observer .header input {
     height: 28px;
     width: 320px;
     border: 0;
-    outline: none; }
+    outline: none;
+    padding-left: 6px;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px; }
+  .observer .header button {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px; }
   .observer .header .cnt {
     padding: 8px 20px; }
 
