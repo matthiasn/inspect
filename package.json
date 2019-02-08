@@ -1,6 +1,6 @@
 {
   "name": "inspect",
-  "version": "0.2.74",
+  "version": "0.2.75",
   "description": "a tool for inspecting systems-toolbox based systems",
   "main": "prod/main/main.js",
   "scripts": {
@@ -25,6 +25,7 @@
     "always-tail": "^0.2.0",
     "asar": "0.14.6",
     "cookie-parser": "^1.4.3",
+    "create-react-class": "^15.6.3",
     "d3": "^4.10.2",
     "d3-ellipse-force": "^0.1.1",
     "d3-force": "^1.0.6",
