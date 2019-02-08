@@ -2,8 +2,7 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.10.516"]
                  [re-frame "0.10.6"]
-                 [reagent "0.8.1"
-                  :exclusions [cljsjs/react cljsjs/react-dom]]
+                 [reagent "0.8.1"]
                  [com.taoensso/timbre "4.10.0"]
                  [matthiasn/systems-toolbox "0.6.38"]
                  [matthiasn/systems-toolbox-electron "0.6.29"]
