@@ -22,6 +22,6 @@
               :resources-path rp
               :app-path       app-path}]
     (into {:index-page (if repo-dir
-                         "./view-dev.html"
-                         "/view.html")}
+                         "./resources/view-dev.html"
+                         "/resources/view.html")}
           (map (fn [[k v]] [k (normalize v)]) info))))

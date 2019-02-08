@@ -1,7 +1,9 @@
 (defproject matthiasn/inspect "0.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.10.0"]
-                 [org.clojure/clojurescript "1.10.339"]
+                 [org.clojure/clojurescript "1.10.516"]
                  [re-frame "0.10.6"]
+                 [reagent "0.8.1"
+                  :exclusions [cljsjs/react cljsjs/react-dom]]
                  [com.taoensso/timbre "4.10.0"]
                  [matthiasn/systems-toolbox "0.6.38"]
                  [matthiasn/systems-toolbox-electron "0.6.29"]
@@ -28,7 +30,7 @@
                     ["sass4clj" "once"]]}
 
   :cljsbuild {:builds [{:id           "main"
-                        :source-paths ["src/inspect/specs" "src/inspect/main"]
+                        :source-paths ["src/cljs"]
                         :compiler     {:main           inspect.main.core
                                        :target         :nodejs
                                        :output-to      "prod/main/main.js"
@@ -39,7 +41,7 @@
                                        :language-out   :ecmascript5
                                        :parallel-build true}}
                        {:id           "view"
-                        :source-paths ["src/inspect/specs" "src/inspect/view"]
+                        :source-paths ["src/cljs"]
                         :compiler     {:main           inspect.view.core
                                        :output-to      "prod/view/core.js"
                                        :target         :nodejs
@@ -48,16 +50,17 @@
                                        :optimizations  :simple
                                        :parallel-build true}}
                        {:id           "view-dev"
-                        :source-paths ["src/inspect/specs" "src/inspect/view"]
+                        :source-paths ["src/cljs"]
                         :compiler     {:main           inspect.view.core
                                        :output-to      "dev/view/core.js"
                                        :target         :nodejs
                                        :output-dir     "dev/view"
                                        :source-map     true
+                                       :npm-deps       true
                                        :optimizations  :none
                                        :parallel-build true}}
                        {:id           "updater"
-                        :source-paths ["src/inspect/specs" "src/inspect/update"]
+                        :source-paths ["src/cljs"]
                         :compiler     {:main           inspect.update.core
                                        :output-to      "prod/updater/update.js"
                                        :target         :nodejs
