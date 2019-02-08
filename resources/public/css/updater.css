@@ -1,0 +1,148 @@
+body {
+  color: #576364;
+  background-color: #94a4b5;
+  font-size: 12px;
+  font-weight: 300;
+  font-family: "Lato", sans-serif;
+  overflow: hidden; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Oswald", "Lato", sans-serif; }
+
+.flex-container {
+  display: flex;
+  flex-flow: column;
+  height: 100vh; }
+
+.updater {
+  padding: 1em; }
+  .updater .info {
+    padding: 1em 0 2em 0; }
+
+.btn {
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  cursor: pointer;
+  white-space: nowrap; }
+  .btn .fas {
+    padding-right: 0.1em; }
+
+.save {
+  height: 15px; }
+
+.not-saved {
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  background-color: #ca3c3c;
+  cursor: pointer; }
+
+.link-btn {
+  padding: 0 5px;
+  color: white;
+  font-size: 0.8em;
+  background-color: #4CAF50;
+  cursor: pointer;
+  white-space: nowrap; }
+
+button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 5px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  outline: 0; }
+  button i {
+    margin-right: 6px; }
+
+.menu-new {
+  background-color: #0078e7; }
+
+.show-more-btn {
+  background-color: #1f8dd6;
+  color: whitesmoke;
+  font-size: 0.8em;
+  padding: 1px 5px; }
+
+.delete-warn {
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  cursor: pointer;
+  background-color: #ca3c3c; }
+
+.show-more {
+  padding: 20px 0; }
+
+a, a:visited {
+  text-decoration: none;
+  font-weight: 400;
+  color: #006c91;
+  outline: none !important; }
+
+.toggle {
+  padding: 2px;
+  margin-left: 4px;
+  cursor: pointer; }
+  .toggle.green {
+    color: #3d8b40; }
+
+.fa-thumbs-up, .fa-thumbs-down {
+  color: #006C91; }
+
+.inactive {
+  color: #AAA; }
+
+.hidden-comments {
+  color: red; }
+
+a .toggle {
+  color: #576364; }
+
+.upvotes {
+  vertical-align: super;
+  color: #006C91;
+  font-size: 0.7em;
+  line-height: 1.2em;
+  font-weight: bold;
+  padding: 0 2px 0 1px;
+  margin-left: 1px;
+  margin-bottom: 3px;
+  border: 1px solid #006C91;
+  border-radius: 2px; }
+
+.toggle-cmds {
+  margin-right: 30px; }
+
+.linked-tasks .filter {
+  background-color: #DDD;
+  color: #AAA;
+  font-size: 0.8em;
+  padding: 1px 5px;
+  margin: 0 2px 0 3px;
+  cursor: pointer; }
+
+.linked-tasks .current {
+  background-color: #1f8dd6;
+  color: whitesmoke; }
+
+.meter {
+  height: 16px;
+  position: relative;
+  background: #5d7186;
+  border-radius: 6px;
+  padding: 4px; }
+
+.meter > span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background-color: #4CAF50;
+  position: relative;
+  overflow: hidden; }

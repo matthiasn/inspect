@@ -1,0 +1,22 @@
+body {
+  color: #576364;
+  background-color: #94a4b5;
+  font-size: 12px;
+  font-weight: 300;
+  font-family: "Lato", sans-serif;
+  overflow: hidden; }
+
+.loader {
+  border: 8px solid #f6f6f6;
+  border-top: 8px solid #4CAF50;
+  border-radius: 50%;
+  margin: 20px;
+  width: 60px;
+  height: 60px;
+  animation: spin 2s linear infinite; }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(360deg); } }

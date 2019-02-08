@@ -5,7 +5,6 @@ dist/
 prod/
 dev/
 out/
-resources/
 .sass-cache/
 *.log
 .DS_Store
