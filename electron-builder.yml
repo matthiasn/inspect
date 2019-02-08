@@ -1,14 +1,16 @@
 appId: "matthiasn.inspect"
 asar: false
 files:
-    - "**/*"
-    - "package/**"
-    - "package/main/**"
-    - "package/render/**"
-    - "!bin/"
-    - "!node_modules/neon-sled/native/target/"
+    - "node_modules/**"
+    - "!node_modules/babel-runtime/**"
+    - "prod/**"
+    - "electron/**"
+    - "src/**"
+    - "resources/**"
+    - "doc/**"
 publish:
-    provider: "s3"
-    bucket: "matthiasn-inspect"
-    channel: "release"
-    acl: "public-read"
+    provider: "github"
+    owner: "matthiasn"
+    draft: true
+nsis:
+    differentialPackage: false

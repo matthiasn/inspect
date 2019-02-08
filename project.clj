@@ -1,8 +1,7 @@
 (defproject matthiasn/inspect "0.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.10.339"]
-                 [reagent "0.8.1"]
-                 [re-frame "0.10.5"]
+                 [re-frame "0.10.6"]
                  [com.taoensso/timbre "4.10.0"]
                  [matthiasn/systems-toolbox "0.6.38"]
                  [matthiasn/systems-toolbox-electron "0.6.29"]
@@ -33,8 +32,9 @@
                         :compiler     {:main           inspect.main.core
                                        :target         :nodejs
                                        :output-to      "prod/main/main.js"
-                                       :output-dir     "prod/main"
+                                       :output-dir     "out/main"
                                        :optimizations  :simple
+                                       :npm-deps       true
                                        :language-in    :ecmascript5
                                        :language-out   :ecmascript5
                                        :parallel-build true}}
@@ -43,7 +43,8 @@
                         :compiler     {:main           inspect.view.core
                                        :output-to      "prod/view/core.js"
                                        :target         :nodejs
-                                       :output-dir     "prod/view"
+                                       :npm-deps       true
+                                       :output-dir     "out/view"
                                        :optimizations  :simple
                                        :parallel-build true}}
                        {:id           "view-dev"
@@ -62,4 +63,5 @@
                                        :target         :nodejs
                                        :output-dir     "prod/updater"
                                        :optimizations  :simple
+                                       :npm-deps       true
                                        :parallel-build true}}]})

@@ -67,7 +67,7 @@
                       :text   (str per-sec " msg/s")}])
             (info "Messages received:" cnt
                   "-" per-sec "msg/s"))))
-      (catch :default e (error "Something went wrong" e)))))
+      (catch :default e (error "Something went wrong" e data)))))
 
 (defn start [{:keys [put-fn cmp-state put-chan current-state msg-payload]
               :as   msg-map}]

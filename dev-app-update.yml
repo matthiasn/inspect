@@ -1,3 +1,0 @@
-provider: s3
-bucket: matthiasn-inspect
-acl: public-read

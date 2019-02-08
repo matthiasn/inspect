@@ -1,8 +1,7 @@
 (ns inspect.view.ui.cmp
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [re-frame.core :refer [subscribe]]
-            [taoensso.timbre :as timbre :refer-macros [info debug]]
-            [inspect.view.util :as u]
+            [taoensso.timbre :refer-macros [info debug]]
             [cljs.pprint :as pp]))
 
 (defn cnt-cell
@@ -58,9 +57,7 @@
   (let [components (subscribe [:components])]
     (fn [cmp-id put-fn]
       [:div.cmp-table
-       [:h2
-        ;[:span.color {:style {:background-color (u/random-color cmp-id)}}]
-        (str cmp-id)]
+       [:h2 (str cmp-id)]
        [:div.tables
         [msg-table cmp-id :in put-fn]
         [msg-table cmp-id :out put-fn]]])))

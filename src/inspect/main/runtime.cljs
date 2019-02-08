@@ -16,11 +16,12 @@
         info {:platform       (.-platform process)
               :downloads      (.getPath app "downloads")
               :user-data      user-data
-              ;:dl-path        (join user-data "downloads")
               :bin-path       (join user-data "bin")
               :cwd            cwd
               :pid-file       (str user-data "/inspect.pid")
               :resources-path rp
               :app-path       app-path}]
-    (into {:index-page (if repo-dir "view-dev.html" "view.html")}
+    (into {:index-page (if repo-dir
+                         "./view-dev.html"
+                         "/view.html")}
           (map (fn [[k v]] [k (normalize v)]) info))))
