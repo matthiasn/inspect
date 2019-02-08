@@ -133,49 +133,16 @@
         count (subscribe [:cnt])
         spec-errors (subscribe [:spec-errors])
         kafka-status (subscribe [:kafka-status])
-        known-hosts (subscribe [:known-hosts])
         active-cmps (subscribe [:active-cmps])
-        local (r/atom {:kafka-host ""
-                       :expanded   true})
-        input-fn (fn [ev]
-                   (let [address (-> ev .-nativeEvent .-target .-value)]
-                     (swap! local assoc-in [:kafka-host] address)))
-        subscribe #(let [kafka-host (:kafka-host @local)]
-                     (info :start kafka-host)
-                     (put-fn [:tail/start kafka-host])
-                     (swap! local assoc-in [:expanded] false))
-        stop #(do (put-fn [:tail/stop])
-                  (swap! local assoc-in [:expanded] true)
-                  (swap! local assoc-in [:kafka-host] ""))
         freeze #(put-fn [:state/freeze])
         clear #(put-fn [:state/clear])]
     (fn [_]
-      (let [entered (:kafka-host @local)
-            hosts (filter #(s/includes? % entered) @known-hosts)]
+      (let []
         [:div.grid.observer
          [:div.wrapper
           [:div.menu
            [:div.section
             [:div.header
-             [:div.hosts
-              [:div.host-input
-               [:input {:type      :text
-                        :on-change input-fn
-                        :value     (:kafka-host @local)}]
-               (if (contains? #{:starting :connected} (:status @kafka-status))
-                 [:button.stop {:on-click stop}
-                  [:i.fas.fa-stop] "stop"]
-                 [:button {:on-click subscribe}
-                  [:i.fas.fa-play] "subscribe"])]
-              (when (and (:expanded @local) (not-empty @known-hosts))
-                [:div.known-hosts
-                 (for [host hosts]
-                   ^{:key host}
-                   [:div.known-host
-                    {:on-click (fn [_]
-                                 (swap! local assoc-in [:kafka-host] host)
-                                 (subscribe))}
-                    host])])]
              (let [cnt @count]
                (when (pos? cnt)
                  [:div.cnt [:strong cnt] " messages analyzed"]))]

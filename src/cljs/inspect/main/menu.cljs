@@ -1,8 +1,17 @@
 (ns inspect.main.menu
   (:require [taoensso.timbre :as timbre :refer-macros [info debug]]
-            [electron :refer [app Menu]]
+            [electron :refer [app Menu dialog]]
             [cljs.nodejs :as nodejs :refer [process]]
             [inspect.main.runtime :as rt]))
+
+(defn open-dialog [put-fn]
+  (let [options (clj->js {:properties  ["openFile"]
+                          :buttonLabel "Open"
+                          :filters     []})
+        callback (fn [res]
+                   (let [file (first (js->clj res))]
+                     (put-fn [:tail/start file])))]
+    (.showOpenDialog dialog options callback)))
 
 (defn state-fn [put-fn]
   (let [index-page (:index-page rt/runtime-info)
@@ -34,7 +43,9 @@
                      :accelerator "Cmd+Q"
                      :click       #(put-fn [:app/shutdown])}]}
          {:label   "File"
-          :submenu []}
+          :submenu [{:label       "Open File..."
+                     :accelerator "CmdOrCtrl+O"
+                     :click       #(open-dialog put-fn)}]}
          {:label   "Edit"
           :submenu [{:label       "Undo"
                      :accelerator "CmdOrCtrl+Z"
